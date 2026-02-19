@@ -1,22 +1,22 @@
+const objectMap = new Map<Function, (data: any) => boolean>([
+  [Map, (d: Map<unknown, unknown>) => d.size === 0],
+  [Set, (d: Set<unknown>) => d.size === 0],
+  [Blob, (d: Blob) => d.size === 0],
+  [FormData, (d: FormData) => d.keys().next().done === true],
+  [URL, () => false],
+  [Date, () => false],
+  [RegExp, () => false],
+]);
+
 const checkObjectEmptiness = (data: object): boolean => {
   if (Array.isArray(data)) {
     return data.length === 0;
   }
 
-  if (data instanceof Map || data instanceof Set) {
-    return data.size === 0;
-  }
-
-  if (data instanceof FormData) {
-    return data.keys().next().done === true;
-  }
-
-  if (data instanceof Blob) {
-    return data.size === 0;
-  }
-
-  if (data instanceof URL || data instanceof Date || data instanceof RegExp) {
-    return false;
+  for (const [type, checker] of objectMap.entries()) {
+    if (data instanceof type) {
+      return checker(data);
+    }
   }
 
   return Object.keys(data).length === 0;

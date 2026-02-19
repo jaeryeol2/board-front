@@ -12,9 +12,5 @@ export default function UserAgentProvider({
   children,
   userAgent,
 }: Readonly<UserAgentProviderProps>) {
-  return (
-    <UserAgentContext.Provider value={userAgent}>
-      {children}
-    </UserAgentContext.Provider>
-  );
+  return <UserAgentContext value={userAgent}>{children}</UserAgentContext>;
 }

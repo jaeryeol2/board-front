@@ -66,7 +66,6 @@ const responseError = (error: unknown) => {
  * data fetching function base ofetch
  * @param path
  * @param options
- * @param timeout
  * @returns
  */
 export const appFetch = (async <R>(

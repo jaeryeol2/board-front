@@ -23,7 +23,7 @@ export const tokenUtil = () => {
     },
     async verifyToken(token: string) {
       return await jwtVerify(token, secretKey, {
-        algorithms: ['HS256'], // 알고리즘 명시 권장
+        algorithms: ['HS256'],
       });
     },
   };
