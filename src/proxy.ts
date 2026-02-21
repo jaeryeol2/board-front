@@ -56,19 +56,25 @@ export async function proxy(request: NextRequest) {
   let cookie = null;
   const { verifyToken } = tokenUtil();
   const authToken = request.headers.get('auth_token') || '';
+  const refreshToken = request.headers.get('refresh_token') || '';
 
   try {
     await verifyToken(authToken);
     isLogin = true;
-  } catch {
-    const refreshToken = request.headers.get('refresh_token') || '';
-    await verifyToken(refreshToken);
-    // auth token get
-    const response = await appFetch('/api/auth', { useNative: true });
-    cookie = response.headers.get(SET_COOKIE);
-    isLogin = true;
-  } finally {
-    isLogin = false;
+  } catch (error) {
+    console.error('auth token error : ', (error as { code: string }).code);
+  }
+
+  if (!isLogin) {
+    try {
+      await verifyToken(refreshToken);
+      // auth token get
+      const response = await appFetch('/api/auth', { useNative: true });
+      cookie = response.headers.get(SET_COOKIE);
+      isLogin = true;
+    } catch (error) {
+      console.error('refresh token error : ', (error as { code: string }).code);
+    }
   }
 
   return nextResponse(request, isLogin, cookie);
