@@ -1,6 +1,6 @@
 'use client';
 
-import { clearCache } from '@/actions/common';
+import { clearCacheAll } from '@/actions/common';
 import { useGlobalStore } from '@/contexts/GlobalContext';
 import { appFetch } from '@/utils/appFetch';
 import Link from 'next/link';
@@ -22,7 +22,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
     }));
 
     if (data) {
-      clearCache();
+      clearCacheAll();
       push('/');
     }
   };

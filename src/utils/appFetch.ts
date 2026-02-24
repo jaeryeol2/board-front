@@ -1,22 +1,8 @@
 import { ResponseApi } from '@/types/base';
 import { FetchError, FetchOptions, ofetch } from 'ofetch';
 
-type AppFetchOptions = FetchOptions & { useNative?: true };
-type AppFetchType = {
-  (
-    path: string,
-    options?: AppFetchOptions,
-    timeout?: number,
-  ): Promise<Response>;
-  <R>(
-    path: string,
-    options?: AppFetchOptions,
-    timeout?: number,
-  ): Promise<ResponseApi<R>>;
-};
-
 //  ofetch create
-//  https://github.com/unjs/ofetch
+//   https://github.com/unjs/ofetch
 const $fetch = ofetch.create({
   baseURL: process.env.NEXT_BASE_API_URL,
   retry: 3,
@@ -26,21 +12,18 @@ const $fetch = ofetch.create({
   // onResponse({ request, options, response }) {}
   // onRequestError({ request, options, error }) {}
   // onResponseError({ request, response, options }) {}
-  onRequest({ request }) {
+  onRequest({ request, options }) {
     console.log('request : ', request);
-  },
-  onResponse({ options }) {},
-  onRequestError({ error }) {
-    throw new FetchError(error.message, { cause: error.cause });
+    options.headers.set('x-app', 'next-sample-project');
   },
 });
 
-const responseError = (error: unknown) => {
+const returnError = (error: unknown) => {
   let status = 404;
   let message = 'Unknown Error';
 
   // 2. 에러가 객체인지 확인
-  if (error && typeof error === 'object') {
+  if (!error && typeof error === 'object') {
     const err = error as FetchError;
 
     if (err.response?.status) {
@@ -61,37 +44,32 @@ const responseError = (error: unknown) => {
   };
 };
 
-/**
- * app fetch
- * data fetching function base ofetch
- * @param path
- * @param options
- * @returns
- */
-export const appFetch = (async <R>(
+const native = async (
   path: string,
-  options: AppFetchOptions,
-): Promise<ResponseApi<R> | Response> => {
-  if (options && 'useNative' in options && options.useNative) {
-    options.useNative = undefined;
-    const { headers, status, statusText, _data } = await $fetch.raw(
-      path,
-      options,
-    );
-    const data = typeof _data === 'object' ? JSON.stringify(_data) : _data;
+  options?: FetchOptions,
+): Promise<Response> => {
+  const { headers, status, statusText, _data } = await $fetch.raw(
+    path,
+    options,
+  );
+  const data = typeof _data === 'object' ? JSON.stringify(_data) : _data;
 
-    return new Response(data, {
-      headers: (() => {
-        const h = new Headers(headers);
-        h.delete('content-length');
+  return new Response(data, {
+    headers: (() => {
+      const h = new Headers(headers);
+      h.delete('content-length');
 
-        return h;
-      })(),
-      status,
-      statusText,
-    });
-  }
+      return h;
+    })(),
+    status,
+    statusText,
+  });
+};
 
+const fetch = async <R>(
+  path: string,
+  options?: FetchOptions,
+): Promise<ResponseApi<R>> => {
   try {
     const response = await $fetch(path, options);
 
@@ -108,6 +86,17 @@ export const appFetch = (async <R>(
       data: response as R,
     };
   } catch (error) {
-    return responseError(error);
+    return returnError(error);
   }
-}) as AppFetchType;
+};
+
+/**
+ * app fetch
+ * data fetching function base ofetch
+ * @param path
+ * @param options
+ * @returns
+ */
+export const appFetch = Object.assign(fetch, {
+  native,
+});

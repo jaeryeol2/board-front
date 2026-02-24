@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SET_COOKIE, X_CURRENT_PATH, X_IS_LOGIN } from './constants/common';
+import {
+  ACCESS_TOKEN,
+  RERESH_TOKEN,
+  SET_COOKIE,
+  X_CURRENT_PATH,
+  X_IS_LOGIN,
+} from './constants/common';
 import { appFetch } from './utils/appFetch';
 import { tokenUtil } from './utils/tokenUtil';
 
@@ -55,8 +61,8 @@ export async function proxy(request: NextRequest) {
   let isLogin = false;
   let cookie = null;
   const { verifyToken } = tokenUtil();
-  const authToken = request.headers.get('auth_token') || '';
-  const refreshToken = request.headers.get('refresh_token') || '';
+  const authToken = request.headers.get(ACCESS_TOKEN) || '';
+  const refreshToken = request.headers.get(RERESH_TOKEN) || '';
 
   try {
     await verifyToken(authToken);
@@ -68,8 +74,7 @@ export async function proxy(request: NextRequest) {
   if (!isLogin) {
     try {
       await verifyToken(refreshToken);
-      // auth token get
-      const response = await appFetch('/api/auth', { useNative: true });
+      const response = await appFetch.native('/api/auth');
       cookie = response.headers.get(SET_COOKIE);
       isLogin = true;
     } catch (error) {
