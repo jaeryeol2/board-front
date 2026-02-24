@@ -66,7 +66,7 @@ const native = async (
   });
 };
 
-const fetch = async <R>(
+const fetch = async <R = unknown>(
   path: string,
   options?: FetchOptions,
 ): Promise<ResponseApi<R>> => {
