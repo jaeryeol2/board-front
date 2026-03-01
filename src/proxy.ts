@@ -53,9 +53,7 @@ const nextResponse = (
 };
 
 export const config = {
-  matcher: [
-    String.raw`/((?!api|_next/static|_next/image|.*\\.png$|.*\\.ico|.*\\.json).*)`,
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|.*.png$|.*.ico|.*.json).*)'],
 };
 export async function proxy(request: NextRequest) {
   let isLogin = false;
