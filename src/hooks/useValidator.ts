@@ -1,23 +1,38 @@
 'use client';
 
-import { ValidatorType } from '@/types/base';
-
 /**
  * useValidator hook
  * @returns
  */
 export const useValidator = () => {
-  /**
-   * validate check
-   * @param validators
-   * @returns
-   */
-  const validate = (validators: Array<ValidatorType>) =>
-    validators.every((valid) =>
-      typeof valid === 'function' ? valid() : valid.validate(),
-    );
+  const validators: Array<{ condition: boolean; message?: string }> = [];
+  const validate = () => {
+    return validators.every((item) => {
+      if (item.condition) {
+        if (item?.message) {
+          throw new Error(item.message);
+        }
+
+        return false;
+      }
+
+      return true;
+    });
+  };
+  const instance = {
+    verification(condition: boolean, message?: string) {
+      validators.push({ condition, message });
+
+      return instance;
+    },
+    validate,
+  };
 
   return {
-    validate,
+    verification(condition: boolean, message?: string) {
+      validators.push({ condition, message });
+
+      return instance;
+    },
   };
 };

@@ -42,9 +42,3 @@ export type ReducerActionType<T = { [key: string]: unknown }> = {
         payload: T[key];
       };
 }[keyof T];
-
-export type ValidatorType =
-  | (() => boolean)
-  | {
-      validate: () => boolean;
-    };
