@@ -14,7 +14,7 @@ const $fetch = ofetch.create({
   // onResponseError({ request, response, options }) {}
   onRequest({ request, options }) {
     console.log('request : ', request);
-    options.headers.set('x-app', 'next-sample-project');
+    options.headers.set('x-login-id', 'next-sample-project');
   },
 });
 

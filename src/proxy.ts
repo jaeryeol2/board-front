@@ -14,12 +14,7 @@ const REDIRECT_PATH_SET = new Set(['/login', '/signup']);
 const redirectValidate = (request: NextRequest, isLogin: boolean) => {
   const { nextUrl } = request;
   const path = nextUrl.pathname;
-
-  const validate = [
-    () => {
-      return isLogin && REDIRECT_PATH_SET.has(path);
-    },
-  ];
+  const validate = [() => isLogin && REDIRECT_PATH_SET.has(path)];
 
   return validate.every((func) => func());
 };
@@ -72,7 +67,7 @@ export async function proxy(request: NextRequest) {
   if (!isLogin) {
     try {
       await verifyToken(refreshToken);
-      const response = await appFetch.native('/api/auth');
+      const response = await appFetch.native('/api/auth/access');
       cookie = response.headers.get(SET_COOKIE);
       isLogin = true;
     } catch (error) {

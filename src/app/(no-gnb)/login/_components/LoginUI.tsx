@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { SubmitEvent, useState } from 'react';
 
 export default function LoginUI() {
-  const { validate } = useValidator();
+  const { verification } = useValidator();
   const [login, setLogin] = useState({
     loginId: '',
     password: '',
@@ -19,36 +19,26 @@ export default function LoginUI() {
   const { replace } = useRouter();
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
+    const validator = verification(
+      isEmpty(login.loginId),
+      '아이디를 입력해주세요.',
+    ).verification(isEmpty(login.password), '비밀번호를 입력해주세요.');
 
-    const validators = [
-      () => {
-        if (isEmpty(login.loginId)) {
-          alert('아이디를 입력해주세요.');
-          return false;
+    try {
+      if (validator.validate()) {
+        const { data } = await appFetch<boolean>('/api/login', {
+          method: 'post',
+          body: login,
+        });
+
+        if (data) {
+          clearCacheAll();
+          replace('/');
         }
-
-        return true;
-      },
-      () => {
-        if (isEmpty(login.password)) {
-          alert('비밀번호를 입력해주세요.');
-          return false;
-        }
-
-        return true;
-      },
-    ];
-
-    if (validate(validators)) {
-      const { data } = await appFetch<boolean>('/api/login', {
-        method: 'post',
-        body: login,
-      });
-
-      if (data) {
-        clearCacheAll();
-        replace('/');
       }
+    } catch (error) {
+      alert((error as Error).message);
+      return;
     }
   };
 
