@@ -21,7 +21,7 @@ const redirectValidate = (request: NextRequest, isLogin: boolean) => {
 const nextResponse = (
   request: NextRequest,
   isLogin: boolean,
-  cookie: string | null,
+  cookie: string,
 ) => {
   const { nextUrl, headers } = request;
   const path = nextUrl.pathname;
@@ -37,12 +37,9 @@ const nextResponse = (
     headers: {
       [X_CURRENT_PATH]: path,
       [X_IS_LOGIN]: `${isLogin ?? false}`,
+      [SET_COOKIE]: cookie,
     },
   });
-
-  if (cookie) {
-    nextResponse.headers.set(SET_COOKIE, cookie);
-  }
 
   return nextResponse;
 };
@@ -52,13 +49,13 @@ export const config = {
 };
 export async function proxy(request: NextRequest) {
   let isLogin = false;
-  let cookie = null;
+  let cookie = request.cookies.toString();
   const { verifyToken } = tokenUtil();
-  const authToken = request.headers.get(ACCESS_TOKEN) || '';
-  const refreshToken = request.headers.get(RERESH_TOKEN) || '';
+  const accessToken = request.cookies.get(ACCESS_TOKEN)?.value || '';
+  const refreshToken = request.cookies.get(RERESH_TOKEN)?.value || '';
 
   try {
-    await verifyToken(authToken);
+    await verifyToken(accessToken);
     isLogin = true;
   } catch (error) {
     console.error('auth token error : ', (error as { code: string }).code);
@@ -68,7 +65,7 @@ export async function proxy(request: NextRequest) {
     try {
       await verifyToken(refreshToken);
       const response = await appFetch.native('/api/auth/access');
-      cookie = response.headers.get(SET_COOKIE);
+      cookie = response.headers.get(SET_COOKIE) || '';
       isLogin = true;
     } catch (error) {
       console.error('refresh token error : ', (error as { code: string }).code);

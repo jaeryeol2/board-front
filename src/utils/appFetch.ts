@@ -1,3 +1,5 @@
+import { getCookie } from '@/actions/common';
+import { ACCESS_TOKEN, RERESH_TOKEN } from '@/constants/common';
 import { ResponseApi } from '@/types/base';
 import { FetchError, FetchOptions, ofetch } from 'ofetch';
 
@@ -12,9 +14,15 @@ const $fetch = ofetch.create({
   // onResponse({ request, options, response }) {}
   // onRequestError({ request, options, error }) {}
   // onResponseError({ request, response, options }) {}
-  onRequest({ request, options }) {
-    console.log('request : ', request);
-    options.headers.set('x-login-id', 'next-sample-project');
+  async onRequest({ request, options }) {
+    console.log('api request path: ', request);
+    const accessToken = await getCookie(ACCESS_TOKEN);
+    const refreshToken = await getCookie(RERESH_TOKEN);
+
+    if (accessToken) {
+      options.headers.set('Authorization', `Bearer ${accessToken}`);
+      options.headers.set('Cookie', `${RERESH_TOKEN}=${refreshToken}`);
+    }
   },
 });
 

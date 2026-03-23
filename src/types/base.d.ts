@@ -42,3 +42,8 @@ export type ReducerActionType<T = { [key: string]: unknown }> = {
         payload: T[key];
       };
 }[keyof T];
+
+export type HeaderSetType = {
+  key: string;
+  value: string;
+};

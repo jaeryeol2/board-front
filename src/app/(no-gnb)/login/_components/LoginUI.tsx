@@ -19,6 +19,7 @@ export default function LoginUI() {
   const { replace } = useRouter();
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
+
     const validator = verification(
       isEmpty(login.loginId),
       '아이디를 입력해주세요.',

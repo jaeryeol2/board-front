@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
           destination: '/api/access-token',
         },
         {
+          source: '/api/cookie',
+          destination: '/api/cookie',
+        },
+        {
+          source: '/api/header',
+          destination: '/api/header',
+        },
+        {
           source: '/api/:path*',
           destination: process.env.NEXT_BASE_API_URL + '/api/:path*',
         },

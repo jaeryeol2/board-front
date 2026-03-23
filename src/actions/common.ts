@@ -1,6 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
+import { cookies, headers } from 'next/headers';
 
 export const clearCache = async (path: string, type: 'layout' | 'page') => {
   revalidatePath(path, type);
@@ -8,4 +10,21 @@ export const clearCache = async (path: string, type: 'layout' | 'page') => {
 
 export const clearCacheAll = async () => {
   await clearCache('/', 'layout');
+};
+
+export const setCookie = async (
+  key: string,
+  value: string,
+  options?: ResponseCookie,
+) => {
+  const cookie = await cookies();
+  cookie.set(key, value, { path: '/', ...options });
+};
+
+export const getCookie = async (key: string) => {
+  return (await cookies()).get(key)?.value;
+};
+
+export const getHeader = async () => {
+  return await headers();
 };
