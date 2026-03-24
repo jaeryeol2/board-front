@@ -27,7 +27,7 @@ export default function LoginUI() {
 
     try {
       if (validator.validate()) {
-        const { data } = await appFetch<boolean>('/api/login', {
+        const { data, message } = await appFetch<boolean>('/api/login', {
           method: 'post',
           body: user,
         });
@@ -35,6 +35,9 @@ export default function LoginUI() {
         if (data) {
           clearCacheAll();
           replace('/');
+        } else {
+          alert(message);
+          return;
         }
       }
     } catch (error) {
