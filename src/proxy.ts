@@ -47,6 +47,7 @@ const nextResponse = (
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|.*.png$|.*.ico|.*.json).*)'],
 };
+
 export async function proxy(request: NextRequest) {
   let isLogin = false;
   let cookie = request.cookies.toString();
@@ -64,7 +65,11 @@ export async function proxy(request: NextRequest) {
   if (!isLogin) {
     try {
       await verifyToken(refreshToken);
-      const response = await appFetch.native('/api/auth/access');
+
+      const response = await appFetch.native('/api/auth/access', {
+        method: 'post',
+      });
+
       cookie = response.headers.get(SET_COOKIE) || '';
       isLogin = true;
     } catch (error) {

@@ -12,8 +12,8 @@ import { SubmitEvent, useState } from 'react';
 
 export default function LoginUI() {
   const { verification } = useValidator();
-  const [login, setLogin] = useState({
-    loginId: '',
+  const [user, setUser] = useState({
+    userId: '',
     password: '',
   });
   const { replace } = useRouter();
@@ -21,15 +21,15 @@ export default function LoginUI() {
     e.preventDefault();
 
     const validator = verification(
-      isEmpty(login.loginId),
+      isEmpty(user.userId),
       '아이디를 입력해주세요.',
-    ).verification(isEmpty(login.password), '비밀번호를 입력해주세요.');
+    ).verification(isEmpty(user.password), '비밀번호를 입력해주세요.');
 
     try {
       if (validator.validate()) {
         const { data } = await appFetch<boolean>('/api/login', {
           method: 'post',
-          body: login,
+          body: user,
         });
 
         if (data) {
@@ -51,11 +51,12 @@ export default function LoginUI() {
           label="아이디"
           placeholder="아이디를 입력하세요"
           onInput={(e) =>
-            setLogin((l) => ({
-              ...l,
-              loginId: (e.target as HTMLInputElement).value,
+            setUser((u) => ({
+              ...u,
+              userId: (e.target as HTMLInputElement).value,
             }))
           }
+          value={user.userId}
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -63,11 +64,12 @@ export default function LoginUI() {
           label="비밀번호"
           placeholder="비밀번호를 입력하세요"
           onInput={(e) =>
-            setLogin((l) => ({
-              ...l,
+            setUser((u) => ({
+              ...u,
               password: (e.target as HTMLInputElement).value,
             }))
           }
+          value={user.password}
         />
       </div>
       <Button type="submit" className="mt-4 w-full">

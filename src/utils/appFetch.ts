@@ -21,6 +21,8 @@ const $fetch = ofetch.create({
 
     if (accessToken) {
       options.headers.set('Authorization', `Bearer ${accessToken}`);
+    }
+    if (refreshToken) {
       options.headers.set('Cookie', `${RERESH_TOKEN}=${refreshToken}`);
     }
   },
