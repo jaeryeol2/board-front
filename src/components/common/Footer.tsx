@@ -1,26 +1,26 @@
-import Link from 'next/link';
+import AppLink from '../base/AppLink';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#F9FAFB] text-[#8B95A1] border-t border-[#F2F4F6]">
-      <div className="container mx-auto px-4 py-10">
+    <footer className="bg-gray-50 text-gray-500 border-t border-gray-200">
+      <div className="container mx-auto max-w-7xl px-4 py-8">
         <div className="flex items-center justify-between">
           <p className="text-sm">
             &copy; {new Date().getFullYear()} MyCompany. All rights reserved.
           </p>
           <div className="flex space-x-6 text-sm font-medium">
-            <Link
+            <AppLink
               href="/privacy"
-              className="transition-colors hover:text-[#4E5968]"
+              className="transition-colors hover:text-gray-700"
             >
               Privacy Policy
-            </Link>
-            <Link
+            </AppLink>
+            <AppLink
               href="/terms"
-              className="transition-colors hover:text-[#4E5968]"
+              className="transition-colors hover:text-gray-700"
             >
               Terms of Service
-            </Link>
+            </AppLink>
           </div>
         </div>
       </div>

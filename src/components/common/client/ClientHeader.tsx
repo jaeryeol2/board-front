@@ -1,13 +1,13 @@
 'use client';
 
 import { clearCacheAll } from '@/actions/common';
+import AppLink from '@/components/base/AppLink';
 import { useGlobalStore } from '@/contexts/GlobalContext';
 import { appFetch } from '@/utils/appFetch';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 type ClientHeaderProps = {
-  menus: Array<{ name: string; href: string }>;
+  menus: Array<{ menuName: string; href: string }>;
 };
 
 export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
@@ -28,22 +28,22 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#F2F4F6]">
-      <div className="container mx-auto flex items-center justify-between px-4 h-[60px]">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200">
+      <div className="container mx-auto max-w-7xl flex items-center justify-between px-4 h-16">
         {/* Left Section: Logo and Menu */}
         <div className="flex items-center space-x-8">
-          <Link href="/" className="text-2xl font-bold text-[#191F28]">
+          <AppLink href="/" className="text-2xl font-bold text-gray-800">
             MyLogo
-          </Link>
+          </AppLink>
           <nav className="hidden space-x-6 md:flex">
             {menus.map((item) => (
-              <Link
-                key={item.name}
+              <AppLink
+                key={item.menuName}
                 href={item.href}
-                className="text-[#4E5968] font-medium transition-colors hover:text-[#191F28] hover:bg-[#F2F4F6] px-3 py-2 rounded-lg"
+                className="text-gray-500 font-medium transition-colors hover:text-gray-900 hover:bg-gray-100 px-3 py-2 rounded-md"
               >
-                {item.name}
-              </Link>
+                {item.menuName}
+              </AppLink>
             ))}
           </nav>
         </div>
@@ -52,40 +52,40 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
         <div className="flex items-center space-x-4">
           {isLogin ? (
             <>
-              <span className="text-[#333D4B] font-medium">
+              <span className="text-gray-700 font-medium">
                 Welcome, {userInfo?.userName}!
               </span>
-              <Link
+              <AppLink
                 href="/mypage"
-                className="text-[#4E5968] font-medium transition-colors hover:text-[#191F28]"
+                className="text-gray-500 font-medium transition-colors hover:text-gray-900"
               >
                 My Page
-              </Link>
-              <Link
+              </AppLink>
+              <AppLink
                 href="/"
-                className="text-[#4E5968] font-medium transition-colors hover:text-[#191F28]"
+                className="text-gray-500 font-medium transition-colors hover:text-gray-900"
                 onNavigate={(e) => {
                   e.preventDefault();
                   handleLogout();
                 }}
               >
                 Logout
-              </Link>
+              </AppLink>
             </>
           ) : (
             <>
-              <Link
+              <AppLink
                 href="/login"
-                className="px-4 py-2 text-[#3182F6] bg-[#3182F6]/10 rounded-lg font-semibold transition-colors hover:bg-[#3182F6]/20"
+                className="px-4 py-2 text-blue-500 bg-blue-50 rounded-md font-semibold transition-colors hover:bg-blue-100"
               >
                 Login
-              </Link>
-              <Link
+              </AppLink>
+              <AppLink
                 href="/signup"
-                className="px-4 py-2 bg-[#3182F6] text-white rounded-lg font-semibold transition-colors hover:bg-[#1B64DA]"
+                className="px-4 py-2 bg-blue-500 text-white rounded-md font-semibold transition-colors hover:bg-blue-600"
               >
                 Sign Up
-              </Link>
+              </AppLink>
             </>
           )}
         </div>

@@ -1,9 +1,9 @@
 'use client';
 
 import { clearCacheAll } from '@/actions/common';
-import Button from '@/components/base/Button';
-import Input from '@/components/base/Input';
 import Password from '@/components/base/Password';
+import Submit from '@/components/base/Submit';
+import Text from '@/components/base/Text';
 import { useValidator } from '@/hooks/useValidator';
 import { appFetch } from '@/utils/appFetch';
 import { isEmpty } from '@/utils/isEmpty';
@@ -47,10 +47,9 @@ export default function LoginUI() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <Input
-          type="text"
+        <Text
           label="아이디"
           placeholder="아이디를 입력하세요"
           onInput={(e) =>
@@ -75,9 +74,10 @@ export default function LoginUI() {
           value={user.password}
         />
       </div>
-      <Button type="submit" className="mt-4 w-full">
-        로그인
-      </Button>
+      <Submit
+        label="로그인"
+        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg"
+      />
     </form>
   );
 }

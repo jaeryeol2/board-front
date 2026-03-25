@@ -1,14 +1,26 @@
 'use client';
 
-import { forwardRef } from 'react';
-import Input, { type InputProps } from './Input';
+import { TextProps } from '@/types/component';
+import { useId } from '@/utils/useId';
 
-export interface TextInputProps extends Omit<InputProps, 'type'> {}
-
-const Text = forwardRef<HTMLInputElement, TextInputProps>((props, ref) => {
-  return <Input type="text" autoComplete="off" ref={ref} {...props} />;
-});
-
-Text.displayName = 'Text';
-
-export default Text;
+export default function Text({ label, ...props }: Readonly<TextProps>) {
+  const id = props?.id ?? useId();
+  return (
+    <div className="w-full">
+      {label && (
+        <label
+          htmlFor={id}
+          className="block text-sm font-semibold text-gray-500 mb-2"
+        >
+          {label}
+        </label>
+      )}
+      <input
+        type="text"
+        className="block w-full rounded-md border-0 bg-white px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6 transition-all"
+        id={id}
+        {...props}
+      />
+    </div>
+  );
+}
