@@ -1,4 +1,4 @@
-import WrapLayout from '@/app/wrap-layout';
+import WrapLayout from '@/app/WrapLayout';
 import Footer from '@/components/common/Footer';
 import Header from '@/components/common/Header';
 import { ChildrenType } from '@/types/base';
