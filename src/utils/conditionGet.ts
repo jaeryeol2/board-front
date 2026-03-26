@@ -41,10 +41,12 @@ export const conditionGet = <T>() => {
   };
 
   return {
-    when(condition: (() => boolean) | boolean) {
-      currentCondition =
-        typeof condition === 'boolean' ? () => condition : condition;
-      return doInstance;
+    cond: {
+      when(condition: (() => boolean) | boolean) {
+        currentCondition =
+          typeof condition === 'boolean' ? () => condition : condition;
+        return doInstance;
+      },
     },
   };
 };

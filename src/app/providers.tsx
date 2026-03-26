@@ -10,7 +10,7 @@ import { userAgent } from 'next/server';
 export default async function Providers({ children }: Readonly<ChildrenType>) {
   const headerStore = await headers();
   const userAgentStore = userAgent({ headers: headerStore });
-  const isLogin = headerStore.get(X_IS_LOGIN) === 'true';
+  const isLogin = JSON.parse(headerStore.get(X_IS_LOGIN) ?? 'false') as boolean;
   const global: {
     isLogin: boolean;
     userInfo: UserInfoType | null;
