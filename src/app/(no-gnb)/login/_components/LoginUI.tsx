@@ -11,30 +11,32 @@ import { useRouter } from 'next/navigation';
 import { SubmitEvent, useState } from 'react';
 
 export default function LoginUI() {
-  const { verification } = useValidator();
+  const { validator } = useValidator();
   const [user, setUser] = useState({
     userId: '',
     password: '',
   });
-  const { replace } = useRouter();
+  const { push } = useRouter();
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
-    const validator = verification(
-      isEmpty(user.userId),
-      '아이디를 입력해주세요.',
-    ).verification(isEmpty(user.password), '비밀번호를 입력해주세요.');
+    const checker = validator
+      .verification(() => isEmpty(user.userId), '아이디를 입력해주세요.')
+      .verification(() => isEmpty(user.password), '비밀번호를 입력해주세요.');
 
     try {
-      if (validator.validate()) {
-        const { data, message } = await appFetch<boolean>('/api/login', {
-          method: 'post',
-          body: user,
-        });
+      if (checker.validate()) {
+        const { status, data, message } = await appFetch<boolean>(
+          '/api/login',
+          {
+            method: 'post',
+            body: user,
+          },
+        );
 
-        if (data) {
+        if (status === 200 && data) {
           clearCacheAll();
-          replace('/');
+          push('/');
         } else {
           alert(message);
           return;

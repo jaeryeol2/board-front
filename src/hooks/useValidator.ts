@@ -5,10 +5,10 @@
  * @returns
  */
 export const useValidator = () => {
-  const validators: Array<{ condition: boolean; message?: string }> = [];
+  const validators: Array<{ condition: () => boolean; message?: string }> = [];
   const validate = () => {
     return validators.every((item) => {
-      if (item.condition) {
+      if (item.condition?.()) {
         if (item?.message) {
           throw new Error(item.message);
         }
@@ -20,8 +20,11 @@ export const useValidator = () => {
     });
   };
   const instance = {
-    verification(condition: boolean, message?: string) {
-      validators.push({ condition, message });
+    verification(condition: (() => boolean) | boolean, message?: string) {
+      validators.push({
+        condition: typeof condition === 'boolean' ? () => condition : condition,
+        message,
+      });
 
       return instance;
     },
@@ -29,10 +32,16 @@ export const useValidator = () => {
   };
 
   return {
-    verification(condition: boolean, message?: string) {
-      validators.push({ condition, message });
+    validator: {
+      verification(condition: (() => boolean) | boolean, message?: string) {
+        validators.push({
+          condition:
+            typeof condition === 'boolean' ? () => condition : condition,
+          message,
+        });
 
-      return instance;
+        return instance;
+      },
     },
   };
 };

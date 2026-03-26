@@ -14,7 +14,8 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
   const { push } = useRouter();
   const { isLogin, userInfo } = useGlobalStore((state) => state);
 
-  const handleLogout = async () => {
+  const handleLogout = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
     const { data } = await appFetch<boolean>('/api/logout', {
       method: 'post',
     }).catch(() => ({
@@ -61,13 +62,11 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
               >
                 My Page
               </AppLink>
+              <span> | </span>
               <AppLink
                 href="/"
                 className="text-gray-500 font-medium transition-colors hover:text-gray-900"
-                onNavigate={(e) => {
-                  e.preventDefault();
-                  handleLogout();
-                }}
+                onNavigate={(e) => handleLogout(e)}
               >
                 Logout
               </AppLink>
