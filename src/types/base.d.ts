@@ -43,7 +43,11 @@ export type ReducerActionType<T = { [key: string]: unknown }> = {
       };
 }[keyof T];
 
-export type HeaderSetType = {
-  key: string;
-  value: string;
+export type ParamsType<T = { slug: string }> = {
+  params: Promise<T>;
 };
+export type SearchParamsType = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export type SlugType = ParamsType & SearchParamsType;
