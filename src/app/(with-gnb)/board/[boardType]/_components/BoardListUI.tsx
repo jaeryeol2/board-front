@@ -1,10 +1,124 @@
 'use client';
 
+import Button from '@/components/base/Button';
+import Pagination from '@/components/common/client/Pagination';
 import { Board } from '@/types/board';
+import { useParams, useRouter } from 'next/navigation';
+import { useMemo } from 'react';
 
 type BoardListProps = {
   list: Array<Board>;
+  page: number;
 };
-export default function BoardListUI({ list }: Readonly<BoardListProps>) {
-  return <></>;
+
+const ITEMS_PER_PAGE = 10; // 페이지 당 보여줄 아이템 수
+
+/**
+ * 게시판 목록 UI 컴포넌트
+ * @param list 전체 게시글 목록
+ */
+export default function BoardListUI({ list, page }: Readonly<BoardListProps>) {
+  const router = useRouter();
+  const params = useParams();
+  const boardType = params.boardType as string;
+
+  // 현재 페이지에 해당하는 데이터 목록
+  const paginatedList = useMemo(() => {
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+
+    return list.slice(startIndex, endIndex);
+  }, [list]);
+
+  /**
+   * 행 클릭 시 상세 페이지로 이동합니다.
+   * @param boardId 게시글 ID
+   */
+  const handleRowClick = (boardId: number): void => {
+    router.push(`/board/${boardType}/${boardId}`);
+  };
+  const handlePage = (page: number) => {
+    router.push(`/board/${boardType}?page=${page}`);
+  };
+
+  /**
+   * 글쓰기 버튼 클릭 시 글쓰기 페이지로 이동합니다.
+   */
+  const handleWriteClick = (): void => {
+    router.push(`/board/${boardType}/write`);
+  };
+
+  return (
+    <div className="py-8">
+      <div className="flex justify-end mb-4">
+        <Button
+          className="px-4 py-2 bg-blue-500 text-white rounded-md font-semibold transition-colors hover:bg-blue-600"
+          onClick={handleWriteClick}
+        >
+          글쓰기
+        </Button>
+      </div>
+      <div
+        className="relative overflow-x-auto shadow-md sm:rounded-lg"
+        style={{ minHeight: '640px' }}
+      >
+        <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+          <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" className="w-24 px-6 py-3 text-center">
+                번호
+              </th>
+              <th scope="col" className="px-6 py-3">
+                제목
+              </th>
+              <th scope="col" className="w-40 px-6 py-3 text-center">
+                작성자
+              </th>
+              <th scope="col" className="w-40 px-6 py-3 text-center">
+                작성일
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedList.length > 0 ? (
+              paginatedList.map((board: Board, index: number) => (
+                <tr
+                  key={board.id}
+                  className="cursor-pointer border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
+                  onClick={() => handleRowClick(board.id)}
+                >
+                  <td className="px-6 py-4 text-center">
+                    {paginatedList.length - index}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white">
+                    {board.title}
+                  </td>
+                  <td className="px-6 py-4 text-center">{board.writerName}</td>
+                  <td className="px-6 py-4 text-center">
+                    {new Date(board.createdAt).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                  게시글이 없습니다.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      {list.length > 0 && (
+        <div className="flex justify-center mt-4">
+          <Pagination
+            totalItems={list.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+            page={page}
+            onPageChange={handlePage}
+          />
+        </div>
+      )}
+    </div>
+  );
 }

@@ -4,6 +4,7 @@ import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
 import { Metadata } from 'next';
 import { cache } from 'react';
+import BoardDetailUI from '../_components/BoardDetailUI';
 
 type BoardDetailParam = {
   boardType: string;
@@ -31,5 +32,6 @@ export default async function BoardDetailPage({
 }: Readonly<ParamsType<BoardDetailParam>>) {
   const { boardType, id } = await params;
   const { data } = await fetchData(boardType, id);
-  return <></>;
+
+  return <BoardDetailUI board={data} />;
 }
