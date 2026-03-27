@@ -76,10 +76,9 @@ export default function LoginUI() {
           value={user.password}
         />
       </div>
-      <Submit
-        label="로그인"
-        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg"
-      />
+      <Submit className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">
+        로그인
+      </Submit>
     </form>
   );
 }

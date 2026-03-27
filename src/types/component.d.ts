@@ -31,10 +31,7 @@ export interface CheckboxProps extends BaseInputPropsWithRef {}
 export interface ButtonProps extends Omit<
   ComponentPropsWithRef<'button'>,
   'type'
-> {
-  /** 버튼명 */
-  label: string;
-}
+> {}
 /** selectbox props type */
 export interface SelectProps extends ComponentPropsWithRef<'select'> {
   startAll?: boolean;

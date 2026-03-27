@@ -15,7 +15,7 @@ export default function Submit(props: Readonly<ButtonProps>) {
       className="px-4 py-2 text-base font-semibold text-white transition-all duration-200 bg-blue-500 rounded-md hover:bg-blue-600 active:scale-95 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
       {...attributes}
     >
-      {props.label}
+      {props.children}
     </button>
   );
 }
