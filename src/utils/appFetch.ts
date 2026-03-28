@@ -26,24 +26,28 @@ const $fetch = ofetch.create({
       options.headers.set('Cookie', `${RERESH_TOKEN}=${refreshToken}`);
     }
   },
+  onResponseError({ response }) {
+    if (response.status === 401) {
+      throw new FetchError('접근권한이 없습니다.');
+    }
+  },
 });
 
 const returnError = (error: unknown) => {
   let status = 404;
   let message = 'Unknown Error';
 
-  // 2. 에러가 객체인지 확인
-  if (!error && typeof error === 'object') {
-    const err = error as FetchError;
-
-    if (err.response?.status) {
-      status = err.response.status;
-    } else if (err.status) {
-      status = err.status;
+  if (error instanceof Error) {
+    message = error.message;
+  } else if (error instanceof FetchError) {
+    if (error.response?.status) {
+      status = error.response.status;
+    } else if (error.status) {
+      status = error.status;
     }
 
-    if (err.message) {
-      message = err.message;
+    if (error.message) {
+      message = error.message;
     }
   }
 

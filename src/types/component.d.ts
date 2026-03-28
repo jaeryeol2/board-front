@@ -15,7 +15,9 @@ export interface TextProps extends BaseInputPropsWithRef {
   label?: string;
 }
 /** email props type */
-export interface EmailProps extends BaseInputPropsWithRef {}
+export interface EmailProps extends BaseInputPropsWithRef {
+  label?: string;
+}
 /** password props type witout ref */
 export interface PasswordProps extends BaseInputPropsWithoutRef {
   label?: string;
