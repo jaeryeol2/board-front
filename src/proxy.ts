@@ -71,6 +71,11 @@ export async function proxy(request: NextRequest) {
       });
 
       cookie = response.headers.get(SET_COOKIE) || '';
+      const accessToken = cookie
+        .split(';')[0]
+        .replaceAll(`${ACCESS_TOKEN}=`, '');
+
+      request.cookies.set(ACCESS_TOKEN, accessToken);
       isLogin = true;
     } catch (error) {
       console.error('refresh token error : ', (error as { code: string }).code);
