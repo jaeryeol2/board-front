@@ -44,13 +44,61 @@ const nextResponse = (
   return nextResponse;
 };
 
+const parseCookie = (cookie: string) => {
+  const parts = cookie.split(';').map((p) => p.trim());
+
+  // 첫 번째 요소는 항상 name=value 형태
+  const [name, ...valueParts] = parts[0].split('=');
+  const value = valueParts.join('='); // 토큰 내부에 = 이 포함될 경우 대비
+
+  const options: Record<string, unknown> = {};
+
+  // 나머지 속성들 파싱
+  parts.slice(1).forEach((part) => {
+    const [key, val] = part.split('=');
+    const lowerKey = key.toLowerCase();
+
+    switch (lowerKey) {
+      case 'path':
+        options.path = val;
+        break;
+      case 'max-age':
+        options.maxAge = Number.parseInt(val, 10);
+        break;
+      case 'expires':
+        options.expires = new Date(val);
+        break;
+      case 'secure':
+        options.secure = true;
+        break;
+      case 'httponly':
+        options.httpOnly = true;
+        break;
+      case 'samesite':
+        options.sameSite = val.toLowerCase();
+        break;
+      case 'domain':
+        options.domain = val;
+        break;
+      case 'priority':
+        options.priority = val.toLowerCase();
+        break;
+      case 'partitioned':
+        options.partitioned = true;
+        break;
+    }
+  });
+
+  return { name, value, options };
+};
+
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|.*.png$|.*.ico|.*.json).*)'],
 };
 
 export async function proxy(request: NextRequest) {
   let isLogin = false;
-  let cookie = request.cookies.toString();
+  let setCookie = '';
   const { verifyToken } = tokenUtil();
   const accessToken = request.cookies.get(ACCESS_TOKEN)?.value || '';
   const refreshToken = request.cookies.get(RERESH_TOKEN)?.value || '';
@@ -70,17 +118,20 @@ export async function proxy(request: NextRequest) {
         method: 'post',
       });
 
-      cookie = response.headers.get(SET_COOKIE) || '';
-      const accessToken = cookie
-        .split(';')[0]
-        .replaceAll(`${ACCESS_TOKEN}=`, '');
+      setCookie = response.headers.get(SET_COOKIE) || '';
 
-      request.cookies.set(ACCESS_TOKEN, accessToken);
+      const newAccessToken = parseCookie(setCookie);
+      request.cookies.set({
+        name: newAccessToken.name,
+        value: newAccessToken.value,
+        ...newAccessToken.options,
+      });
+
       isLogin = true;
     } catch (error) {
       console.error('refresh token error : ', (error as { code: string }).code);
     }
   }
 
-  return nextResponse(request, isLogin, cookie);
+  return nextResponse(request, isLogin, setCookie);
 }
