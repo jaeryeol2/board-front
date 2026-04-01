@@ -39,7 +39,7 @@ export default function BoardListUI({
    * 행 클릭 시 상세 페이지로 이동합니다.
    * @param boardId 게시글 ID
    */
-  const handleRowClick = (boardId: number): void => {
+  const handleRowClick = (boardId: number) => {
     router.push(`/board/${boardType}/${boardId}`);
   };
   const handlePage = (page: number) => {
@@ -56,12 +56,7 @@ export default function BoardListUI({
   return (
     <div className="py-8">
       <div className="flex justify-end mb-4">
-        <Button
-          className="px-4 py-2 bg-blue-500 text-white rounded-md font-semibold transition-colors hover:bg-blue-600"
-          onClick={handleWriteClick}
-        >
-          글쓰기
-        </Button>
+        <Button onClick={handleWriteClick}>글쓰기</Button>
       </div>
       <div
         className="relative overflow-x-auto shadow-md sm:rounded-lg"
