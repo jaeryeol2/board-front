@@ -1,10 +1,11 @@
 'use client';
 
 import { SelectProps } from '@/types/component';
-import { useId } from '@/utils/useId';
+import { useId } from 'react';
 
 export default function Select(props: Readonly<SelectProps>) {
-  const id = useId();
+  const altId = useId();
+  const id = props?.id ?? altId;
   const optionArray = [];
   const attributes = { ...props, startAll: undefined, options: undefined };
   const options = props.options ? [...props.options] : [];
@@ -15,7 +16,11 @@ export default function Select(props: Readonly<SelectProps>) {
 
   for (const option of options) {
     optionArray.push(
-      <option key={`${id}-${option.value}`} value={option.value} disabled={option.disabled}>
+      <option
+        key={`${id}-${option.value}`}
+        value={option.value}
+        disabled={option.disabled}
+      >
         {option.label}
       </option>,
     );

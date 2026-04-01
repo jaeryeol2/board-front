@@ -45,3 +45,7 @@ export interface SelectProps extends ComponentPropsWithRef<'select'> {
 }
 /** image props type */
 export interface ImageProps extends NextImageProps {}
+
+export interface TextareaProps extends ComponentPropsWithRef<'textarea'> {
+  label?: string;
+}

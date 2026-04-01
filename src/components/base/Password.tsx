@@ -1,10 +1,11 @@
 'use client';
 
 import { PasswordProps } from '@/types/component';
-import { useId } from '@/utils/useId';
+import { useId } from 'react';
 
 export default function Password({ label, ...props }: Readonly<PasswordProps>) {
-  const id = props?.id ?? useId();
+  const altId = useId();
+  const id = props?.id ?? altId;
 
   return (
     <div className="w-full">
