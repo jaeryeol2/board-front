@@ -7,25 +7,30 @@ import { useParams, useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 
 type BoardListProps = {
+  total: number;
   list: Array<Board>;
   page: number;
+  rowsPerPage: number;
 };
-
-const ITEMS_PER_PAGE = 10; // 페이지 당 보여줄 아이템 수
 
 /**
  * 게시판 목록 UI 컴포넌트
  * @param list 전체 게시글 목록
  */
-export default function BoardListUI({ list, page }: Readonly<BoardListProps>) {
+export default function BoardListUI({
+  total,
+  list,
+  page,
+  rowsPerPage,
+}: Readonly<BoardListProps>) {
   const router = useRouter();
   const params = useParams();
   const boardType = params.boardType as string;
 
   // 현재 페이지에 해당하는 데이터 목록
   const paginatedList = useMemo(() => {
-    const startIndex = (page - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const startIndex = (page - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
 
     return list.slice(startIndex, endIndex);
   }, [list]);
@@ -77,6 +82,9 @@ export default function BoardListUI({ list, page }: Readonly<BoardListProps>) {
               <th scope="col" className="w-40 px-6 py-3 text-center">
                 작성일
               </th>
+              <th scope="col" className="w-40 px-6 py-3 text-center">
+                조회수
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -97,6 +105,7 @@ export default function BoardListUI({ list, page }: Readonly<BoardListProps>) {
                   <td className="px-6 py-4 text-center">
                     {new Date(board.createdAt).toLocaleDateString()}
                   </td>
+                  <td className="px-6 py-4 text-center">{board.viewCount}</td>
                 </tr>
               ))
             ) : (
@@ -109,11 +118,11 @@ export default function BoardListUI({ list, page }: Readonly<BoardListProps>) {
           </tbody>
         </table>
       </div>
-      {list.length > 0 && (
+      {total > 0 && (
         <div className="flex justify-center mt-4">
           <Pagination
-            totalItems={list.length}
-            itemsPerPage={ITEMS_PER_PAGE}
+            totalItems={total}
+            itemsPerPage={rowsPerPage}
             page={page}
             onPageChange={handlePage}
           />

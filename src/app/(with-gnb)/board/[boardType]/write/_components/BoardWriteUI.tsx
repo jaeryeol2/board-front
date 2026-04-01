@@ -48,7 +48,7 @@ export default function BoardWriteUI({
     form.set('content', content);
 
     if (isNotEmpty(attachments)) {
-      for (const [index, file] of Array.from(attachments).entries()) {
+      for (const [_, file] of Array.from(attachments).entries()) {
         form.append(`attachments`, file);
       }
     }

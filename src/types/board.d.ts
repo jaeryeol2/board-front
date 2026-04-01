@@ -4,6 +4,7 @@ export type Board = {
   writerId: string;
   writerName: string;
   createdAt: string;
+  viewCount: number;
 };
 
 export type BoardDetail = {

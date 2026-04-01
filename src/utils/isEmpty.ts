@@ -50,9 +50,9 @@ export const isEmpty = <T>(data: T): boolean => {
       return checkObjectEmptiness(data as object);
 
     case 'number':
-    case 'boolean':
     case 'bigint':
-      return false;
+    case 'boolean':
+      return Number.isNaN(data);
 
     case 'function':
     case 'symbol':
