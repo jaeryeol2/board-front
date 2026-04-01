@@ -8,7 +8,7 @@ import { FetchError, FetchOptions, ofetch } from 'ofetch';
 const $fetch = ofetch.create({
   baseURL: process.env.NEXT_BASE_API_URL,
   retry: 3,
-  retryDelay: 500,
+  retryDelay: 1000,
   timeout: 2000,
   // onRequest({ request, options }) {}
   // onResponse({ request, options, response }) {}
