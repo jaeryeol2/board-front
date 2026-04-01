@@ -7,6 +7,23 @@ export type Board = {
   viewCount: number;
 };
 
+type BoardComment = {
+  id: number;
+  parentId: number;
+  content: string;
+  writerId: string;
+  writerName: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type BoardFile = {
+  id: number;
+  boardId: number;
+  fileUrl: string;
+  originalFileName: string;
+};
+
 export type BoardDetail = {
   id: number;
   title: string;
@@ -17,5 +34,6 @@ export type BoardDetail = {
   likeCount: number;
   createdAt: string;
   updatedAt: string;
-  commentList: Array<unknown>;
+  commentList: Array<BoardComment>;
+  fileList: Array<BoardFile>;
 };

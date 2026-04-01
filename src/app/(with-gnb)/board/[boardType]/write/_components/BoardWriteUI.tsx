@@ -3,6 +3,7 @@
 import Button from '@/components/base/Button';
 import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
+import Textarea from '@/components/base/Textarea';
 import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
 import { isNotEmpty } from '@/utils/isEmpty';
@@ -98,16 +99,7 @@ export default function BoardWriteUI({
 
           {/* 내용 입력란 */}
           <div className="border-b border-gray-200 focus-within:border-blue-500 transition-colors">
-            <label
-              htmlFor="content"
-              className="text-sm font-medium text-gray-500"
-            >
-              내용
-            </label>
-            <textarea
-              id="content"
-              rows={12}
-              className="w-full pt-2 pb-3 text-base bg-transparent border-none focus:ring-0 resize-none placeholder-gray-400"
+            <Textarea
               placeholder="내용을 입력해 주세요"
               value={content}
               onChange={(e) => setContent(e.target.value)}

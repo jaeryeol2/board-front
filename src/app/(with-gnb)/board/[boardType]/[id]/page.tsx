@@ -3,6 +3,7 @@ import { BoardDetail } from '@/types/board';
 import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { cache } from 'react';
 import BoardDetailUI from '../_components/BoardDetailUI';
 
@@ -32,6 +33,10 @@ export default async function BoardDetailPage({
 }: Readonly<ParamsType<BoardDetailParam>>) {
   const { boardType, id } = await params;
   const { data } = await fetchData(boardType, id);
+
+  if (data === null) {
+    return notFound();
+  }
 
   return <BoardDetailUI board={data} />;
 }

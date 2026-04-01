@@ -3,6 +3,7 @@
 import Button from '@/components/base/Button';
 import Pagination from '@/components/common/client/Pagination';
 import { Board } from '@/types/board';
+import { format } from 'date-fns';
 import { useParams, useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 
@@ -98,14 +99,17 @@ export default function BoardListUI({
                   </td>
                   <td className="px-6 py-4 text-center">{board.writerName}</td>
                   <td className="px-6 py-4 text-center">
-                    {new Date(board.createdAt).toLocaleDateString()}
+                    {format(new Date(board.createdAt), 'yyyy.MM.dd')}
                   </td>
                   <td className="px-6 py-4 text-center">{board.viewCount}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                <td
+                  colSpan={5}
+                  className="h-[590px] text-center align-middle text-gray-500"
+                >
                   게시글이 없습니다.
                 </td>
               </tr>
