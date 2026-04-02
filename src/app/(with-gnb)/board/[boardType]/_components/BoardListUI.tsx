@@ -27,14 +27,8 @@ export default function BoardListUI({
   const router = useRouter();
   const params = useParams();
   const boardType = params.boardType as string;
-
   // 현재 페이지에 해당하는 데이터 목록
-  const paginatedList = useMemo(() => {
-    const startIndex = (page - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-
-    return list.slice(startIndex, endIndex);
-  }, [list]);
+  const paginatedList = useMemo(() => list, [list]);
 
   /**
    * 행 클릭 시 상세 페이지로 이동합니다.
