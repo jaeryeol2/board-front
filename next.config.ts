@@ -28,6 +28,7 @@ const nextConfig: NextConfig = {
     };
   },
   images: {
+    dangerouslyAllowLocalIP: process.env.APP_ENV === 'local',
     remotePatterns: [new URL((process.env.NEXT_IMAGE_URL ?? '').concat('/**'))],
   },
 };
