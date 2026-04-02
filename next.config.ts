@@ -27,6 +27,9 @@ const nextConfig: NextConfig = {
       ],
     };
   },
+  images: {
+    remotePatterns: [new URL((process.env.NEXT_IMAGE_URL ?? '').concat('/**'))],
+  },
 };
 
 export default nextConfig;
