@@ -2,6 +2,7 @@ import { ParamsType } from '@/types/base';
 import { BoardDetail } from '@/types/board';
 import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
+import { isNotEmpty } from '@/utils/isEmpty';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
@@ -34,7 +35,7 @@ export default async function BoardDetailPage({
   const { boardType, id } = await params;
   const { data } = await fetchData(boardType, id);
 
-  if (data === null) {
+  if (!isNotEmpty(data)) {
     return notFound();
   }
 

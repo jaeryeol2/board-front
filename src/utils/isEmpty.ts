@@ -24,7 +24,8 @@ const checkObjectEmptiness = (data: object): boolean => {
 
 /**
  * 빈값 체크
- * true:빈값, false: 값있음
+ *
+ * true: 빈값, false: 값있음
  *
  * 조건문 블록 내에서 해당 타입의 프로퍼티를 사용하고싶으면 'isNotEmpty'를 사용하세요.
  *
@@ -65,7 +66,8 @@ export const isEmpty = <T>(data: T): boolean => {
 
 /**
  * 빈값 체크
- * true: 값있음, false: 빈값
+ *
+ * true: 값 있음, false: 빈값
  *
  * https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates
  * @param data
