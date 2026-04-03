@@ -5,6 +5,7 @@ import Button from '@/components/base/Button';
 import Textarea from '@/components/base/Textarea';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { BoardDetail } from '@/types/board';
+import { isNotEmpty } from '@/utils/isEmpty';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { FocusEvent, useContext, useState } from 'react';
@@ -68,8 +69,12 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
               {board.title}
             </h1>
             <div className="flex items-center text-gray-500 text-sm">
-              <span className="font-medium">{board.writerName}</span>
-              <span className="mx-2.5 text-gray-300">·</span>
+              {isNotEmpty(board.writerName) && (
+                <>
+                  <span className="font-medium">{board.writerName}</span>
+                  <span className="mx-2.5 text-gray-300">·</span>
+                </>
+              )}
               <span>
                 {format(new Date(board.createdAt), 'yyyy.MM.dd HH:mm')}
               </span>

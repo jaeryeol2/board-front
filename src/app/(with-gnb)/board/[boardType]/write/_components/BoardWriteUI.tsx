@@ -4,9 +4,10 @@ import Button from '@/components/base/Button';
 import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
 import Textarea from '@/components/base/Textarea';
+import { useValidator } from '@/hooks/useValidator';
 import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
-import { isNotEmpty } from '@/utils/isEmpty';
+import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, SubmitEvent, useState } from 'react';
 
@@ -25,6 +26,7 @@ export default function BoardWriteUI({
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [attachments, setAttachments] = useState<FileList | null>(null);
+  const { validator } = useValidator();
 
   /**
    * 파일 선택 변경 핸들러
@@ -42,29 +44,34 @@ export default function BoardWriteUI({
    */
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const form = new FormData();
+    const valid = validator
+      .verification(() => isEmpty(title), '제목을 입력해주세요.')
+      .verification(() => isEmpty(content), '내용을 입력해주세요.');
 
-    console.log('게시글 작성:', { boardType, title, content, attachments });
-    form.set('title', title);
-    form.set('content', content);
+    if (valid.validate() && confirm('등록하시겠습니까?')) {
+      form.set('title', title);
+      form.set('content', content);
 
-    if (isNotEmpty(attachments)) {
-      for (const [_, file] of Array.from(attachments).entries()) {
-        form.append(`attachments`, file);
+      if (isNotEmpty(attachments)) {
+        for (const file of Array.from(attachments)) {
+          form.append(`attachments`, file);
+        }
       }
-    }
 
-    const { status, data } = await appFetch<boolean>(
-      `/api/board/${toSnakeCase(boardType).toUpperCase()}`,
-      {
-        method: 'post',
-        body: form,
-      },
-    );
+      const { status, data } = await appFetch<boolean>(
+        `/api/board/${toSnakeCase(boardType).toUpperCase()}`,
+        {
+          method: 'post',
+          body: form,
+        },
+      );
 
-    if (status === 201 && data) {
-      alert('게시글이 작성되었습니다.');
-      router.push(`/board/${boardType}?page=1`);
+      if (status === 201 && data) {
+        alert('게시글이 작성되었습니다.');
+        router.push(`/board/${boardType}?page=1`);
+      }
     }
   };
 
@@ -177,8 +184,8 @@ export default function BoardWriteUI({
               {/* 버튼 영역 */}
               <div className="flex justify-end gap-4 pt-8 border-t border-gray-200 mt-12">
                 <Button
-                  onClick={handleCancel}
                   className="px-8 py-3 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                  onClick={handleCancel}
                 >
                   취소
                 </Button>

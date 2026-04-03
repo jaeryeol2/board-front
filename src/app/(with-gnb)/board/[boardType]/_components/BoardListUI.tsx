@@ -4,6 +4,7 @@ import Button from '@/components/base/Button';
 import Pagination from '@/components/common/client/Pagination';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { Board } from '@/types/board';
+import { isNotEmpty } from '@/utils/isEmpty';
 import { format } from 'date-fns';
 import { useParams, useRouter } from 'next/navigation';
 import { useContext, useMemo } from 'react';
@@ -31,6 +32,8 @@ export default function BoardListUI({
   // 현재 페이지에 해당하는 데이터 목록
   const paginatedList = useMemo(() => list, [list]);
   const { isLogin } = useContext(GlobalContext);
+  const canWrite = isLogin && boardType !== 'board-popular';
+  const isNotAnony = boardType !== 'board-anony';
 
   /**
    * 행 클릭 시 상세 페이지로 이동합니다.
@@ -52,7 +55,7 @@ export default function BoardListUI({
 
   return (
     <div className="py-8">
-      {isLogin && (
+      {canWrite && (
         <div className="flex justify-end mb-4">
           <Button onClick={handleWriteClick}>글쓰기</Button>
         </div>
@@ -67,12 +70,14 @@ export default function BoardListUI({
               <th scope="col" className="w-24 px-6 py-3 text-center">
                 번호
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-6 py-3 cols-2">
                 제목
               </th>
-              <th scope="col" className="w-40 px-6 py-3 text-center">
-                작성자
-              </th>
+              {isNotAnony && (
+                <th scope="col" className="w-40 px-6 py-3 text-center">
+                  작성자
+                </th>
+              )}
               <th scope="col" className="w-40 px-6 py-3 text-center">
                 작성일
               </th>
@@ -102,9 +107,15 @@ export default function BoardListUI({
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-center">{board.writerName}</td>
+                  {isNotAnony && (
+                    <td className="px-6 py-4 text-center">
+                      {board.writerName}
+                    </td>
+                  )}
                   <td className="px-6 py-4 text-center">
-                    {format(new Date(board.createdAt), 'yyyy.MM.dd')}
+                    {isNotEmpty(board?.createdAt)
+                      ? format(new Date(board.createdAt), 'yyyy.MM.dd')
+                      : ''}
                   </td>
                   <td className="px-6 py-4 text-center">{board.viewCount}</td>
                 </tr>
