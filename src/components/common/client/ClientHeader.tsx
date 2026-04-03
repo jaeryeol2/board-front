@@ -23,8 +23,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
   const { push } = useRouter();
   const { isLogin, userInfo } = useContext(GlobalContext);
 
-  const handleLogout = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
+  const handleLogout = async () => {
     const { data } = await appFetch<boolean>('/api/logout', {
       method: 'post',
     }).catch(() => ({
@@ -41,12 +40,11 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
     const menuMap = new Map<number, MenuItem>();
     const rootMenus: MenuItem[] = [];
 
-    menus.forEach((menu) => {
+    for (const menu of menus) {
       menuMap.set(menu.id, { ...menu, children: [] });
-    });
 
-    menus.forEach((menu) => {
       const menuItem = menuMap.get(menu.id);
+
       if (menuItem) {
         if (menu.parentId) {
           const parent = menuMap.get(menu.parentId);
@@ -55,7 +53,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
           rootMenus.push(menuItem);
         }
       }
-    });
+    }
 
     return rootMenus;
   }, [menus]);
@@ -69,7 +67,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
             href="/"
             className="text-xl font-extrabold text-gray-900 md:text-2xl"
           >
-            Board
+            The Lounge.
           </AppLink>
           <nav className="hidden items-center space-x-1 md:flex">
             {menuTree.map((menu) => (
@@ -124,38 +122,76 @@ function HeaderMenuItem({ item }: Readonly<{ item: MenuItem }>) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null); // For hover delay
 
   const isActive =
     item.href !== '/' && pathname.startsWith(item.href)
       ? 'text-blue-600 font-semibold'
       : 'text-gray-500 font-medium';
 
+  const handleOpen = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setIsOpen(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 100); // Small delay to allow moving mouse from button to menu
+  }, []);
+
   const handleToggle = useCallback(() => {
     setIsOpen((prev) => !prev);
   }, []);
 
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+        buttonRef.current?.focus(); // Return focus to the button
+      }
+    },
+    [isOpen],
+  );
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      // 클릭이 메뉴 외부와 버튼 외부에서 발생했을 때만 메뉴를 닫습니다.
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('keydown', handleKeyDown); // Add keydown listener
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown); // Clean up
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [handleKeyDown]);
 
   if (item.menuType === 'DIRECTORY' && item.children?.length) {
     return (
-      <div
-        ref={menuRef}
-        className="relative"
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
-      >
-        <button
-          type="button"
+      <div className="relative">
+        <Button
+          ref={buttonRef} // Assign ref to the button
           onClick={handleToggle}
+          onMouseEnter={handleOpen} // Open on hover
+          onMouseLeave={handleClose} // Close on leave (with delay)
           className={`flex items-center rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 hover:text-gray-900 ${isActive}`}
+          aria-haspopup="menu" // Indicate that this button opens a menu
+          aria-expanded={isOpen} // Indicate whether the menu is currently open
         >
           {item.menuName}
           <svg
@@ -172,15 +208,24 @@ function HeaderMenuItem({ item }: Readonly<{ item: MenuItem }>) {
               clipRule="evenodd"
             />
           </svg>
-        </button>
+        </Button>
         {isOpen && (
           <div className="absolute left-0 top-full z-10 mt-2 w-48 origin-top-left rounded-lg border border-gray-100 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-            <div className="py-1">
+            <div // Assign menuRef to the actual dropdown div
+              ref={menuRef}
+              onMouseEnter={handleOpen} // Keep open if mouse enters menu
+              onMouseLeave={handleClose} // Close if mouse leaves menu (with delay)
+              role="menu" // Add role and orientation to the actual menu container
+              aria-orientation="vertical"
+              tabIndex={-1} // Make the menu focusable
+              className="py-1"
+            >
               {item.children.map((child, index) => (
                 <Fragment key={child.id}>
                   <AppLink
                     href={child.href}
                     className="block w-full px-4 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-gray-100"
+                    role="menuitem" // Indicate this is a menu item
                   >
                     {child.menuName}
                   </AppLink>

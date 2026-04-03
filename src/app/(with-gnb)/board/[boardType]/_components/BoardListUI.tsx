@@ -90,7 +90,7 @@ export default function BoardListUI({
                   onClick={() => handleRowClick(board.id)}
                 >
                   <td className="px-6 py-4 text-center">
-                    {paginatedList.length - index}
+                    {total - (page - 1) * rowsPerPage - index}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                     <div className="flex items-center gap-3">
