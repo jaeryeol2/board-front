@@ -1,11 +1,12 @@
+import { Menu } from '@/types/global';
 import { appFetch } from '@/utils/appFetch';
 import { cache } from 'react';
 import ClientHeader from './client/ClientHeader';
 
 const fetchData = cache(async () => {
-  return await appFetch<Array<{ menuName: string; href: string }>>(
-    '/api/menus',
-  );
+  return await appFetch<Array<Menu>>('/api/menus', {
+    next: { revalidate: 3600 },
+  });
 });
 
 export default async function Header() {
