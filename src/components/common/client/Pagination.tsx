@@ -1,7 +1,7 @@
 'use client';
 
 import Button from '@/components/base/Button';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 
 type PaginationProps = {
   totalItems: number;
@@ -11,7 +11,7 @@ type PaginationProps = {
 };
 
 /**
- * TOAST UI Pagination 공통 컴포넌트
+ * Pagination 공통 컴포넌트
  * @param totalItems 전체 아이템 개수
  * @param itemsPerPage 페이지당 아이템 개수
  * @param page 현재 페이지
@@ -23,9 +23,9 @@ export default function Pagination({
   page,
   onPageChange,
 }: Readonly<PaginationProps>) {
+  const currentPage = useRef(page);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const visiblePages = 5; // TUI Pagination과 동일하게 5개 페이지 번호 표시
-
   const startPage = useMemo(() => {
     const half = Math.floor(visiblePages / 2);
     let start = page - half;
@@ -66,6 +66,19 @@ export default function Pagination({
       onPageChange(page + 1);
     }
   };
+  const handlePageChange = (page: number) => {
+    if (currentPage.current === page) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+
+      return;
+    }
+
+    currentPage.current = page;
+    onPageChange(page);
+  };
 
   return (
     <nav
@@ -89,7 +102,7 @@ export default function Pagination({
               ? 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700'
               : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700'
           }`}
-          onClick={() => onPageChange(number)}
+          onClick={() => handlePageChange(number)}
         >
           {number}
         </Button>
