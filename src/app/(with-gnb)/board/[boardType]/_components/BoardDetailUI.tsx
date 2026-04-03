@@ -5,7 +5,7 @@ import Button from '@/components/base/Button';
 import Textarea from '@/components/base/Textarea';
 import { BoardDetail } from '@/types/board';
 import { format } from 'date-fns';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 type BoardDetailProps = {
@@ -15,7 +15,6 @@ type BoardDetailProps = {
 export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
   const [comment, setComment] = useState<string>('');
   const router = useRouter();
-  const path = usePathname();
 
   // TODO: 댓글 작성 로직 추가 필요
   const handleCommentSubmit = () => {
@@ -24,20 +23,20 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
   };
 
   const handleGoBack = () => {
-    router.push(path.substring(0, path.lastIndexOf('/')));
+    router.back();
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
+    <div className="bg-white min-h-screen">
+      <div className="py-20">
         <div className="mb-8">
           <Button
             onClick={handleGoBack}
-            className="flex items-center text-gray-500 hover:text-gray-700 transition-colors"
+            className="flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-100"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2"
+              className="h-5 w-5 mr-1.5"
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -47,7 +46,7 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
                 clipRule="evenodd"
               />
             </svg>
-            <span>뒤로가기</span>
+            목록으로
           </Button>
         </div>
 
@@ -75,11 +74,11 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
 
           {board.fileList && board.fileList.length > 0 && (
             <div className="mt-12">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="flex flex-col gap-4">
                 {board.fileList.map((file) => (
                   <div
                     key={file.id}
-                    className="relative w-full h-56 rounded-lg overflow-hidden group"
+                    className="relative w-full aspect-video rounded-lg overflow-hidden group"
                   >
                     <AppImage
                       src={file.fileUrl}
@@ -139,19 +138,19 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
             </div>
 
             <div className="mt-10">
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-gray-100 rounded-xl p-5">
                 <Textarea
                   placeholder="따뜻한 댓글을 남겨주세요."
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   rows={3}
-                  className="w-full resize-none bg-transparent border-none p-0 focus:ring-0"
+                  className="w-full resize-none bg-transparent border-none p-0 focus:ring-0 text-base placeholder-gray-500"
                 />
                 <div className="flex justify-end mt-2 border-t border-gray-200 pt-3">
                   <Button
                     onClick={handleCommentSubmit}
                     disabled={!comment.trim()}
-                    className="px-6 py-2 text-sm"
+                    className="px-6 py-2.5 text-sm font-semibold"
                   >
                     등록
                   </Button>

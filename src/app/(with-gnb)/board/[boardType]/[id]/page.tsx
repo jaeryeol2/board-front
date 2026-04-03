@@ -35,9 +35,9 @@ export default async function BoardDetailPage({
   const { boardType, id } = await params;
   const { data } = await fetchData(boardType, id);
 
-  if (!isNotEmpty(data)) {
-    return notFound();
+  if (isNotEmpty(data)) {
+    return <BoardDetailUI board={data} />;
   }
 
-  return <BoardDetailUI board={data} />;
+  return notFound();
 }

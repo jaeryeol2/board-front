@@ -76,101 +76,118 @@ export default function BoardWriteUI({
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <div className="bg-white p-8 sm:p-10 rounded-xl shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">게시글 작성</h1>
-        <p className="text-gray-500 mb-10">
-          새로운 소식을 공유하고 다른 사람들과 소통해보세요.
-        </p>
+    <div className="bg-white min-h-screen">
+      <div className="py-20">
+        <div className="bg-white p-8 sm:p-12 rounded-2xl shadow-sm">
+          <div className="max-w-3xl mx-auto">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              게시글 작성
+            </h1>
+            <p className="text-gray-600 mb-12">
+              새로운 소식을 공유하고 다른 사람들과 소통해보세요.
+            </p>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* 제목 입력란 */}
-          <div className="border-b border-gray-200 focus-within:border-blue-500 transition-colors">
-            <Text
-              label="제목"
-              id="title"
-              className="w-full pt-2 pb-3 text-lg bg-transparent border-none focus:ring-0 placeholder-gray-400"
-              placeholder="제목을 입력해 주세요"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-          </div>
-
-          {/* 내용 입력란 */}
-          <div className="border-b border-gray-200 focus-within:border-blue-500 transition-colors">
-            <Textarea
-              placeholder="내용을 입력해 주세요"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              required
-            />
-          </div>
-
-          {/* 첨부파일 입력란 */}
-          <div>
-            <label
-              htmlFor="attachments"
-              className="text-sm font-medium text-gray-500"
-            >
-              첨부파일
-            </label>
-            <div className="mt-2 flex items-center justify-center w-full">
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg
-                    className="w-8 h-8 mb-4 text-gray-500"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 20 16"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                    />
-                  </svg>
-                  <p className="mb-2 text-sm text-gray-500">
-                    <span className="font-semibold">클릭하여 업로드</span> 또는
-                    파일을 드래그하세요.
-                  </p>
-                </div>
-                <input
-                  id="attachments"
-                  name="attachments"
-                  type="file"
-                  className="hidden"
-                  multiple
-                  onChange={handleFileChange}
+            <form onSubmit={handleSubmit} className="space-y-10">
+              {/* 제목 입력란 */}
+              <div className="border-b-2 border-gray-200 focus-within:border-gray-900 transition-colors duration-200">
+                <Text
+                  id="title"
+                  className="w-full pt-2 pb-3 text-3xl font-semibold bg-transparent border-none focus:ring-0 placeholder-gray-400"
+                  placeholder="제목을 입력하세요"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
                 />
-              </label>
-            </div>
-            {attachments && attachments.length > 0 && (
-              <div className="mt-3 text-sm text-gray-600">
-                <span className="font-semibold">선택된 파일: </span>
-                {Array.from(attachments)
-                  .map((file) => file.name)
-                  .join(', ')}
               </div>
-            )}
-          </div>
 
-          {/* 버튼 영역 */}
-          <div className="flex justify-end gap-4 pt-6">
-            <Button
-              onClick={handleCancel}
-              className="px-8 py-3 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-            >
-              취소
-            </Button>
-            <Submit className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-              작성 완료
-            </Submit>
+              {/* 내용 입력란 */}
+              <div className="mt-8">
+                <Textarea
+                  placeholder="내용을 입력하세요"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  className="w-full text-lg text-gray-800 bg-transparent border-none focus:ring-0 placeholder-gray-400 min-h-[400px] resize-none"
+                  required
+                />
+              </div>
+
+              {/* 첨부파일 입력란 */}
+              <div className="border-t border-gray-200 pt-8">
+                <label
+                  htmlFor="attachments"
+                  className="text-lg font-semibold text-gray-800"
+                >
+                  파일 첨부
+                </label>
+                <div className="mt-4 flex items-center justify-center w-full">
+                  <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-500">
+                      <svg
+                        className="w-10 h-10 mb-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h1.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293h4.586a4 4 0 014 4v5a4 4 0 01-4 4H7z"
+                        ></path>
+                      </svg>
+                      <p className="mb-2 text-base">
+                        <span className="font-semibold">클릭 또는 드래그</span>
+                      </p>
+                      <p className="text-xs">이미지 파일을 업로드하세요.</p>
+                    </div>
+                    <input
+                      id="attachments"
+                      name="attachments"
+                      type="file"
+                      className="hidden"
+                      multiple
+                      onChange={handleFileChange}
+                      accept="image/*"
+                    />
+                  </label>
+                </div>
+                {attachments && attachments.length > 0 && (
+                  <div className="mt-4 text-sm text-gray-600">
+                    <ul className="space-y-2">
+                      {Array.from(attachments).map((file, index) => (
+                        <li
+                          key={index}
+                          className="flex items-center justify-between p-2 px-3 bg-gray-100 rounded-md"
+                        >
+                          <span className="font-medium truncate pr-4">
+                            {file.name}
+                          </span>
+                          <span className="text-gray-500 text-xs flex-shrink-0">
+                            {(file.size / 1024).toFixed(2)} KB
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* 버튼 영역 */}
+              <div className="flex justify-end gap-4 pt-8 border-t border-gray-200 mt-12">
+                <Button
+                  onClick={handleCancel}
+                  className="px-8 py-3 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                >
+                  취소
+                </Button>
+                <Submit className="px-8 py-3 rounded-lg font-semibold">
+                  작성 완료
+                </Submit>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
