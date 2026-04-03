@@ -1,4 +1,4 @@
-import { X_CURRENT_PATH } from '@/constants/common';
+import { BASE_SEO_TITLE, X_CURRENT_PATH } from '@/constants/common';
 import { ParamsType, SearchParamsType } from '@/types/base';
 import { Board } from '@/types/board';
 import { Menu } from '@/types/global';
@@ -40,13 +40,13 @@ export const generateMetadata = async ({
 
   if (isNotEmpty(data)) {
     return {
-      title: `The Lounge. | ${data.menuName}`,
+      title: `${BASE_SEO_TITLE} | ${data.menuName}`,
       description: data.href,
     };
   }
 
   return {
-    title: 'The Lounge. | 게시판',
+    title: `${BASE_SEO_TITLE} | 게시판`,
     description: 'The Board.',
   };
 };

@@ -9,3 +9,4 @@ export const APPLICATION_JSON = 'application/json';
 export const APPLICATION_FORM_URLENCODED = 'application/x-www-form-urlencoded';
 export const BEARER = 'Bearer';
 export const CONTENT_DISPOSITION = 'Content-Disposition';
+export const BASE_SEO_TITLE = 'The Lounge';
