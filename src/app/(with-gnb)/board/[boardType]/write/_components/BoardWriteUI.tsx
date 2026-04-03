@@ -113,14 +113,15 @@ export default function BoardWriteUI({
 
               {/* 첨부파일 입력란 */}
               <div className="border-t border-gray-200 pt-8">
-                <label
-                  htmlFor="attachments"
-                  className="text-lg font-semibold text-gray-800"
-                >
+                <div className="text-lg font-semibold text-gray-800">
                   파일 첨부
-                </label>
+                </div>
                 <div className="mt-4 flex items-center justify-center w-full">
-                  <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <label
+                    htmlFor="attachments"
+                    aria-label="파일 첨부"
+                    className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-500">
                       <svg
                         className="w-10 h-10 mb-4"
@@ -141,23 +142,23 @@ export default function BoardWriteUI({
                       </p>
                       <p className="text-xs">이미지 파일을 업로드하세요.</p>
                     </div>
-                    <input
-                      id="attachments"
-                      name="attachments"
-                      type="file"
-                      className="hidden"
-                      multiple
-                      onChange={handleFileChange}
-                      accept="image/*"
-                    />
                   </label>
+                  <input
+                    id="attachments"
+                    name="attachments"
+                    type="file"
+                    className="hidden"
+                    multiple
+                    onChange={handleFileChange}
+                    accept="image/*"
+                  />
                 </div>
                 {attachments && attachments.length > 0 && (
                   <div className="mt-4 text-sm text-gray-600">
                     <ul className="space-y-2">
                       {Array.from(attachments).map((file, index) => (
                         <li
-                          key={index}
+                          key={`${index}-${file.name}`}
                           className="flex items-center justify-between p-2 px-3 bg-gray-100 rounded-md"
                         >
                           <span className="font-medium truncate pr-4">
