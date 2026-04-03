@@ -34,7 +34,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
         {/* Left Section: Logo and Menu */}
         <div className="flex items-center space-x-8">
           <AppLink href="/" className="text-2xl font-bold text-gray-800">
-            MyLogo
+            Temp
           </AppLink>
           <nav className="hidden space-x-6 md:flex">
             {menus.map((item) => (
