@@ -1,9 +1,10 @@
 import { X_CURRENT_PATH } from '@/constants/common';
 import { ParamsType, SearchParamsType } from '@/types/base';
 import { Board } from '@/types/board';
+import { Menu } from '@/types/global';
 import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
-import { isEmpty } from '@/utils/isEmpty';
+import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -14,23 +15,39 @@ type BoardFilter = {
   page: number;
   rowsPerPage: number;
 };
-const fetchData = cache(async (boardType: string, query: BoardFilter) => {
-  return await appFetch<{ total: number; list: Array<Board> }>(
-    `/api/board/${toSnakeCase(boardType).toUpperCase()}`,
-    {
-      query,
-    },
+const fetchBoardInfoData = cache(async (boardType: string) => {
+  return await appFetch<Menu>(
+    `/api/menus/${toSnakeCase(boardType).toUpperCase()}`,
+    { next: { revalidate: 3600 } },
   );
 });
+const fetchBoardListData = cache(
+  async (boardType: string, query: BoardFilter) => {
+    return await appFetch<{ total: number; list: Array<Board> }>(
+      `/api/board/${toSnakeCase(boardType).toUpperCase()}`,
+      {
+        query,
+      },
+    );
+  },
+);
 
 export const generateMetadata = async ({
   params,
 }: Readonly<ParamsType<{ boardType: string }>>): Promise<Metadata> => {
   const boardType = (await params).boardType;
-  console.log('>>>> ', boardType);
+  const { data } = await fetchBoardInfoData(boardType);
+
+  if (isNotEmpty(data)) {
+    return {
+      title: data.menuName,
+      description: data.href,
+    };
+  }
+
   return {
-    title: '게시판입니다.',
-    description: '임시입니다.',
+    title: '게시판',
+    description: 'The Board.',
   };
 };
 
@@ -47,7 +64,7 @@ export default async function BoardPage({
     redirect(path === '/' ? path : path.concat(`?page=1`));
   }
 
-  const { data } = await fetchData(boardType, { page, rowsPerPage });
+  const { data } = await fetchBoardListData(boardType, { page, rowsPerPage });
 
   return (
     <BoardListUI

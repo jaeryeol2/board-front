@@ -2,10 +2,11 @@
 
 import Button from '@/components/base/Button';
 import Pagination from '@/components/common/client/Pagination';
+import { GlobalContext } from '@/contexts/GlobalContext';
 import { Board } from '@/types/board';
 import { format } from 'date-fns';
 import { useParams, useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 
 type BoardListProps = {
   total: number;
@@ -29,6 +30,7 @@ export default function BoardListUI({
   const boardType = params.boardType as string;
   // 현재 페이지에 해당하는 데이터 목록
   const paginatedList = useMemo(() => list, [list]);
+  const { isLogin } = useContext(GlobalContext);
 
   /**
    * 행 클릭 시 상세 페이지로 이동합니다.
@@ -50,9 +52,11 @@ export default function BoardListUI({
 
   return (
     <div className="py-8">
-      <div className="flex justify-end mb-4">
-        <Button onClick={handleWriteClick}>글쓰기</Button>
-      </div>
+      {isLogin && (
+        <div className="flex justify-end mb-4">
+          <Button onClick={handleWriteClick}>글쓰기</Button>
+        </div>
+      )}
       <div
         className="relative overflow-x-auto shadow-md sm:rounded-lg"
         style={{ minHeight: '640px' }}
@@ -88,8 +92,15 @@ export default function BoardListUI({
                   <td className="px-6 py-4 text-center">
                     {paginatedList.length - index}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white">
-                    {board.title}
+                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                    <div className="flex items-center gap-3">
+                      {/* NOTE: 섬네일 이미지 영역. board.thumbnailUrl과 같은 데이터가 있다면 AppImage 컴포넌트로 교체할 수 있습니다. */}
+                      <div className="w-16 h-10 flex-shrink-0 rounded-md bg-gray-100 dark:bg-gray-700" />
+                      {/* NOTE: 섬네일 이미지 영역. board.thumbnailUrl과 같은 데이터가 있다면 AppImage 컴포넌트로 교체할 수 있습니다. */}
+                      <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                        {board.title}
+                      </span>
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-center">{board.writerName}</td>
                   <td className="px-6 py-4 text-center">
