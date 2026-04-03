@@ -80,9 +80,7 @@ const mockBoards = [
 export default function HomeUI() {
   return (
     <main className="w-full max-w-screen-xl mx-auto p-4 md:p-8">
-      <div
-        className={`grid grid-cols-1 md:grid-cols-${mockBoards.length <= 2 ? '2' : '3'} gap-6 md:gap-8`}
-      >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         {mockBoards.map((board) => (
           // NOTE: 이 섹션은 `src/components/base/Card.tsx` 와 같은 공통 컴포넌트로 분리하여 재사용성을 높일 수 있습니다.
           <section
