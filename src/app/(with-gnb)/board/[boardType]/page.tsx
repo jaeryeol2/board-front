@@ -40,13 +40,13 @@ export const generateMetadata = async ({
 
   if (isNotEmpty(data)) {
     return {
-      title: data.menuName,
+      title: `The Lounge. | ${data.menuName}`,
       description: data.href,
     };
   }
 
   return {
-    title: '게시판',
+    title: 'The Lounge. | 게시판',
     description: 'The Board.',
   };
 };
