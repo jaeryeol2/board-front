@@ -3,6 +3,7 @@
 import Button from '@/components/base/Button';
 import Textarea from '@/components/base/Textarea';
 import Pagination from '@/components/common/client/Pagination';
+import SectionLoading from '@/components/common/SectionLoading';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { BoardComment } from '@/types/board';
 import { appFetch } from '@/utils/appFetch';
@@ -18,6 +19,7 @@ export default function CommentSection({
   boardId,
   initialComments,
 }: Readonly<BoardCommentSectionProps>) {
+  const [loading, setLoading] = useState(false);
   const [comment, setComment] = useState<string>('');
   const [commentList, setCommentList] = useState(initialComments);
   const [page, setPage] = useState(1);
@@ -48,9 +50,18 @@ export default function CommentSection({
 
       const { data: newComments } = await appFetch<Array<BoardComment>>(
         `/api/board/comment/${boardId}`,
+        {
+          onRequest() {
+            setLoading(true);
+          },
+          onResponse() {
+            setLoading(false);
+          },
+        },
       );
+
       setCommentList(newComments ?? []);
-      setPage(1); // 새 댓글 등록 후 1페이지로 이동
+      setPage(1);
     }
   };
 
@@ -107,58 +118,60 @@ export default function CommentSection({
         </div>
 
         {/* 댓글 목록 */}
-        <div className="space-y-4">
-          {paginatedComments && paginatedComments.length > 0 ? (
-            paginatedComments.map((c, index) => (
-              <div
-                key={c.id}
-                className={`py-5 ${index === paginatedComments.length - 1 ? '' : 'border-b border-gray-100'}`}
-              >
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-500">
-                      {c.writerName.charAt(0)}
+        <SectionLoading loading={loading}>
+          <div className="space-y-4">
+            {paginatedComments && paginatedComments.length > 0 ? (
+              paginatedComments.map((c, index) => (
+                <div
+                  key={c.id}
+                  className={`py-5 ${index === paginatedComments.length - 1 ? '' : 'border-b border-gray-100'}`}
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-shrink-0">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-500">
+                        {c.writerName.charAt(0)}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-gray-800">
-                        {c.writerName}
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-gray-800">
+                          {c.writerName}
+                        </span>
+                      </div>
+                      <p className="mt-1.5 text-base leading-relaxed text-gray-700">
+                        {c.content}
+                      </p>
+                      <span className="mt-2.5 block text-sm text-gray-500">
+                        {format(new Date(c.createdAt), 'yyyy.MM.dd HH:mm')}
                       </span>
                     </div>
-                    <p className="mt-1.5 text-base leading-relaxed text-gray-700">
-                      {c.content}
-                    </p>
-                    <span className="mt-2.5 block text-sm text-gray-500">
-                      {format(new Date(c.createdAt), 'yyyy.MM.dd HH:mm')}
-                    </span>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="rounded-lg bg-gray-50 py-16 text-center">
+                <div className="mb-2 text-4xl">💬</div>
+                <p className="font-semibold text-gray-600">
+                  아직 댓글이 없습니다.
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  가장 먼저 댓글을 남겨보세요!
+                </p>
               </div>
-            ))
-          ) : (
-            <div className="rounded-lg bg-gray-50 py-16 text-center">
-              <div className="mb-2 text-4xl">💬</div>
-              <p className="font-semibold text-gray-600">
-                아직 댓글이 없습니다.
-              </p>
-              <p className="mt-1 text-sm text-gray-500">
-                가장 먼저 댓글을 남겨보세요!
-              </p>
+            )}
+          </div>
+          {/* 페이지네이션 */}
+          {commentList.length > rowsPerPage && (
+            <div className="flex justify-center mt-8">
+              <Pagination
+                totalItems={commentList.length}
+                itemsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handlePageChange}
+              />
             </div>
           )}
-        </div>
-        {/* 페이지네이션 */}
-        {commentList.length > rowsPerPage && (
-          <div className="flex justify-center mt-8">
-            <Pagination
-              totalItems={commentList.length}
-              itemsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handlePageChange}
-            />
-          </div>
-        )}
+        </SectionLoading>
       </div>
     </>
   );

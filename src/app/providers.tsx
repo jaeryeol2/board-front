@@ -1,5 +1,5 @@
 import { X_IS_LOGIN } from '@/constants/common';
-import GlobalProvider from '@/contexts/GlobalContext';
+import { GlobalProvider } from '@/contexts/GlobalContext';
 import UserAgentProvider from '@/contexts/UserAgentContext';
 import { ChildrenType } from '@/types/base';
 import { UserInfoType } from '@/types/user';
