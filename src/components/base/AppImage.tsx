@@ -1,12 +1,37 @@
+'use client';
+
 import { ImageProps } from '@/types/component';
 import Image from 'next/image';
-import { SyntheticEvent } from 'react';
+import { SyntheticEvent, useState } from 'react';
 
-export default function AppImage({ alt, ...props }: Readonly<ImageProps>) {
+export default function AppImage({
+  alt,
+  src,
+  onError,
+  ...props
+}: Readonly<ImageProps>) {
+  const [hasError, setHasError] = useState(false);
+  const [prevSrc, setPrevSrc] = useState(src);
   const ALT_IMAGE = '/images/alt-image.png';
-  const handleErrorImage = (e: SyntheticEvent) => {
-    (e.target as HTMLImageElement).src = ALT_IMAGE;
+  const displaySrc = hasError ? ALT_IMAGE : src;
+
+  if (src !== prevSrc) {
+    setPrevSrc(src);
+    setHasError(false);
+  }
+
+  const handleErrorImage = (e: SyntheticEvent<HTMLImageElement, Event>) => {
+    if (onError) {
+      onError(e);
+      return;
+    }
+
+    if (!hasError) {
+      setHasError(true);
+    }
   };
 
-  return <Image onError={(e) => handleErrorImage(e)} {...props} alt={alt} />;
+  return (
+    <Image {...props} src={displaySrc} alt={alt} onError={handleErrorImage} />
+  );
 }
