@@ -43,6 +43,11 @@ export default function CommentSection({
 
   const { isLogin } = useContext(GlobalContext);
 
+  const handleFocusArea = () => {
+    if (onFocusArea) {
+      onFocusArea();
+    }
+  };
   const handleCommentSubmit = async () => {
     const { status, data } = await appFetch<boolean>(
       `/api/board/comment/${boardId}`,
@@ -74,10 +79,7 @@ export default function CommentSection({
 
       setCommentList(newComments ?? []);
       setPage(1);
-
-      if (onFocusArea) {
-        onFocusArea();
-      }
+      handleFocusArea();
     }
   };
 
@@ -92,6 +94,7 @@ export default function CommentSection({
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
+    handleFocusArea();
   };
 
   return (
