@@ -15,9 +15,20 @@ export const GlobalContext = createContext<GlobalContextType>({
   cartCount: 0,
 });
 
-export default function GlobalProvider({
+export function GlobalProvider({
   global,
   children,
 }: Readonly<{ global: GlobalContextType } & ChildrenType>) {
   return <GlobalContext value={global}>{children}</GlobalContext>;
+}
+
+/** rcc loading context */
+export const LoadingContext = createContext<boolean>(false);
+
+/** rsc loading context provider */
+export function LoadingProvider({
+  loading,
+  children,
+}: Readonly<{ loading: boolean } & ChildrenType>) {
+  return <LoadingContext value={loading}>{children}</LoadingContext>;
 }
