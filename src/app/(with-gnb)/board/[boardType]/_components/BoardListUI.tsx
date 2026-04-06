@@ -109,7 +109,11 @@ export default function BoardListUI({
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                     <div className="flex items-center gap-3">
                       {/* NOTE: 섬네일 이미지 영역. board.thumbnailUrl과 같은 데이터가 있다면 AppImage 컴포넌트로 교체할 수 있습니다. */}
-                      <div className="w-16 h-10 flex-shrink-0 rounded-md bg-gray-100 dark:bg-gray-700" />
+                      {isNotEmpty(board.fileUrl) ? (
+                        <div className="w-16 h-10 flex-shrink-0 rounded-md bg-gray-100 dark:bg-gray-700" />
+                      ) : (
+                        <span className="w-16 h-10"></span>
+                      )}
                       {/* NOTE: 섬네일 이미지 영역. board.thumbnailUrl과 같은 데이터가 있다면 AppImage 컴포넌트로 교체할 수 있습니다. */}
                       <span className="whitespace-nowrap overflow-hidden text-ellipsis">
                         {board.title}

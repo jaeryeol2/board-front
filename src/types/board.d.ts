@@ -5,6 +5,7 @@ export type Board = {
   writerName: string;
   createdAt: string;
   viewCount: number;
+  fileUrl: string;
 };
 
 type BoardComment = {
