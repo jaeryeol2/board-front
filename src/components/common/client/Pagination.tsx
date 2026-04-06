@@ -8,6 +8,7 @@ type PaginationProps = {
   itemsPerPage: number;
   page: number;
   onPageChange: (page: number) => void;
+  onFocusArea?: () => void;
 };
 
 /**
@@ -22,6 +23,7 @@ export default function Pagination({
   itemsPerPage,
   page,
   onPageChange,
+  onFocusArea,
 }: Readonly<PaginationProps>) {
   const [currentPage, setCurrentPage] = useState(page);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -68,10 +70,14 @@ export default function Pagination({
   };
   const handlePageChange = (page: number) => {
     if (currentPage === page) {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
+      if (onFocusArea) {
+        onFocusArea();
+      } else {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      }
 
       return;
     }

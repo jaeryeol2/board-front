@@ -6,6 +6,7 @@ import { BoardDetail } from '@/types/board';
 import { isNotEmpty } from '@/utils/isEmpty';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
+import { useRef } from 'react';
 import CommentSection from './CommentSection';
 
 type BoardDetailProps = {
@@ -14,10 +15,19 @@ type BoardDetailProps = {
 
 export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
   const router = useRouter();
+  const commentArea = useRef<HTMLDivElement>(null);
 
   const handleGoBack = () => {
     router.back();
   };
+  const handleFocusArea = () => {
+    commentArea.current?.scrollIntoView({
+      behavior: 'smooth', // 부드러운 이동 (instant, smooth)
+      block: 'start', // 수직 정렬 (start, center, end, nearest)
+      inline: 'nearest', // 수평 정렬
+    });
+  };
+
   return (
     <div className="bg-white min-h-screen">
       <div className="py-20">
@@ -91,8 +101,10 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
           )}
 
           <CommentSection
+            ref={commentArea}
             boardId={board.id}
             initialComments={board.commentList}
+            onFocusArea={handleFocusArea}
           />
         </div>
       </div>

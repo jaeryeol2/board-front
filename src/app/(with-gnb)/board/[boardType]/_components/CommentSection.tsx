@@ -8,16 +8,25 @@ import { GlobalContext } from '@/contexts/GlobalContext';
 import { BoardComment } from '@/types/board';
 import { appFetch } from '@/utils/appFetch';
 import { format } from 'date-fns';
-import { FocusEvent, useContext, useMemo, useState } from 'react';
+import {
+  ComponentPropsWithRef,
+  FocusEvent,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 
-type BoardCommentSectionProps = {
+interface BoardCommentSectionProps extends ComponentPropsWithRef<'div'> {
   boardId: number;
   initialComments: Array<BoardComment>;
-};
+  onFocusArea?: () => void;
+}
 
 export default function CommentSection({
   boardId,
   initialComments,
+  onFocusArea,
+  ref,
 }: Readonly<BoardCommentSectionProps>) {
   const [loading, setLoading] = useState(false);
   const [comment, setComment] = useState<string>('');
@@ -65,6 +74,10 @@ export default function CommentSection({
 
       setCommentList(newComments ?? []);
       setPage(1);
+
+      if (onFocusArea) {
+        onFocusArea();
+      }
     }
   };
 
@@ -94,7 +107,7 @@ export default function CommentSection({
         </div>
 
         {/* 댓글 입력 폼 */}
-        <div className="mt-6 mb-8">
+        <div ref={ref} className="mt-6 mb-8">
           <div className="relative rounded-lg border border-gray-200 bg-white transition focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
             <Textarea
               placeholder="따뜻한 댓글을 남겨주세요. (100자 이내)"
@@ -171,6 +184,7 @@ export default function CommentSection({
                 itemsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handlePageChange}
+                onFocusArea={onFocusArea}
               />
             </div>
           )}
