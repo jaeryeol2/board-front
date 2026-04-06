@@ -57,6 +57,9 @@ export default function CommentSection({
           onResponse() {
             setLoading(false);
           },
+          onRequestError() {
+            setLoading(false);
+          },
         },
       );
 
