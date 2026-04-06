@@ -97,7 +97,7 @@ export default function CommentSection({
   return (
     <>
       {/* 댓글 섹션 */}
-      <div className="mt-16">
+      <div ref={ref} className="mt-16">
         {/* 댓글 헤더 */}
         <div className="flex items-center mb-4">
           <h2 className="text-xl font-bold text-gray-800">댓글</h2>
@@ -107,7 +107,7 @@ export default function CommentSection({
         </div>
 
         {/* 댓글 입력 폼 */}
-        <div ref={ref} className="mt-6 mb-8">
+        <div className="mt-6 mb-8">
           <div className="relative rounded-lg border border-gray-200 bg-white transition focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
             <Textarea
               placeholder="따뜻한 댓글을 남겨주세요. (100자 이내)"
