@@ -1,7 +1,7 @@
 'use client';
 
 import Button from '@/components/base/Button';
-import { useMemo, useRef } from 'react';
+import { useMemo, useState } from 'react';
 
 type PaginationProps = {
   totalItems: number;
@@ -23,7 +23,7 @@ export default function Pagination({
   page,
   onPageChange,
 }: Readonly<PaginationProps>) {
-  const currentPage = useRef(page);
+  const [currentPage, setCurrentPage] = useState(page);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const visiblePages = 5; // TUI Pagination과 동일하게 5개 페이지 번호 표시
   const startPage = useMemo(() => {
@@ -67,7 +67,7 @@ export default function Pagination({
     }
   };
   const handlePageChange = (page: number) => {
-    if (currentPage.current === page) {
+    if (currentPage === page) {
       window.scrollTo({
         top: 0,
         behavior: 'smooth',
@@ -76,9 +76,13 @@ export default function Pagination({
       return;
     }
 
-    currentPage.current = page;
+    setCurrentPage(page);
     onPageChange(page);
   };
+
+  if (currentPage !== page) {
+    setCurrentPage(page);
+  }
 
   return (
     <nav
