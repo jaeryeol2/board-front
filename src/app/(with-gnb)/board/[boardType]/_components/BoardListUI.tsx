@@ -6,14 +6,15 @@ import { GlobalContext } from '@/contexts/GlobalContext';
 import { Board } from '@/types/board';
 import { isNotEmpty } from '@/utils/isEmpty';
 import { format } from 'date-fns';
-import { useParams, useRouter } from 'next/navigation';
-import { useContext, useMemo } from 'react';
+import { useParams, usePathname, useRouter } from 'next/navigation';
+import { useContext, useEffect, useMemo } from 'react';
 
 type BoardListProps = {
   total: number;
   list: Array<Board>;
   page: number;
   rowsPerPage: number;
+  redefinePage: boolean;
 };
 
 /**
@@ -25,8 +26,10 @@ export default function BoardListUI({
   list,
   page,
   rowsPerPage,
+  redefinePage,
 }: Readonly<BoardListProps>) {
   const router = useRouter();
+  const path = usePathname();
   const params = useParams();
   const boardType = params.boardType as string;
   // 현재 페이지에 해당하는 데이터 목록
@@ -52,6 +55,12 @@ export default function BoardListUI({
   const handleWriteClick = (): void => {
     router.push(`/board/${boardType}/write`);
   };
+
+  useEffect(() => {
+    if (redefinePage) {
+      history.replaceState(null, '', `${path}?page=${page}`);
+    }
+  }, [path, page, redefinePage]);
 
   return (
     <div className="py-8">

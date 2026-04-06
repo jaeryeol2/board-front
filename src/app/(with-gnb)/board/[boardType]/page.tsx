@@ -1,13 +1,12 @@
-import { BASE_SEO_TITLE, X_CURRENT_PATH } from '@/constants/common';
+import { BASE_SEO_TITLE } from '@/constants/common';
 import { ParamsType, SearchParamsType } from '@/types/base';
 import { Board } from '@/types/board';
 import { Menu } from '@/types/global';
 import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
-import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
+import { isNotEmpty } from '@/utils/isEmpty';
 import { Metadata } from 'next';
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { cache } from 'react';
 import BoardListUI from './_components/BoardListUI';
 
@@ -56,15 +55,17 @@ export default async function BoardPage({
   searchParams,
 }: Readonly<ParamsType<{ boardType: string }> & SearchParamsType>) {
   const boardType = (await params).boardType;
-  const page = Number((await searchParams).page as string);
+  const hasPage = isNotEmpty((await searchParams)?.page);
+  const page = Number((await searchParams)?.page ?? 1);
   const rowsPerPage = 20;
+  const { data } = await fetchBoardListData(boardType, {
+    page,
+    rowsPerPage,
+  });
 
-  if (isEmpty(page)) {
-    const path = (await headers()).get(X_CURRENT_PATH) ?? '/';
-    redirect(path === '/' ? path : path.concat(`?page=1`));
+  if (!isNotEmpty(boardType)) {
+    return notFound();
   }
-
-  const { data } = await fetchBoardListData(boardType, { page, rowsPerPage });
 
   return (
     <BoardListUI
@@ -72,6 +73,7 @@ export default async function BoardPage({
       list={data?.list ?? []}
       page={page}
       rowsPerPage={rowsPerPage}
+      redefinePage={!hasPage}
     />
   );
 }
