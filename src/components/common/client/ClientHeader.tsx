@@ -81,7 +81,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
           {isLogin ? (
             <div className="flex items-center space-x-4">
               <span className="hidden text-sm font-medium text-gray-700 sm:block">
-                {userInfo?.userName}님
+                {userInfo?.userName ?? '회원'}님
               </span>
               <AppLink
                 href="/mypage"
@@ -89,6 +89,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
               >
                 마이페이지
               </AppLink>
+              <span>|</span>
               <Button
                 className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
                 onClick={handleLogout}
