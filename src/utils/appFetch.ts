@@ -17,9 +17,6 @@ const $fetch = ofetch.create({
   async onRequest({ request, options }) {
     console.log('api request path: ', request);
 
-    for (const [key, value] of options.headers.entries()) {
-      console.log(`${key} : ${value}`);
-    }
     const [ip, accessToken, refreshToken] = await Promise.all([
       getIp().catch(() => ''),
       getCookie(ACCESS_TOKEN).catch(() => ''),
