@@ -80,14 +80,11 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
         <div className="flex items-center space-x-2 sm:space-x-4">
           {isLogin ? (
             <div className="flex items-center space-x-4">
-              <span className="hidden text-sm font-medium text-gray-700 sm:block">
-                {userInfo?.userName ?? '회원'}님
-              </span>
               <AppLink
                 href="/mypage"
                 className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
               >
-                마이페이지
+                {userInfo?.userName ?? '회원'}님
               </AppLink>
               <span>|</span>
               <Button
