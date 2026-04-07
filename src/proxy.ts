@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   ACCESS_TOKEN,
-  RERESH_TOKEN,
+  REFRESH_TOKEN,
   SET_COOKIE,
   X_CURRENT_PATH,
   X_IS_LOGIN,
@@ -52,7 +52,7 @@ export async function proxy(request: NextRequest) {
   const header = new Headers();
   const { verifyToken } = tokenUtil();
   const accessToken = request.cookies.get(ACCESS_TOKEN)?.value || '';
-  const refreshToken = request.cookies.get(RERESH_TOKEN)?.value || '';
+  const refreshToken = request.cookies.get(REFRESH_TOKEN)?.value || '';
 
   if (accessToken || refreshToken) {
     try {

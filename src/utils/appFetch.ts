@@ -1,5 +1,5 @@
-import { getCookie } from '@/actions/common';
-import { ACCESS_TOKEN, RERESH_TOKEN } from '@/constants/common';
+import { getCookie, getIp } from '@/actions/common';
+import { ACCESS_TOKEN, REFRESH_TOKEN } from '@/constants/common';
 import { ResponseApi } from '@/types/base';
 import { FetchError, FetchOptions, ofetch } from 'ofetch';
 
@@ -16,15 +16,19 @@ const $fetch = ofetch.create({
   // onResponseError({ request, response, options }) {}
   async onRequest({ request, options }) {
     console.log('api request path: ', request);
-    const accessToken = await getCookie(ACCESS_TOKEN);
-    const refreshToken = await getCookie(RERESH_TOKEN);
 
-    if (accessToken) {
-      options.headers.set('Authorization', `Bearer ${accessToken}`);
+    for (const [key, value] of options.headers.entries()) {
+      console.log(`${key} : ${value}`);
     }
-    if (refreshToken) {
-      options.headers.set('Cookie', `${RERESH_TOKEN}=${refreshToken}`);
-    }
+    const [ip, accessToken, refreshToken] = await Promise.all([
+      getIp().catch(() => ''),
+      getCookie(ACCESS_TOKEN).catch(() => ''),
+      getCookie(REFRESH_TOKEN).catch(() => ''),
+    ]);
+
+    options.headers.set('X-Forwarded-For', ip);
+    options.headers.set('Authorization', `Bearer ${accessToken}`);
+    options.headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken}`);
   },
   onResponseError({ response }) {
     if (response.status === 401) {

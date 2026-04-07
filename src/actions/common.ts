@@ -28,3 +28,18 @@ export const getCookie = async (key: string) => {
 export const getHeader = async () => {
   return await headers();
 };
+
+export const getIp = async () => {
+  const headersList = await getHeader();
+  const xForwardedFor = headersList.get('x-forwarded-for');
+  const clientIp =
+    xForwardedFor?.split(',')[0].trim() ||
+    headersList.get('x-real-ip') ||
+    'Unknown IP';
+
+  if (clientIp === '::1') {
+    return '127.0.0.1';
+  }
+
+  return clientIp;
+};
