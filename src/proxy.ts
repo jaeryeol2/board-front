@@ -59,7 +59,7 @@ export async function proxy(request: NextRequest) {
       await verifyToken(accessToken);
       return nextResponse(request, true, header);
     } catch (error) {
-      console.error('auth token error : ', (error as { code: string }).code);
+      console.error('access token error : ', (error as { code: string }).code);
     }
 
     try {
