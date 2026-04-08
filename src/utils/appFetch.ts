@@ -35,28 +35,29 @@ const $fetch = ofetch.create({
 });
 
 const returnError = (error: unknown) => {
-  let status = 404;
-  let message = 'Unknown Error';
-
-  if (error instanceof Error) {
-    message = error.message;
-  } else if (error instanceof FetchError) {
-    if (error.response?.status) {
-      status = error.response.status;
-    } else if (error.status) {
-      status = error.status;
-    }
-
-    if (error.message) {
-      message = error.message;
-    }
-  }
-
-  return {
-    status,
-    message,
+  const returnError = {
+    status: 404,
+    message: 'Unknown Error',
     data: null,
   };
+
+  if (error instanceof Error) {
+    return {
+      ...returnError,
+      message: error.message,
+    };
+  }
+  if (error instanceof FetchError) {
+    return {
+      ...returnError,
+      status: error.response?.status
+        ? error.response.status
+        : (error?.status ?? returnError.status),
+      message: error?.message ? error.message : returnError.message,
+    };
+  }
+
+  return returnError;
 };
 
 const native = async (
