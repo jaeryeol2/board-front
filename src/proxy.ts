@@ -6,6 +6,7 @@ import {
   X_CURRENT_PATH,
   X_IS_LOGIN,
 } from './constants/common';
+import { ResponseApi } from './types/base';
 import { appFetch } from './utils/appFetch';
 import { tokenUtil } from './utils/tokenUtil';
 
@@ -29,7 +30,6 @@ const nextResponse = (
   if (redirectValidate(request, isLogin)) {
     return NextResponse.redirect(new URL('/', nextUrl));
   }
-
   const nextResponse = NextResponse.next({
     request: {
       headers,
@@ -37,9 +37,16 @@ const nextResponse = (
     headers: {
       [X_CURRENT_PATH]: path,
       [X_IS_LOGIN]: `${isLogin ?? false}`,
-      [SET_COOKIE]: header.getSetCookie().join('; '),
     },
   });
+
+  const setCookies = header.getSetCookie();
+
+  if (setCookies && setCookies.length > 0) {
+    for (const cookie of setCookies) {
+      nextResponse.headers.append(SET_COOKIE, cookie);
+    }
+  }
 
   return nextResponse;
 };
@@ -68,6 +75,7 @@ export async function proxy(request: NextRequest) {
       const response = await appFetch.native('/api/auth/access', {
         method: 'post',
       });
+      const result = (await response.json()) as ResponseApi<boolean>;
 
       for (const [key, value] of response.headers.entries()) {
         if (key.toLowerCase() === SET_COOKIE.toLowerCase()) {
@@ -78,7 +86,7 @@ export async function proxy(request: NextRequest) {
         request.headers.append(key, value);
       }
 
-      return nextResponse(request, true, response.headers);
+      return nextResponse(request, result.data ?? false, response.headers);
     } catch (error) {
       console.error('refresh token error : ', (error as { code: string }).code);
     }

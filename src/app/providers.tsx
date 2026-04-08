@@ -4,6 +4,7 @@ import UserAgentProvider from '@/contexts/UserAgentContext';
 import { ChildrenType } from '@/types/base';
 import { UserInfoType } from '@/types/user';
 import { appFetch } from '@/utils/appFetch';
+import { isNotEmpty } from '@/utils/isEmpty';
 import { headers } from 'next/headers';
 import { userAgent } from 'next/server';
 
@@ -26,8 +27,14 @@ export default async function Providers({ children }: Readonly<ChildrenType>) {
       () => ({ data: null }),
     );
 
-    global.isLogin = isLogin;
-    global.userInfo = userInfo;
+    if (isNotEmpty(userInfo)) {
+      global.isLogin = isLogin;
+      global.userInfo = userInfo;
+    } else {
+      await appFetch('/api/token-expire', {
+        method: 'post',
+      });
+    }
   }
 
   return (

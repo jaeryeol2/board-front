@@ -9,8 +9,8 @@ const nextConfig: NextConfig = {
     return {
       afterFiles: [
         {
-          source: '/api/access-token',
-          destination: '/api/access-token',
+          source: '/api/token-expire',
+          destination: '/api/token-expire',
         },
         {
           source: '/api/cookie',
