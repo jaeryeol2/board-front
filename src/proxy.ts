@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { FetchError } from 'ofetch';
 import {
   ACCESS_TOKEN,
   REFRESH_TOKEN,
@@ -10,15 +11,113 @@ import { ResponseApi } from './types/base';
 import { appFetch } from './utils/appFetch';
 import { tokenUtil } from './utils/tokenUtil';
 
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|.*.png$|.*.ico|.*.json).*)'],
+};
+
+export async function proxy(request: NextRequest) {
+  const header = new Headers();
+  const { verifyToken } = tokenUtil();
+  const accessToken = request.cookies.get(ACCESS_TOKEN)?.value || '';
+  const refreshToken = request.cookies.get(REFRESH_TOKEN)?.value || '';
+
+  if (accessToken || refreshToken) {
+    try {
+      await verifyToken(accessToken);
+      const { data, message } = await appFetch<boolean>('/api/auth/check');
+
+      if (data) {
+        return nextResponse(request, data, header);
+      }
+
+      throw new Error(message);
+    } catch (error) {
+      console.warn('access token error : ', returnError(error).message);
+    }
+
+    try {
+      await verifyToken(refreshToken);
+      const { data, message } = await appFetch<boolean>('/api/auth/check');
+
+      if (data) {
+        const response = await appFetch.native('/api/auth/access', {
+          method: 'post',
+        });
+        const result = (await response.json()) as ResponseApi<boolean>;
+
+        if (result.data) {
+          setRequestCookie(request, response.headers);
+          return nextResponse(request, result.data, response.headers);
+        }
+      }
+
+      throw new Error(message);
+    } catch (error) {
+      console.warn('refresh token error : ', returnError(error).message);
+      const response = await appFetch.native('/api/token-expire', {
+        method: 'post',
+      });
+
+      setRequestCookie(request, response.headers);
+      setResponseCookie(response.headers.getSetCookie(), header);
+    }
+  }
+
+  return nextResponse(request, false, header);
+}
+
 const REDIRECT_PATH_SET = new Set(['/login', '/signup']);
 
+/**
+ * redirect check함수
+ * @param request
+ * @param isLogin
+ * @returns
+ */
 const redirectValidate = (request: NextRequest, isLogin: boolean) => {
   const { nextUrl } = request;
   const path = nextUrl.pathname;
-  const validate = [() => isLogin && REDIRECT_PATH_SET.has(path)];
+  const validator = [() => isLogin && REDIRECT_PATH_SET.has(path)];
 
-  return validate.every((func) => func());
+  return validator.every((func) => func());
 };
+
+/**
+ * request 쿠키 set
+ * @param request
+ * @param headers
+ */
+const setRequestCookie = (request: NextRequest, headers: Headers) => {
+  for (const [key, value] of headers.entries()) {
+    if (key.toLowerCase() === SET_COOKIE.toLowerCase()) {
+      request.headers.append(SET_COOKIE.replaceAll('Set-', ''), value);
+      continue;
+    }
+
+    request.headers.append(key, value);
+  }
+};
+
+/**
+ * response 쿠키 set
+ * @param cookies
+ * @param headers
+ */
+const setResponseCookie = (cookies: Array<string>, headers: Headers) => {
+  if (cookies && cookies.length > 0) {
+    for (const cookie of cookies) {
+      headers.append(SET_COOKIE, cookie);
+    }
+  }
+};
+
+/**
+ * Next response 함수
+ * @param request
+ * @param isLogin
+ * @param header
+ * @returns
+ */
 const nextResponse = (
   request: NextRequest,
   isLogin: boolean,
@@ -40,57 +139,38 @@ const nextResponse = (
     },
   });
 
-  const setCookies = header.getSetCookie();
-
-  if (setCookies && setCookies.length > 0) {
-    for (const cookie of setCookies) {
-      nextResponse.headers.append(SET_COOKIE, cookie);
-    }
-  }
+  setResponseCookie(header.getSetCookie(), nextResponse.headers);
 
   return nextResponse;
 };
 
-export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*.png$|.*.ico|.*.json).*)'],
-};
+/**
+ * 에러 조합함수
+ * @param error
+ * @returns
+ */
+const returnError = (error: unknown) => {
+  const returnError = {
+    status: 404,
+    message: 'Unknown Error',
+    data: null,
+  };
 
-export async function proxy(request: NextRequest) {
-  const header = new Headers();
-  const { verifyToken } = tokenUtil();
-  const accessToken = request.cookies.get(ACCESS_TOKEN)?.value || '';
-  const refreshToken = request.cookies.get(REFRESH_TOKEN)?.value || '';
-
-  if (accessToken || refreshToken) {
-    try {
-      await verifyToken(accessToken);
-      return nextResponse(request, true, header);
-    } catch (error) {
-      console.error('access token error : ', (error as { code: string }).code);
-    }
-
-    try {
-      await verifyToken(refreshToken);
-
-      const response = await appFetch.native('/api/auth/access', {
-        method: 'post',
-      });
-      const result = (await response.json()) as ResponseApi<boolean>;
-
-      for (const [key, value] of response.headers.entries()) {
-        if (key.toLowerCase() === SET_COOKIE.toLowerCase()) {
-          request.headers.append(SET_COOKIE.replaceAll('Set-', ''), value);
-          continue;
-        }
-
-        request.headers.append(key, value);
-      }
-
-      return nextResponse(request, result.data ?? false, response.headers);
-    } catch (error) {
-      console.error('refresh token error : ', (error as { code: string }).code);
-    }
+  if (error instanceof Error) {
+    return {
+      ...returnError,
+      message: error.message,
+    };
+  }
+  if (error instanceof FetchError) {
+    return {
+      ...returnError,
+      status: error.response?.status
+        ? error.response.status
+        : (error?.status ?? returnError.status),
+      message: error?.message ? error.message : returnError.message,
+    };
   }
 
-  return nextResponse(request, false, header);
-}
+  return returnError;
+};

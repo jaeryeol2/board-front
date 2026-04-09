@@ -30,10 +30,6 @@ export default async function Providers({ children }: Readonly<ChildrenType>) {
     if (isNotEmpty(userInfo)) {
       global.isLogin = isLogin;
       global.userInfo = userInfo;
-    } else {
-      await appFetch('/api/token-expire', {
-        method: 'post',
-      });
     }
   }
 

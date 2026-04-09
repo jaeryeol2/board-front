@@ -27,10 +27,8 @@ const $fetch = ofetch.create({
     options.headers.set('Authorization', `Bearer ${accessToken}`);
     options.headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken}`);
   },
-  onResponseError({ response }) {
-    if (response.status === 401) {
-      throw new FetchError('접근권한이 없습니다.');
-    }
+  onResponseError({ error }) {
+    throw new FetchError(error?.message ?? '접근권한이 없습니다.');
   },
 });
 
