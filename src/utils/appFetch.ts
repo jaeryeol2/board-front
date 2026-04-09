@@ -27,8 +27,17 @@ const $fetch = ofetch.create({
     options.headers.set('Authorization', `Bearer ${accessToken}`);
     options.headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken}`);
   },
-  onResponseError({ error }) {
-    throw new FetchError(error?.message ?? '접근권한이 없습니다.');
+  async onResponseError({ response, error }) {
+    if (error) {
+      throw new FetchError(error.message, { cause: error.cause });
+    }
+
+    const data = response._data as ResponseApi<null>;
+    const err = new FetchError(data.message);
+
+    err.response = response;
+
+    throw err;
   },
 });
 
@@ -39,12 +48,6 @@ const returnError = (error: unknown) => {
     data: null,
   };
 
-  if (error instanceof Error) {
-    return {
-      ...returnError,
-      message: error.message,
-    };
-  }
   if (error instanceof FetchError) {
     return {
       ...returnError,
@@ -52,6 +55,12 @@ const returnError = (error: unknown) => {
         ? error.response.status
         : (error?.status ?? returnError.status),
       message: error?.message ? error.message : returnError.message,
+    };
+  }
+  if (error instanceof Error) {
+    return {
+      ...returnError,
+      message: error.message,
     };
   }
 
