@@ -1,3 +1,4 @@
+import Unauthorized from '@/components/common/client/Unauthorized';
 import { ParamsType } from '@/types/base';
 import { BoardDetail } from '@/types/board';
 import { appFetch } from '@/utils/appFetch';
@@ -33,11 +34,15 @@ export default async function BoardDetailPage({
   params,
 }: Readonly<ParamsType<BoardDetailParam>>) {
   const { boardType, id } = await params;
-  const { data } = await fetchData(boardType, id);
+  const { status, data } = await fetchData(boardType, id);
 
-  if (isNotEmpty(data)) {
-    return <BoardDetailUI board={data} />;
+  if (status === 401) {
+    return <Unauthorized />;
   }
 
-  return notFound();
+  if (!isNotEmpty(data)) {
+    return notFound();
+  }
+
+  return <BoardDetailUI board={data} />;
 }
