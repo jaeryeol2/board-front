@@ -18,12 +18,14 @@ export default function Unauthorized() {
         <AppLink
           href="/login"
           className="rounded-xl bg-blue-500 px-8 py-4 text-lg font-bold text-white transition-all hover:bg-blue-600 active:scale-[0.98]"
+          replace
         >
           로그인 페이지로
         </AppLink>
         <AppLink
           href="/"
           className="rounded-xl bg-gray-200 px-8 py-4 text-lg font-bold text-gray-800 transition-all hover:bg-gray-300 active:scale-[0.98]"
+          replace
         >
           홈으로 돌아가기
         </AppLink>
