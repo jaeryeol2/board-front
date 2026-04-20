@@ -11,20 +11,22 @@ type HomeProps = {
 export default function HomeUI({ menus }: Readonly<HomeProps>) {
   return (
     <main className="w-full max-w-screen-xl mx-auto p-4 md:p-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+      <div
+        className={`grid grid-cols-1 md:grid-cols-2 ${menus.length >= 3 ? 'lg:grid-cols-3' : ''} gap-6 md:gap-8`}
+      >
         {menus.map((menu) => (
           // NOTE: 이 섹션은 `src/components/base/Card.tsx` 와 같은 공통 컴포넌트로 분리하여 재사용성을 높일 수 있습니다.
           <section
             key={menu.menuName}
             className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 p-6"
           >
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">
+            <div className="flex justify-between items-center mb-4 gap-4">
+              <h2 className="text-xl font-bold text-gray-800 truncate">
                 {menu.menuName}
               </h2>
               <AppLink
                 href={`${menu.href}?page=1`}
-                className="flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+                className="flex-shrink-0 flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors"
               >
                 더보기
                 <svg
