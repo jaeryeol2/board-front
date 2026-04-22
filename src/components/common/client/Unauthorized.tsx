@@ -8,7 +8,7 @@ export default function Unauthorized() {
   const path = usePathname();
   const handleLogin = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    router.replace(`/login?redirect=${path}`);
+    router.replace(`/login?redirect=${encodeURIComponent(path)}`);
   };
 
   return (

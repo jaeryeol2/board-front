@@ -48,7 +48,7 @@ export default function LoginUI() {
             localStorage.removeItem('savedUserId');
           }
           clearCacheAll();
-          push(query.get('redirect') ?? '/');
+          push(decodeURIComponent(query.get('redirect') ?? '/'));
         } else {
           alert(message);
           return;
