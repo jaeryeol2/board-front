@@ -1,8 +1,16 @@
 'use client';
 
 import AppLink from '@/components/base/AppLink';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Unauthorized() {
+  const router = useRouter();
+  const path = usePathname();
+  const handleLogin = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    router.replace(`/login?redirect=${path}`);
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 text-center">
       <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gray-100">
@@ -18,6 +26,7 @@ export default function Unauthorized() {
         <AppLink
           href="/login"
           className="rounded-xl bg-blue-500 px-8 py-4 text-lg font-bold text-white transition-all hover:bg-blue-600 active:scale-[0.98]"
+          onNavigate={(e) => handleLogin(e)}
           replace
         >
           로그인 페이지로

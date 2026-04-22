@@ -7,28 +7,22 @@ import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
 import { useValidator } from '@/hooks/useValidator';
 import { appFetch } from '@/utils/appFetch';
-import { isEmpty } from '@/utils/isEmpty';
-import { useRouter } from 'next/navigation';
-import { SubmitEvent, useEffect, useState } from 'react';
+import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { SubmitEvent, useState } from 'react';
 
 export default function LoginUI() {
+  const query = useSearchParams();
   const { validator } = useValidator();
-  const [user, setUser] = useState({
-    userId: '',
-    password: '',
-  });
-  const [rememberId, setRememberId] = useState(false);
-  const { push } = useRouter();
-
-  // 컴포넌트 마운트 시 localStorage에서 저장된 아이디를 확인합니다.
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const savedUserId = localStorage.getItem('savedUserId');
-    if (savedUserId) {
-      setUser((prev) => ({ ...prev, userId: savedUserId }));
-      setRememberId(true);
-    }
-  }, []); // 의존성 배열이 비어 있으므로 마운트 시에만 실행됩니다.
 
+    return { userId: savedUserId ?? '', password: '' };
+  });
+  const [rememberId, setRememberId] = useState(() =>
+    isNotEmpty(localStorage.getItem('savedUserId')),
+  );
+  const { push } = useRouter();
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
@@ -54,7 +48,7 @@ export default function LoginUI() {
             localStorage.removeItem('savedUserId');
           }
           clearCacheAll();
-          push('/');
+          push(query.get('redirect') ?? '/');
         } else {
           alert(message);
           return;
