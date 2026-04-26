@@ -6,7 +6,12 @@ import { GlobalContext } from '@/contexts/GlobalContext';
 import { Board } from '@/types/board';
 import { isNotEmpty } from '@/utils/isEmpty';
 import { format } from 'date-fns';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
 import { useContext, useEffect, useMemo } from 'react';
 
 type BoardListProps = {
@@ -14,7 +19,6 @@ type BoardListProps = {
   list: Array<Board>;
   page: number;
   rowsPerPage: number;
-  redefinePage: boolean;
 };
 
 /**
@@ -26,11 +30,11 @@ export default function BoardListUI({
   list,
   page,
   rowsPerPage,
-  redefinePage,
 }: Readonly<BoardListProps>) {
   const router = useRouter();
   const path = usePathname();
   const params = useParams();
+  const searchParams = useSearchParams();
   const boardType = params.boardType as string;
   // 현재 페이지에 해당하는 데이터 목록
   const paginatedList = useMemo(() => list, [list]);
@@ -57,10 +61,10 @@ export default function BoardListUI({
   };
 
   useEffect(() => {
-    if (redefinePage) {
-      history.replaceState(null, '', `${path}?page=${page}`);
+    if (!searchParams.has('page')) {
+      history.replaceState(null, '', `${path}?page=1`);
     }
-  }, [path, page, redefinePage]);
+  }, [path, searchParams]);
 
   return (
     <div className="py-8">

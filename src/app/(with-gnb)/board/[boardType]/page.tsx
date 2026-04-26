@@ -1,6 +1,6 @@
 import { BASE_SEO_TITLE } from '@/constants/common';
 import { ParamsType, SearchParamsType } from '@/types/base';
-import { Board } from '@/types/board';
+import { Board, BoardFilter } from '@/types/board';
 import { Menu } from '@/types/global';
 import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
@@ -10,10 +10,6 @@ import { notFound } from 'next/navigation';
 import { cache } from 'react';
 import BoardListUI from './_components/BoardListUI';
 
-type BoardFilter = {
-  page: number;
-  rowsPerPage: number;
-};
 const fetchBoardInfoData = cache(async (boardType: string) => {
   return await appFetch<Menu>(
     `/api/menus/${toSnakeCase(boardType).toUpperCase()}`,
@@ -55,7 +51,6 @@ export default async function BoardPage({
   searchParams,
 }: Readonly<ParamsType<{ boardType: string }> & SearchParamsType>) {
   const boardType = (await params).boardType;
-  const hasPage = isNotEmpty((await searchParams)?.page);
   const page = Number((await searchParams)?.page ?? 1);
   const rowsPerPage = 20;
   const { data } = await fetchBoardListData(boardType, {
@@ -73,7 +68,6 @@ export default async function BoardPage({
       list={data?.list ?? []}
       page={page}
       rowsPerPage={rowsPerPage}
-      redefinePage={!hasPage}
     />
   );
 }

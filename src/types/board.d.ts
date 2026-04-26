@@ -1,3 +1,8 @@
+export type BoardFilter = {
+  page: number;
+  rowsPerPage: number;
+};
+
 export type Board = {
   id: number;
   title: string;
