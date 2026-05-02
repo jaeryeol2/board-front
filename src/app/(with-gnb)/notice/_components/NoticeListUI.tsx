@@ -2,6 +2,8 @@
 
 import Pagination from '@/components/common/client/Pagination';
 import { Notice } from '@/types/notice';
+import { isNotEmpty } from '@/utils/isEmpty';
+import { format } from 'date-fns';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -54,7 +56,7 @@ export default function NoticeListUI({
               list.map((notice) => (
                 <tr
                   key={notice.id}
-                  className="bg-white border-b hover:bg-gray-50"
+                  className="cursor-pointer border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
                 >
                   <th
                     scope="row"
@@ -62,7 +64,11 @@ export default function NoticeListUI({
                   >
                     {notice.title}
                   </th>
-                  <td className="px-6 py-4">{notice.createdAt}</td>
+                  <td className="px-6 py-4">
+                    {isNotEmpty(notice?.createdAt)
+                      ? format(new Date(notice.createdAt), 'yyyy.MM.dd')
+                      : ''}
+                  </td>
                 </tr>
               ))
             ) : (
