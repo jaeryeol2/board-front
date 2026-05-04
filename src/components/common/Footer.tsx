@@ -1,5 +1,6 @@
 import { appFetch } from '@/utils/appFetch';
 import AppLink from '../base/AppLink';
+import { TraficUser } from './client/TraficUser';
 
 export default async function Footer() {
   const currentYear = new Date().getFullYear();
@@ -105,14 +106,7 @@ export default async function Footer() {
             </div>
 
             <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 px-3 py-1.5 border border-[#e5e8eb] bg-white rounded-full text-[12px] font-medium text-[#4e5968]">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                동시접속자{' '}
-                <strong className="text-[#333d4b]">{data ?? 0}</strong>명
-              </div>
+              <TraficUser userCount={data ?? 0} />
               <p className="text-[13px] font-medium text-[#8b95a1]">
                 &copy; {currentYear} Board Project. All rights reserved.
               </p>
