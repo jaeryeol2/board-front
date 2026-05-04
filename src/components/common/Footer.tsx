@@ -1,7 +1,9 @@
+import { appFetch } from '@/utils/appFetch';
 import AppLink from '../base/AppLink';
 
-export default function Footer() {
+export default async function Footer() {
   const currentYear = new Date().getFullYear();
+  const { data } = await appFetch<number>('/api/user/user-count');
 
   return (
     <footer className="bg-[#f9fafb] border-t border-[#f2f4f6] pt-16 pb-12">
@@ -108,7 +110,8 @@ export default function Footer() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
-                동시접속자 <strong className="text-[#333d4b]">1,234</strong>명
+                동시접속자{' '}
+                <strong className="text-[#333d4b]">{data ?? 0}</strong>명
               </div>
               <p className="text-[13px] font-medium text-[#8b95a1]">
                 &copy; {currentYear} Board Project. All rights reserved.

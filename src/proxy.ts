@@ -61,18 +61,6 @@ export async function proxy(request: NextRequest) {
       setRequestCookie(request, response.headers);
       setResponseCookie(response.headers.getSetCookie(), header);
     }
-
-    try {
-      const response = await appFetch.native('/api/auth/guest', {
-        method: 'post',
-      });
-      const result = (await response.json()) as ResponseApi<boolean>;
-
-      setRequestCookie(request, response.headers);
-      return nextResponse(request, result?.data ?? false, response.headers);
-    } catch (error) {
-      console.warn(error);
-    }
   }
 
   return nextResponse(request, false, header);
@@ -91,7 +79,7 @@ const redirectValidate = (request: NextRequest, isLogin: boolean) => {
   const path = nextUrl.pathname;
   const validator = [() => isLogin && REDIRECT_PATH_SET.has(path)];
 
-  return validator.every((func) => func());
+  return request.method === 'GET' && validator.every((func) => func());
 };
 
 /**
@@ -141,6 +129,7 @@ const nextResponse = (
   if (redirectValidate(request, isLogin)) {
     return NextResponse.redirect(new URL('/', nextUrl));
   }
+
   const nextResponse = NextResponse.next({
     request: {
       headers,

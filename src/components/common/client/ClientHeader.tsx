@@ -1,12 +1,12 @@
 'use client';
 
-import { clearCacheAll } from '@/actions/common';
+import { logoutAction } from '@/actions/user';
 import AppLink from '@/components/base/AppLink';
 import Button from '@/components/base/Button';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { Menu, MenuItem } from '@/types/global';
 import { appFetch } from '@/utils/appFetch';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   Fragment,
   useCallback,
@@ -20,7 +20,6 @@ import {
 type ClientHeaderProps = { menus: Array<Menu> };
 
 export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
-  const { push } = useRouter();
   const { isLogin, userInfo } = useContext(GlobalContext);
 
   const handleLogout = async () => {
@@ -31,8 +30,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
     }));
 
     if (data) {
-      clearCacheAll();
-      push('/');
+      logoutAction();
     }
   };
 

@@ -25,9 +25,16 @@ const $fetch = ofetch.create({
     ]);
 
     options.headers.set('X-Forwarded-For', ip);
-    options.headers.set('Authorization', `Bearer ${accessToken ?? ''}`);
-    options.headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken ?? ''}`);
-    options.headers.set('X-Guest-Id', guestId ?? '');
+
+    if (accessToken) {
+      options.headers.set('Authorization', `Bearer ${accessToken ?? ''}`);
+    }
+    if (refreshToken) {
+      options.headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken ?? ''}`);
+    }
+    if (guestId) {
+      options.headers.set('X-Guest-Id', guestId ?? '');
+    }
   },
   async onResponseError({ response, error }) {
     if (error) {
@@ -73,22 +80,30 @@ const native = async (
   path: string,
   options?: FetchOptions,
 ): Promise<Response> => {
-  const { headers, status, statusText, _data } = await $fetch.raw(
-    path,
-    options,
-  );
+  const { headers, status, statusText, _data } = await $fetch
+    .raw(path, options)
+    .catch((error) => ({
+      headers: error.response.headers,
+      status: error.response.status,
+      statusText: error.message,
+      _data: returnError(error),
+    }));
   const data = typeof _data === 'object' ? JSON.stringify(_data) : _data;
-
-  return new Response(data, {
+  const responseInit: Record<string, unknown> = {
     headers: (() => {
       const h = new Headers(headers);
       h.delete('content-length');
 
       return h;
     })(),
-    status,
-    statusText,
-  });
+  };
+
+  if (status === 200) {
+    responseInit.status = status;
+    responseInit.statusText = statusText;
+  }
+
+  return new Response(data, responseInit);
 };
 
 const fetch = async <R = unknown>(

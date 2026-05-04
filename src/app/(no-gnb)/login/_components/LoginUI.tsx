@@ -1,6 +1,6 @@
 'use client';
 
-import { clearCacheAll } from '@/actions/common';
+import { loginAction } from '@/actions/user';
 import Checkbox from '@/components/base/Checkbox';
 import Password from '@/components/base/Password';
 import Submit from '@/components/base/Submit';
@@ -8,7 +8,7 @@ import Text from '@/components/base/Text';
 import { useValidator } from '@/hooks/useValidator';
 import { appFetch } from '@/utils/appFetch';
 import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { SubmitEvent, useState } from 'react';
 
 export default function LoginUI() {
@@ -22,7 +22,6 @@ export default function LoginUI() {
   const [rememberId, setRememberId] = useState(() =>
     isNotEmpty(localStorage.getItem('savedUserId')),
   );
-  const { push } = useRouter();
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
@@ -47,8 +46,6 @@ export default function LoginUI() {
           } else {
             localStorage.removeItem('savedUserId');
           }
-          clearCacheAll();
-          push(decodeURIComponent(query.get('redirect') ?? '/'));
         } else {
           alert(message);
           return;
@@ -58,6 +55,8 @@ export default function LoginUI() {
       alert((error as Error).message);
       return;
     }
+
+    loginAction(decodeURIComponent(query.get('redirect') ?? '/'));
   };
 
   return (
