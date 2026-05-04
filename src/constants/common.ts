@@ -1,5 +1,6 @@
 export const ACCESS_TOKEN = 'access_token';
 export const REFRESH_TOKEN = 'auth_token';
+export const GUEST_ID = 'guest_tracking_id';
 export const X_IS_LOGIN = 'X-Is-Login';
 export const X_CURRENT_PATH = 'X-Current-Path';
 export const SET_COOKIE = 'Set-Cookie';

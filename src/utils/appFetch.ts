@@ -1,5 +1,5 @@
 import { getCookie, getIp } from '@/actions/common';
-import { ACCESS_TOKEN, REFRESH_TOKEN } from '@/constants/common';
+import { ACCESS_TOKEN, GUEST_ID, REFRESH_TOKEN } from '@/constants/common';
 import { ResponseApi } from '@/types/base';
 import { FetchError, FetchOptions, ofetch } from 'ofetch';
 
@@ -17,15 +17,17 @@ const $fetch = ofetch.create({
   async onRequest({ request, options }) {
     console.log('api request path: ', request);
 
-    const [ip, accessToken, refreshToken] = await Promise.all([
+    const [ip, accessToken, refreshToken, guestId] = await Promise.all([
       getIp().catch(() => ''),
       getCookie(ACCESS_TOKEN).catch(() => ''),
       getCookie(REFRESH_TOKEN).catch(() => ''),
+      getCookie(GUEST_ID).catch(() => ''),
     ]);
 
     options.headers.set('X-Forwarded-For', ip);
-    options.headers.set('Authorization', `Bearer ${accessToken}`);
-    options.headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken}`);
+    options.headers.set('Authorization', `Bearer ${accessToken ?? ''}`);
+    options.headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken ?? ''}`);
+    options.headers.set('X-Guest-Id', guestId ?? '');
   },
   async onResponseError({ response, error }) {
     if (error) {

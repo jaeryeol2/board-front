@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FetchError } from 'ofetch';
 import {
   ACCESS_TOKEN,
+  GUEST_ID,
   REFRESH_TOKEN,
   SET_COOKIE,
   X_CURRENT_PATH,
@@ -20,8 +21,9 @@ export async function proxy(request: NextRequest) {
   const { verifyToken } = tokenUtil();
   const accessToken = request.cookies.get(ACCESS_TOKEN)?.value || '';
   const refreshToken = request.cookies.get(REFRESH_TOKEN)?.value || '';
+  const guestId = request.cookies.get(GUEST_ID)?.value || '';
 
-  if (accessToken || refreshToken) {
+  if (!guestId) {
     try {
       await verifyToken(accessToken);
       const { data, message } = await appFetch<boolean>('/api/auth/check');
@@ -45,10 +47,8 @@ export async function proxy(request: NextRequest) {
         });
         const result = (await response.json()) as ResponseApi<boolean>;
 
-        if (result.data) {
-          setRequestCookie(request, response.headers);
-          return nextResponse(request, result.data, response.headers);
-        }
+        setRequestCookie(request, response.headers);
+        return nextResponse(request, result?.data ?? false, response.headers);
       }
 
       throw new Error(message);
@@ -60,6 +60,18 @@ export async function proxy(request: NextRequest) {
 
       setRequestCookie(request, response.headers);
       setResponseCookie(response.headers.getSetCookie(), header);
+    }
+
+    try {
+      const response = await appFetch.native('/api/auth/guest', {
+        method: 'post',
+      });
+      const result = (await response.json()) as ResponseApi<boolean>;
+
+      setRequestCookie(request, response.headers);
+      return nextResponse(request, result?.data ?? false, response.headers);
+    } catch (error) {
+      console.warn(error);
     }
   }
 
