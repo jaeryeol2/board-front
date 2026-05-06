@@ -18,31 +18,36 @@ const $fetch = ofetch.create({
     console.log('api request path: ', request);
 
     const [ip, accessToken, refreshToken, guestId] = await Promise.all([
-      getIp().catch(() => ''),
-      getCookie(ACCESS_TOKEN).catch(() => ''),
-      getCookie(REFRESH_TOKEN).catch(() => ''),
-      getCookie(GUEST_ID).catch(() => ''),
+      getIp().catch(() => 'Unknown IP'),
+      getCookie(ACCESS_TOKEN).catch(() => undefined),
+      getCookie(REFRESH_TOKEN).catch(() => undefined),
+      getCookie(GUEST_ID).catch(() => undefined),
     ]);
 
-    options.headers.set('X-Forwarded-For', ip);
+    const headers = new Headers(options.headers);
+    headers.set('X-Forwarded-For', ip);
 
     if (accessToken) {
-      options.headers.set('Authorization', `Bearer ${accessToken ?? ''}`);
+      headers.set('Authorization', `Bearer ${accessToken}`);
     }
     if (refreshToken) {
-      options.headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken ?? ''}`);
+      // Refresh Token은 전용 헤더나 쿠키 포맷에 맞춰 설정
+      headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken}`);
     }
     if (guestId) {
-      options.headers.set('X-Guest-Id', guestId ?? '');
+      headers.set('X-Guest-Id', guestId);
     }
+
+    options.headers = headers;
   },
   async onResponseError({ response, error }) {
-    if (error) {
+    if (error && !(error instanceof FetchError)) {
       throw new FetchError(error.message, { cause: error.cause });
     }
 
     const data = response._data as ResponseApi<null>;
-    const err = new FetchError(data.message);
+    const errorMessage = data?.message || response.statusText || 'API Error';
+    const err = new FetchError(errorMessage);
 
     err.response = response;
 
@@ -51,59 +56,52 @@ const $fetch = ofetch.create({
 });
 
 const returnError = (error: unknown) => {
-  const returnError = {
-    status: 404,
-    message: 'Unknown Error',
+  const defaultError = {
+    status: 500,
+    message: 'Internal Server Error',
     data: null,
   };
 
   if (error instanceof FetchError) {
     return {
-      ...returnError,
-      status: error.response?.status
-        ? error.response.status
-        : (error?.status ?? returnError.status),
-      message: error?.message ? error.message : returnError.message,
+      status: error.response?.status || error.status || 500,
+      message: error.message || 'Fetch Error',
+      data: null,
     };
   }
+
   if (error instanceof Error) {
     return {
-      ...returnError,
+      ...defaultError,
       message: error.message,
     };
   }
 
-  return returnError;
+  return defaultError;
 };
 
 const native = async (
   path: string,
   options?: FetchOptions,
 ): Promise<Response> => {
-  const { headers, status, statusText, _data } = await $fetch
-    .raw(path, options)
-    .catch((error) => ({
-      headers: error.response.headers,
-      status: error.response.status,
-      statusText: error.message,
-      _data: returnError(error),
-    }));
+  const result = await $fetch.raw(path, options).catch((error) => ({
+    headers: error.response?.headers || {},
+    status: error.response?.status || 500,
+    statusText: error.message,
+    _data: returnError(error),
+  }));
+
+  const { headers, status, statusText, _data } = result;
   const data = typeof _data === 'object' ? JSON.stringify(_data) : _data;
-  const responseInit: Record<string, unknown> = {
-    headers: (() => {
-      const h = new Headers(headers);
-      h.delete('content-length');
 
-      return h;
-    })(),
-  };
+  const responseHeaders = new Headers(headers);
+  responseHeaders.delete('content-length');
 
-  if (status === 200) {
-    responseInit.status = status;
-    responseInit.statusText = statusText;
-  }
-
-  return new Response(data, responseInit);
+  return new Response(data, {
+    status,
+    statusText,
+    headers: responseHeaders,
+  });
 };
 
 const fetch = async <R = unknown>(
