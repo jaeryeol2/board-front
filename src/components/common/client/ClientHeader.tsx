@@ -77,14 +77,14 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
         {/* Right Section: Auth Links */}
         <div className="flex items-center space-x-2 sm:space-x-4">
           {isLogin ? (
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
               <AppLink
                 href="/mypage"
                 className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
               >
                 {userInfo?.userName ?? '회원'}님
               </AppLink>
-              <span>|</span>
+              <span className="text-gray-300">|</span>
               <Button
                 className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
                 onClick={handleLogout}
