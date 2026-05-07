@@ -1,5 +1,6 @@
 'use client';
 
+import AppLink from '@/components/base/AppLink';
 import Button from '@/components/base/Button';
 import Pagination from '@/components/common/client/Pagination';
 import { GlobalContext } from '@/contexts/GlobalContext';
@@ -44,13 +45,6 @@ export default function BoardListUI({
   const isNotAnony = boardType !== 'board-anony';
   const cond = conditionGet<string>();
 
-  /**
-   * 행 클릭 시 상세 페이지로 이동합니다.
-   * @param boardId 게시글 ID
-   */
-  const handleRowClick = (boardId: number) => {
-    router.push(`/board/${boardType}/${boardId}`);
-  };
   const handlePage = (page: number) => {
     router.push(`/board/${boardType}?page=${page}`);
   };
@@ -119,14 +113,16 @@ export default function BoardListUI({
               paginatedList.map((board: Board, index: number) => (
                 <tr
                   key={board.id}
-                  className="group cursor-pointer bg-white hover:bg-blue-50/30 transition-colors"
-                  onClick={() => handleRowClick(board.id)}
+                  className="group bg-white hover:bg-blue-50/30 transition-colors"
                 >
                   <td className="px-6 py-4 text-center text-gray-400">
                     {total - (page - 1) * rowsPerPage - index}
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
+                    <AppLink
+                      href={`/board/${boardType}/${board.id}`}
+                      className="flex items-center gap-3 group/link"
+                    >
                       {isNotEmpty(board.fileUrl) && (
                         <div className="w-12 h-8 flex-shrink-0 rounded bg-gray-100 overflow-hidden">
                           {/* Placeholder for thumbnail */}
@@ -141,10 +137,10 @@ export default function BoardListUI({
                           </div>
                         </div>
                       )}
-                      <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors truncate max-w-md">
+                      <span className="font-medium text-gray-900 group-hover/link:text-blue-600 transition-colors truncate max-w-md">
                         {board.title}
                       </span>
-                    </div>
+                    </AppLink>
                   </td>
                   {isNotAnony && (
                     <td className="px-6 py-4 text-center text-gray-600">
@@ -175,11 +171,11 @@ export default function BoardListUI({
       {/* Mobile Card View */}
       <div className="md:hidden space-y-3">
         {paginatedList.length > 0 ? (
-          paginatedList.map((board: Board, index: number) => (
-            <div
+          paginatedList.map((board: Board) => (
+            <AppLink
               key={board.id}
-              className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm active:bg-gray-50 transition-colors"
-              onClick={() => handleRowClick(board.id)}
+              href={`/board/${boardType}/${board.id}`}
+              className="block bg-white p-4 rounded-xl border border-gray-100 shadow-sm active:bg-gray-50 transition-colors"
             >
               <div className="flex justify-between items-start gap-3">
                 <div className="flex-1">
@@ -216,7 +212,7 @@ export default function BoardListUI({
                   </div>
                 )}
               </div>
-            </div>
+            </AppLink>
           ))
         ) : (
           <div className="py-20 text-center text-gray-400">

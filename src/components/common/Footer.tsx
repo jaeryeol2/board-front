@@ -128,11 +128,14 @@ export default async function Footer() {
                 <TraficUser userCount={data ?? 0} />
                 <div className="flex gap-3 md:gap-4">
                   {SOCIAL_ICONS.map((social) => (
-                    <div
+                    <a
                       key={social.name}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="w-8 h-8 rounded-full bg-[#e5e8eb] flex items-center justify-center cursor-pointer hover:bg-[#d1d6db] transition-colors"
+                      aria-label={`${social.name} (새창으로 열기)`}
                     >
-                      <span className="sr-only">{social.name}</span>
                       <svg
                         width="16"
                         height="16"
@@ -141,7 +144,7 @@ export default async function Footer() {
                       >
                         <path d={social.path} />
                       </svg>
-                    </div>
+                    </a>
                   ))}
                 </div>
               </div>

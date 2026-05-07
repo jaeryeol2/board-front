@@ -47,8 +47,12 @@ export default function NoticeListUI({
         <table className="w-full text-sm text-left text-gray-500">
           <thead className="bg-gray-50/50 text-xs uppercase text-gray-700 border-b border-gray-100">
             <tr>
-              <th scope="col" className="px-6 py-4">제목</th>
-              <th scope="col" className="w-32 px-6 py-4 text-center">게시일</th>
+              <th scope="col" className="px-6 py-4">
+                제목
+              </th>
+              <th scope="col" className="w-32 px-6 py-4 text-center">
+                게시일
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -56,7 +60,7 @@ export default function NoticeListUI({
               list.map((notice) => (
                 <tr
                   key={notice.id}
-                  className="group cursor-pointer bg-white hover:bg-blue-50/30 transition-colors"
+                  className="group bg-white hover:bg-blue-50/30 transition-colors"
                 >
                   <td className="px-6 py-4">
                     <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
@@ -87,7 +91,7 @@ export default function NoticeListUI({
           list.map((notice) => (
             <div
               key={notice.id}
-              className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm active:bg-gray-50 transition-colors"
+              className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition-colors"
             >
               <div className="flex flex-col gap-2">
                 <h3 className="text-[15px] font-semibold text-gray-900 leading-snug line-clamp-2">
