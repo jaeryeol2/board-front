@@ -30,11 +30,11 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="py-20">
-        <div className="mb-8">
+      <div className="py-6 md:py-12 px-4 md:px-0 max-w-4xl mx-auto">
+        <div className="mb-6 md:mb-8">
           <Button
             onClick={handleGoBack}
-            className="flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-100"
+            className="flex items-center rounded-lg bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-100 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -52,39 +52,39 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
           </Button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm p-8 sm:p-12">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-5">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-10">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
               {board.title}
             </h1>
-            <div className="flex items-center text-gray-500 text-sm">
+            <div className="flex flex-wrap items-center gap-2 text-gray-500 text-sm">
               {isNotEmpty(board.writerName) && (
                 <>
-                  <span className="font-medium">{board.writerName}</span>
-                  <span className="mx-2.5 text-gray-300">·</span>
+                  <span className="font-semibold text-gray-900">{board.writerName}</span>
+                  <span className="text-gray-200">|</span>
                 </>
               )}
               <span>
                 {format(new Date(board.createdAt), 'yyyy.MM.dd HH:mm')}
               </span>
-              <span className="mx-2.5 text-gray-300">·</span>
-              <span>조회수 {board.viewCount}</span>
+              <span className="text-gray-200">|</span>
+              <span>조회 {board.viewCount}</span>
             </div>
           </div>
 
-          <hr className="my-8 border-gray-100" />
+          <hr className="my-6 md:my-8 border-gray-50" />
 
-          <div className="prose prose-lg max-w-none text-gray-800 min-h-[200px]">
-            <p>{board.content}</p>
+          <div className="prose prose-blue max-w-none text-gray-800 min-h-[200px] leading-relaxed break-keep">
+            <p className="whitespace-pre-wrap text-base md:text-lg">{board.content}</p>
           </div>
 
           {board.fileList && board.fileList.length > 0 && (
-            <div className="mt-12">
-              <div className="flex flex-col gap-4">
+            <div className="mt-10 md:mt-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {board.fileList.map((file) => (
                   <div
                     key={file.id}
-                    className="relative w-full aspect-video rounded-lg overflow-hidden group"
+                    className="relative w-full aspect-video rounded-xl overflow-hidden group border border-gray-100 shadow-sm"
                   >
                     <AppImage
                       src={file.fileUrl}
@@ -92,7 +92,7 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
                       fill
                       style={{ objectFit: 'cover' }}
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="transition-transform duration-300 group-hover:scale-105"
+                      className="transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
                 ))}
@@ -100,12 +100,14 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
             </div>
           )}
 
-          <CommentSection
-            ref={commentArea}
-            boardId={board.id}
-            initialComments={board.commentList}
-            onFocusArea={handleFocusArea}
-          />
+          <div className="mt-12">
+            <CommentSection
+              ref={commentArea}
+              boardId={board.id}
+              initialComments={board.commentList}
+              onFocusArea={handleFocusArea}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -109,43 +109,45 @@ export default async function Footer() {
 
         {/* Bottom Section: Company Info & Copyright */}
         <div className="pt-8 border-t border-[#f2f4f6]">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-[#8b95a1]">
-                <span>(주)The Lounge.</span>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 md:gap-6">
+            <div className="flex flex-col gap-3 md:gap-2">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-[#8b95a1]">
+                <span className="font-medium">(주)The Lounge.</span>
                 <span className="hidden md:inline text-[#e5e8eb]">|</span>
                 <span>대표 ***</span>
                 <span className="hidden md:inline text-[#e5e8eb]">|</span>
                 <span>사업자 등록번호 123-45-67890</span>
               </div>
-              <p className="text-[12px] text-[#adb5bd]">
+              <p className="text-[12px] text-[#adb5bd] leading-relaxed">
                 서울특별시 강남구 테헤란로 123, 보드타워 15층
               </p>
             </div>
 
-            <div className="flex items-center gap-6">
-              <TraficUser userCount={data ?? 0} />
-              <p className="text-[13px] font-medium text-[#8b95a1]">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-6 w-full md:w-auto">
+              <div className="flex flex-row items-center justify-between w-full md:w-auto md:justify-start gap-6">
+                <TraficUser userCount={data ?? 0} />
+                <div className="flex gap-3 md:gap-4">
+                  {SOCIAL_ICONS.map((social) => (
+                    <div
+                      key={social.name}
+                      className="w-8 h-8 rounded-full bg-[#e5e8eb] flex items-center justify-center cursor-pointer hover:bg-[#d1d6db] transition-colors"
+                    >
+                      <span className="sr-only">{social.name}</span>
+                      <svg
+                        width="16"
+                        height="16"
+                        fill="#8b95a1"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d={social.path} />
+                      </svg>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className="text-[12px] md:text-[13px] font-medium text-[#8b95a1]">
                 &copy; {currentYear} Board Project. All rights reserved.
               </p>
-              <div className="flex gap-4">
-                {SOCIAL_ICONS.map((social) => (
-                  <div
-                    key={social.name}
-                    className="w-8 h-8 rounded-full bg-[#e5e8eb] flex items-center justify-center cursor-pointer hover:bg-[#d1d6db] transition-colors"
-                  >
-                    <span className="sr-only">{social.name}</span>
-                    <svg
-                      width="18"
-                      height="18"
-                      fill="#8b95a1"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d={social.path} />
-                    </svg>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>

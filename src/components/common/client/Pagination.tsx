@@ -96,7 +96,7 @@ export default function Pagination({
       aria-label="Pagination"
     >
       <Button
-        className={`rounded-l-lg border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 ${
+        className={`rounded-l-lg border border-gray-200 bg-white px-2.5 py-1.5 md:px-3 md:py-2 text-sm md:text-base leading-tight text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors ${
           page === 1 ? 'cursor-not-allowed opacity-50' : ''
         }`}
         onClick={handlePrevClick}
@@ -107,10 +107,10 @@ export default function Pagination({
       {pageNumbers.map((number) => (
         <Button
           key={number}
-          className={`border border-gray-300 px-3 py-2 leading-tight ${
+          className={`border border-gray-200 px-3 py-1.5 md:px-4 md:py-2 text-sm md:text-base leading-tight transition-colors ${
             number === page
-              ? 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700'
-              : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+              ? 'bg-blue-50 text-blue-600 font-bold border-blue-200 z-10 relative'
+              : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-700'
           }`}
           onClick={() => handlePageChange(number)}
         >
@@ -118,7 +118,7 @@ export default function Pagination({
         </Button>
       ))}
       <Button
-        className={`rounded-r-lg border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 ${
+        className={`rounded-r-lg border border-gray-200 bg-white px-2.5 py-1.5 md:px-3 md:py-2 text-sm md:text-base leading-tight text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors ${
           page === totalPages ? 'cursor-not-allowed opacity-50' : ''
         }`}
         onClick={handleNextClick}

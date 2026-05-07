@@ -15,28 +15,33 @@ export default function HomeUI({ menus }: Readonly<HomeProps>) {
   }
 
   return (
-    <main className="w-full max-w-screen-xl mx-auto p-4 md:p-8">
+    <main className="w-full max-w-7xl mx-auto p-4 md:p-10">
+      <div className="mb-10 text-center md:text-left">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">
+          커뮤니티 소식
+        </h1>
+        <p className="text-gray-500">다양한 주제의 이야기를 만나보세요.</p>
+      </div>
       <div
-        className={`grid grid-cols-1 md:grid-cols-2 ${menus.length >= 3 ? 'lg:grid-cols-3' : ''} gap-6 md:gap-8`}
+        className={`grid grid-cols-1 md:grid-cols-2 ${menus.length >= 3 ? 'lg:grid-cols-3' : ''} gap-5 md:gap-8`}
       >
         {menus.map((menu) => (
-          // NOTE: 이 섹션은 `src/components/base/Card.tsx` 와 같은 공통 컴포넌트로 분리하여 재사용성을 높일 수 있습니다.
           <section
             key={menu.menuName}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 p-6"
+            className="bg-white rounded-[24px] shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-6 md:p-8 flex flex-col"
           >
-            <div className="flex justify-between items-center mb-4 gap-4">
-              <h2 className="text-xl font-bold text-gray-800 truncate">
+            <div className="flex justify-between items-center mb-6 gap-4">
+              <h2 className="text-xl font-bold text-gray-900 truncate">
                 {menu.menuName}
               </h2>
               <AppLink
                 href={`${menu.href}?page=1`}
-                className="flex-shrink-0 flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+                className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all"
+                aria-label={`${menu.menuName} 더보기`}
               >
-                더보기
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 ml-1"
+                  className="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -50,15 +55,19 @@ export default function HomeUI({ menus }: Readonly<HomeProps>) {
                 </svg>
               </AppLink>
             </div>
-            {/* NOTE: 이 리스트는 `src/components/base/PostList.tsx` 와 같은 컴포넌트로 분리할 수 있습니다. */}
-            <ul className="space-y-2">
+            <ul className="space-y-3 flex-1">
               {menu.boards.map((post) => (
                 <li key={post.id}>
                   <AppLink
                     href={`/board/${toKebabCase(menu.basePath).toLowerCase()}/${post.id}`}
-                    className="text-gray-700 hover:text-blue-600 hover:font-medium hover:bg-blue-50 rounded-md py-1 px-2 transition-all duration-200 truncate block"
+                    className="group flex items-center justify-between py-1"
                   >
-                    {post.title}
+                    <span className="text-gray-600 group-hover:text-blue-600 group-hover:font-medium transition-all truncate pr-4">
+                      {post.title}
+                    </span>
+                    <span className="text-[10px] font-bold text-gray-300 group-hover:text-blue-200 transition-colors flex-shrink-0 uppercase">
+                      New
+                    </span>
                   </AppLink>
                 </li>
               ))}

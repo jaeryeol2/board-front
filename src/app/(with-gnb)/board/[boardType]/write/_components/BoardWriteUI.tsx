@@ -84,22 +84,22 @@ export default function BoardWriteUI({
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="py-20">
-        <div className="bg-white p-8 sm:p-12 rounded-2xl shadow-sm">
+      <div className="py-6 md:py-12 px-4 md:px-0">
+        <div className="bg-white p-5 md:p-10 rounded-2xl border border-gray-100 shadow-sm max-w-4xl mx-auto">
           <div className="max-w-3xl mx-auto">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-4">
               게시글 작성
             </h1>
-            <p className="text-gray-600 mb-12">
+            <p className="text-sm md:text-base text-gray-500 mb-8 md:mb-12">
               새로운 소식을 공유하고 다른 사람들과 소통해보세요.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-10">
+            <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10">
               {/* 제목 입력란 */}
-              <div className="border-b-2 border-gray-200 focus-within:border-gray-900 transition-colors duration-200">
+              <div className="border-b-2 border-gray-100 focus-within:border-blue-600 transition-colors duration-300">
                 <Text
                   id="title"
-                  className="w-full pt-2 pb-3 text-3xl font-semibold bg-transparent border-none focus:ring-0 placeholder-gray-400"
+                  className="w-full pt-2 pb-3 text-xl md:text-3xl font-bold bg-transparent border-none focus:ring-0 placeholder-gray-300"
                   placeholder="제목을 입력하세요"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -108,30 +108,31 @@ export default function BoardWriteUI({
               </div>
 
               {/* 내용 입력란 */}
-              <div className="mt-8">
+              <div className="mt-6 md:mt-8">
                 <Textarea
-                  placeholder="내용을 입력하세요"
+                  placeholder="당신의 이야기를 들려주세요..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className="w-full text-lg text-gray-800 bg-transparent border-none focus:ring-0 placeholder-gray-400 min-h-[400px] resize-none"
+                  className="w-full text-base md:text-lg text-gray-800 bg-transparent border-none focus:ring-0 placeholder-gray-300 min-h-[300px] md:min-h-[400px] resize-none leading-relaxed"
                   required
                 />
               </div>
 
               {/* 첨부파일 입력란 */}
-              <div className="border-t border-gray-200 pt-8">
-                <div className="text-lg font-semibold text-gray-800">
+              <div className="border-t border-gray-50 pt-8">
+                <div className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                   파일 첨부
                 </div>
-                <div className="mt-4 flex items-center justify-center w-full">
+                <div className="flex items-center justify-center w-full">
                   <label
                     htmlFor="attachments"
                     aria-label="파일 첨부"
-                    className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors"
+                    className="flex flex-col items-center justify-center w-full h-32 md:h-48 border-2 border-gray-100 border-dashed rounded-2xl cursor-pointer bg-gray-50/50 hover:bg-blue-50/50 hover:border-blue-200 transition-all group"
                   >
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-500">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-400 group-hover:text-blue-500">
                       <svg
-                        className="w-10 h-10 mb-4"
+                        className="w-8 h-8 md:w-10 md:h-10 mb-3 transition-transform group-hover:-translate-y-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -144,10 +145,10 @@ export default function BoardWriteUI({
                           d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h1.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293h4.586a4 4 0 014 4v5a4 4 0 01-4 4H7z"
                         ></path>
                       </svg>
-                      <p className="mb-2 text-base">
-                        <span className="font-semibold">클릭 또는 드래그</span>
+                      <p className="mb-1 text-sm md:text-base">
+                        <span className="font-bold">파일 선택</span> 또는 드래그
                       </p>
-                      <p className="text-xs">이미지 파일을 업로드하세요.</p>
+                      <p className="text-xs text-gray-400">이미지 파일 (JPG, PNG, GIF)</p>
                     </div>
                   </label>
                   <input
@@ -161,35 +162,36 @@ export default function BoardWriteUI({
                   />
                 </div>
                 {attachments && attachments.length > 0 && (
-                  <div className="mt-4 text-sm text-gray-600">
-                    <ul className="space-y-2">
-                      {Array.from(attachments).map((file, index) => (
-                        <li
-                          key={`${index}-${file.name}`}
-                          className="flex items-center justify-between p-2 px-3 bg-gray-100 rounded-md"
-                        >
-                          <span className="font-medium truncate pr-4">
+                  <div className="mt-4 space-y-2">
+                    {Array.from(attachments).map((file, index) => (
+                      <div
+                        key={`${index}-${file.name}`}
+                        className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100"
+                      >
+                        <div className="flex items-center gap-3 truncate">
+                          <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" /></svg>
+                          <span className="text-sm font-medium text-gray-700 truncate">
                             {file.name}
                           </span>
-                          <span className="text-gray-500 text-xs flex-shrink-0">
-                            {(file.size / 1024).toFixed(2)} KB
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                        </div>
+                        <span className="text-blue-400 text-xs font-bold flex-shrink-0">
+                          {(file.size / 1024).toFixed(1)} KB
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
 
               {/* 버튼 영역 */}
-              <div className="flex justify-end gap-4 pt-8 border-t border-gray-200 mt-12">
+              <div className="flex flex-col-reverse md:flex-row justify-end gap-3 pt-8 border-t border-gray-100 mt-8 md:mt-12">
                 <Button
-                  className="px-8 py-3 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                  className="w-full md:w-auto px-8 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-colors"
                   onClick={handleCancel}
                 >
                   취소
                 </Button>
-                <Submit className="px-8 py-3 rounded-lg font-semibold">
+                <Submit className="w-full md:w-auto px-10 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-md shadow-blue-200 transition-all active:scale-95">
                   작성 완료
                 </Submit>
               </div>

@@ -21,6 +21,7 @@ type ClientHeaderProps = { menus: Array<Menu> };
 
 export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
   const { isLogin, userInfo } = useContext(GlobalContext);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     const { data } = await appFetch<boolean>('/api/logout', {
@@ -63,19 +64,19 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
         <div className="flex items-center space-x-8">
           <AppLink
             href="/"
-            className="text-xl font-extrabold text-gray-900 md:text-2xl"
+            className="text-xl font-extrabold text-blue-600 md:text-2xl"
           >
             The Lounge.
           </AppLink>
-          <nav className="hidden items-center space-x-1 md:flex">
+          <nav className="hidden items-center space-x-1 lg:flex">
             {menuTree.map((menu) => (
               <HeaderMenuItem key={menu.id} item={menu} />
             ))}
           </nav>
         </div>
 
-        {/* Right Section: Auth Links */}
-        <div className="flex items-center space-x-2 sm:space-x-4">
+        {/* Right Section: Auth Links (PC) */}
+        <div className="hidden items-center space-x-2 lg:flex sm:space-x-4">
           {isLogin ? (
             <div className="flex items-center space-x-2">
               <AppLink
@@ -86,7 +87,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
               </AppLink>
               <span className="text-gray-300">|</span>
               <Button
-                className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+                className="bg-transparent text-sm font-medium text-gray-500 transition-colors hover:text-gray-900 px-0 py-0 shadow-none border-none"
                 onClick={handleLogout}
               >
                 로그아웃
@@ -102,14 +103,130 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
               </AppLink>
               <AppLink
                 href="/signup"
-                className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 shadow-sm"
               >
                 회원가입
               </AppLink>
             </>
           )}
         </div>
+
+        {/* Mobile Menu Button */}
+        <div className="flex items-center lg:hidden">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? (
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden border-t border-gray-100 bg-white">
+          <nav className="flex flex-col p-4 space-y-1">
+            {menuTree.map((menu) => (
+              <div key={menu.id} className="flex flex-col">
+                {menu.children && menu.children.length > 0 ? (
+                  <>
+                    <div className="px-3 py-2 text-sm font-semibold text-gray-900">
+                      {menu.menuName}
+                    </div>
+                    <div className="ml-4 flex flex-col space-y-1 border-l-2 border-gray-50 pl-2">
+                      {menu.children.map((child) => (
+                        <AppLink
+                          key={child.id}
+                          href={child.href}
+                          className="rounded-md px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-blue-600"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {child.menuName}
+                        </AppLink>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <AppLink
+                    href={menu.href}
+                    className="rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-blue-600"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {menu.menuName}
+                  </AppLink>
+                )}
+              </div>
+            ))}
+            <hr className="my-2 border-gray-100" />
+            {isLogin ? (
+              <div className="flex flex-col space-y-1">
+                <AppLink
+                  href="/mypage"
+                  className="px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  마이페이지 ({userInfo?.userName ?? '회원'}님)
+                </AppLink>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+                >
+                  로그아웃
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 p-2">
+                <AppLink
+                  href="/login"
+                  className="flex h-10 items-center justify-center rounded-lg border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  로그인
+                </AppLink>
+                <AppLink
+                  href="/signup"
+                  className="flex h-10 items-center justify-center rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  회원가입
+                </AppLink>
+              </div>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

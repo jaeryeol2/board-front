@@ -100,18 +100,18 @@ export default function CommentSection({
   return (
     <>
       {/* 댓글 섹션 */}
-      <div ref={ref} className="mt-16">
+      <div ref={ref} className="mt-10 md:mt-16">
         {/* 댓글 헤더 */}
         <div className="flex items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">댓글</h2>
-          <span className="ml-2 text-xl font-bold text-blue-600">
+          <h2 className="text-lg md:text-xl font-bold text-gray-800">댓글</h2>
+          <span className="ml-2 text-lg md:text-xl font-bold text-blue-600">
             {commentList?.length || 0}
           </span>
         </div>
 
         {/* 댓글 입력 폼 */}
-        <div className="mt-6 mb-8">
-          <div className="relative rounded-lg border border-gray-200 bg-white transition focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
+        <div className="mt-4 md:mt-6 mb-6 md:mb-8">
+          <div className="relative rounded-xl border border-gray-200 bg-white transition focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 shadow-sm">
             <Textarea
               placeholder="따뜻한 댓글을 남겨주세요. (100자 이내)"
               value={comment}
@@ -119,16 +119,16 @@ export default function CommentSection({
               onChange={(e) => setComment(e.target.value)}
               rows={3}
               maxLength={100}
-              className="w-full resize-none border-0 bg-transparent p-4 pb-12 text-base placeholder-gray-400 focus:outline-none"
+              className="w-full resize-none border-0 bg-transparent p-3 md:p-4 pb-12 text-sm md:text-base placeholder-gray-400 focus:outline-none"
             />
-            <div className="absolute bottom-3 right-3 flex items-center">
-              <span className="mr-3 text-sm text-gray-400">
+            <div className="absolute bottom-2 md:bottom-3 right-2 md:right-3 flex items-center">
+              <span className="mr-3 text-xs md:text-sm text-gray-400">
                 {comment.length}/100
               </span>
               <Button
                 onClick={handleCommentSubmit}
                 disabled={!comment.trim() || !isLogin}
-                className="rounded-md px-5 py-2 text-sm font-semibold"
+                className="rounded-lg px-4 md:px-5 py-1.5 md:py-2 text-xs md:text-sm font-semibold transition-all shadow-sm"
               >
                 등록
               </Button>
@@ -138,29 +138,29 @@ export default function CommentSection({
 
         {/* 댓글 목록 */}
         <SectionLoading loading={loading}>
-          <div className="space-y-4">
+          <div className="space-y-0">
             {paginatedComments && paginatedComments.length > 0 ? (
               paginatedComments.map((c, index) => (
                 <div
                   key={c.id}
-                  className={`py-5 ${index === paginatedComments.length - 1 ? '' : 'border-b border-gray-100'}`}
+                  className={`py-4 md:py-5 ${index === paginatedComments.length - 1 ? '' : 'border-b border-gray-100'}`}
                 >
-                  <div className="flex items-start space-x-4">
+                  <div className="flex items-start space-x-3 md:space-x-4">
                     <div className="flex-shrink-0">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-500">
+                      <div className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-blue-50 text-xs md:text-sm font-bold text-blue-600">
                         {c.writerName.charAt(0)}
                       </div>
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-gray-800">
+                        <span className="font-bold text-[14px] md:text-[15px] text-gray-900 truncate">
                           {c.writerName}
                         </span>
                       </div>
-                      <p className="mt-1.5 text-base leading-relaxed text-gray-700">
+                      <p className="mt-1 md:mt-1.5 text-[14px] md:text-base leading-relaxed text-gray-700 break-words">
                         {c.content}
                       </p>
-                      <span className="mt-2.5 block text-sm text-gray-500">
+                      <span className="mt-2 block text-xs md:text-sm text-gray-400">
                         {format(new Date(c.createdAt), 'yyyy.MM.dd HH:mm')}
                       </span>
                     </div>
@@ -168,12 +168,12 @@ export default function CommentSection({
                 </div>
               ))
             ) : (
-              <div className="rounded-lg bg-gray-50 py-16 text-center">
-                <div className="mb-2 text-4xl">💬</div>
-                <p className="font-semibold text-gray-600">
+              <div className="rounded-xl bg-gray-50 py-12 md:py-16 text-center border border-gray-100">
+                <div className="mb-3 text-3xl md:text-4xl opacity-50">💬</div>
+                <p className="font-semibold text-sm md:text-base text-gray-600">
                   아직 댓글이 없습니다.
                 </p>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-xs md:text-sm text-gray-400">
                   가장 먼저 댓글을 남겨보세요!
                 </p>
               </div>
@@ -181,7 +181,7 @@ export default function CommentSection({
           </div>
           {/* 페이지네이션 */}
           {commentList.length > rowsPerPage && (
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-6 md:mt-8">
               <Pagination
                 totalItems={commentList.length}
                 itemsPerPage={rowsPerPage}
