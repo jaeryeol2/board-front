@@ -8,7 +8,7 @@ import { ButtonProps } from '@/types/component';
  * @returns
  */
 export default function Button(props: Readonly<ButtonProps>) {
-  const attributes = { ...props, label: undefined };
+  const attributes = { ...props };
 
   if (attributes?.className) {
     attributes.className = attributes.className.concat(' cursor-pointer');

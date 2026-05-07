@@ -1,5 +1,6 @@
 'use client';
 
+import { ChildrenType } from '@/types/base';
 import { ButtonProps } from '@/types/component';
 
 /**
@@ -7,8 +8,9 @@ import { ButtonProps } from '@/types/component';
  * @param param0
  * @returns
  */
-export default function Submit(props: Readonly<ButtonProps>) {
-  const attributes = { ...props, label: undefined };
+export default function Submit(props: Readonly<ButtonProps & ChildrenType>) {
+  const attributes = { ...props };
+
   if (attributes?.className) {
     attributes.className = attributes.className.concat(' cursor-pointer');
   }

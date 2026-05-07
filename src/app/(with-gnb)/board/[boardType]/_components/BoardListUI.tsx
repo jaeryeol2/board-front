@@ -4,6 +4,7 @@ import Button from '@/components/base/Button';
 import Pagination from '@/components/common/client/Pagination';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { Board } from '@/types/board';
+import { conditionGet } from '@/utils/conditionGet';
 import { isNotEmpty } from '@/utils/isEmpty';
 import { format } from 'date-fns';
 import {
@@ -41,6 +42,7 @@ export default function BoardListUI({
   const { isLogin } = useContext(GlobalContext);
   const canWrite = isLogin && boardType !== 'board-popular';
   const isNotAnony = boardType !== 'board-anony';
+  const cond = conditionGet<string>();
 
   /**
    * 행 클릭 시 상세 페이지로 이동합니다.
@@ -70,11 +72,16 @@ export default function BoardListUI({
     <div className="py-6 md:py-8 px-4 md:px-0">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl md:text-2xl font-bold text-gray-900">
-          {boardType === 'board-popular' ? '인기 게시판' : 
-           boardType === 'board-anony' ? '익명 게시판' : '자유 게시판'}
+          {cond
+            .when(boardType === 'board-popular')
+            .do(() => '인기 게시판')
+            .when(boardType === 'board-anony')
+            .do(() => '익명 게시판')
+            .other(() => '자유 게시판')
+            .get()}
         </h1>
         {canWrite && (
-          <Button 
+          <Button
             onClick={handleWriteClick}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full shadow-sm transition-all"
           >
@@ -88,13 +95,23 @@ export default function BoardListUI({
         <table className="w-full text-left text-sm text-gray-500">
           <thead className="bg-gray-50/50 text-xs uppercase text-gray-700 border-b border-gray-100">
             <tr>
-              <th scope="col" className="w-20 px-6 py-4 text-center">번호</th>
-              <th scope="col" className="px-6 py-4">제목</th>
+              <th scope="col" className="w-20 px-6 py-4 text-center">
+                번호
+              </th>
+              <th scope="col" className="px-6 py-4">
+                제목
+              </th>
               {isNotAnony && (
-                <th scope="col" className="w-32 px-6 py-4 text-center">작성자</th>
+                <th scope="col" className="w-32 px-6 py-4 text-center">
+                  작성자
+                </th>
               )}
-              <th scope="col" className="w-32 px-6 py-4 text-center">작성일</th>
-              <th scope="col" className="w-24 px-6 py-4 text-center">조회수</th>
+              <th scope="col" className="w-32 px-6 py-4 text-center">
+                작성일
+              </th>
+              <th scope="col" className="w-24 px-6 py-4 text-center">
+                조회수
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -112,10 +129,16 @@ export default function BoardListUI({
                     <div className="flex items-center gap-3">
                       {isNotEmpty(board.fileUrl) && (
                         <div className="w-12 h-8 flex-shrink-0 rounded bg-gray-100 overflow-hidden">
-                           {/* Placeholder for thumbnail */}
-                           <div className="w-full h-full bg-blue-50 flex items-center justify-center">
-                             <svg className="w-4 h-4 text-blue-200" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/></svg>
-                           </div>
+                          {/* Placeholder for thumbnail */}
+                          <div className="w-full h-full bg-blue-50 flex items-center justify-center">
+                            <svg
+                              className="w-4 h-4 text-blue-200"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+                            </svg>
+                          </div>
                         </div>
                       )}
                       <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors truncate max-w-md">
@@ -181,9 +204,15 @@ export default function BoardListUI({
                 </div>
                 {isNotEmpty(board.fileUrl) && (
                   <div className="w-16 h-16 flex-shrink-0 rounded-lg bg-gray-50 overflow-hidden">
-                     <div className="w-full h-full bg-blue-50 flex items-center justify-center">
-                       <svg className="w-6 h-6 text-blue-100" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/></svg>
-                     </div>
+                    <div className="w-full h-full bg-blue-50 flex items-center justify-center">
+                      <svg
+                        className="w-6 h-6 text-blue-100"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+                      </svg>
+                    </div>
                   </div>
                 )}
               </div>

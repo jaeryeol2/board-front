@@ -40,12 +40,10 @@ export const condition = () => {
   };
 
   return {
-    cond: {
-      when(condition: (() => boolean) | boolean) {
-        currentCondition =
-          typeof condition === 'boolean' ? () => condition : condition;
-        return doInstance;
-      },
+    when(condition: (() => boolean) | boolean) {
+      currentCondition =
+        typeof condition === 'boolean' ? () => condition : condition;
+      return doInstance;
     },
   };
 };
