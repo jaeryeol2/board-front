@@ -1,6 +1,7 @@
 'use client';
 
 import Button from '@/components/base/Button';
+import FileInput from '@/components/base/FileInput';
 import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
 import Textarea from '@/components/base/Textarea';
@@ -151,10 +152,9 @@ export default function BoardWriteUI({
                       <p className="text-xs text-gray-400">이미지 파일 (JPG, PNG, GIF)</p>
                     </div>
                   </label>
-                  <input
+                  <FileInput
                     id="attachments"
                     name="attachments"
-                    type="file"
                     className="hidden"
                     multiple
                     onChange={handleFileChange}

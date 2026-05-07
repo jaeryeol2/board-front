@@ -23,6 +23,18 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
   const { isLogin, userInfo } = useContext(GlobalContext);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // 모바일 메뉴 오픈 시 body 스크롤 방지
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
   const handleLogout = async () => {
     const { data } = await appFetch<boolean>('/api/logout', {
       method: 'post',
@@ -58,7 +70,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
   }, [menus]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-100 bg-white/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 border-b border-gray-100 bg-white">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Left Section: Logo and Menu */}
         <div className="flex items-center space-x-8">
@@ -113,9 +125,9 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
 
         {/* Mobile Menu Button */}
         <div className="flex items-center lg:hidden">
-          <button
+          <Button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
+            className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:outline-none bg-transparent shadow-none border-none px-2 py-2"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
@@ -147,38 +159,84 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
                 />
               </svg>
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-gray-100 bg-white">
-          <nav className="flex flex-col p-4 space-y-1">
+      {/* Mobile Menu Overlay & Drawer */}
+      <div
+        className={`fixed inset-0 z-[60] transform transition-all duration-300 lg:hidden ${
+          isMobileMenuOpen ? 'visible' : 'invisible'
+        }`}
+      >
+        {/* Backdrop */}
+        <Button
+          className={`absolute inset-0 w-full h-full bg-black/40 backdrop-blur-sm transition-opacity duration-300 border-none appearance-none outline-none rounded-none p-0 shadow-none ${
+            isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={() => setIsMobileMenuOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              setIsMobileMenuOpen(false);
+            }
+          }}
+          aria-label="Close menu"
+          tabIndex={isMobileMenuOpen ? 0 : -1}
+        />
+
+        {/* Drawer Content */}
+        <div
+          className={`absolute inset-y-0 right-0 w-[280px] max-w-[80%] bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
+            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <div className="flex h-16 items-center justify-between border-b border-gray-100 px-6">
+            <span className="text-lg font-bold text-blue-600">Menu</span>
+            <Button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="rounded-full p-2 text-gray-400 hover:bg-gray-100 bg-transparent shadow-none border-none px-2 py-2"
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </Button>
+          </div>
+
+          <nav className="flex flex-col p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-4rem)]">
             {menuTree.map((menu) => (
               <div key={menu.id} className="flex flex-col">
                 {menu.children && menu.children.length > 0 ? (
-                  <>
-                    <div className="px-3 py-2 text-sm font-semibold text-gray-900">
+                  <div className="mb-2">
+                    <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-gray-400">
                       {menu.menuName}
                     </div>
-                    <div className="ml-4 flex flex-col space-y-1 border-l-2 border-gray-50 pl-2">
+                    <div className="ml-2 flex flex-col space-y-1">
                       {menu.children.map((child) => (
                         <AppLink
                           key={child.id}
                           href={child.href}
-                          className="rounded-md px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-blue-600"
+                          className="rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
                           {child.menuName}
                         </AppLink>
                       ))}
                     </div>
-                  </>
+                  </div>
                 ) : (
                   <AppLink
                     href={menu.href}
-                    className="rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-blue-600"
+                    className="rounded-xl px-4 py-3 text-[15px] font-bold text-gray-800 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {menu.menuName}
@@ -186,47 +244,55 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
                 )}
               </div>
             ))}
-            <hr className="my-2 border-gray-100" />
-            {isLogin ? (
-              <div className="flex flex-col space-y-1">
-                <AppLink
-                  href="/mypage"
-                  className="px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  마이페이지 ({userInfo?.userName ?? '회원'}님)
-                </AppLink>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
-                >
-                  로그아웃
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-2 p-2">
-                <AppLink
-                  href="/login"
-                  className="flex h-10 items-center justify-center rounded-lg border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  로그인
-                </AppLink>
-                <AppLink
-                  href="/signup"
-                  className="flex h-10 items-center justify-center rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  회원가입
-                </AppLink>
-              </div>
-            )}
+
+            <div className="my-4 border-t border-gray-100 pt-4 px-2">
+              {isLogin ? (
+                <div className="flex flex-col space-y-2">
+                  <div className="px-2 py-1 mb-2">
+                    <p className="text-xs text-gray-400 mb-1">내 정보</p>
+                    <p className="text-sm font-bold text-gray-800">
+                      {userInfo?.userName ?? '회원'}님
+                    </p>
+                  </div>
+                  <AppLink
+                    href="/mypage"
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 hover:bg-gray-50"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    마이페이지
+                  </AppLink>
+                  <Button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-red-600 hover:bg-red-50 transition-colors text-left bg-transparent shadow-none border-none w-full"
+                  >
+                    로그아웃
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <AppLink
+                    href="/login"
+                    className="flex h-12 items-center justify-center rounded-xl border border-gray-200 text-[15px] font-bold text-gray-700 hover:bg-gray-50"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    로그인
+                  </AppLink>
+                  <AppLink
+                    href="/signup"
+                    className="flex h-12 items-center justify-center rounded-xl bg-blue-600 text-[15px] font-bold text-white hover:bg-blue-700 shadow-lg shadow-blue-100"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    회원가입
+                  </AppLink>
+                </div>
+              )}
+            </div>
           </nav>
         </div>
-      )}
+      </div>
     </header>
   );
 }

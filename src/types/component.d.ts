@@ -28,6 +28,8 @@ export interface NumericProps extends BaseInputPropsWithRef {}
 export interface RadioProps extends BaseInputPropsWithRef {}
 /** checkbox component props type */
 export interface CheckboxProps extends BaseInputPropsWithRef {}
+/** file input props type */
+export interface FileInputProps extends BaseInputPropsWithRef {}
 
 /** button component props type */
 export interface ButtonProps extends Omit<
