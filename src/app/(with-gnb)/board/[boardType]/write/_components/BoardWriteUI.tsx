@@ -61,7 +61,7 @@ export default function BoardWriteUI({
         }
       }
 
-      const { status, data } = await appFetch<boolean>(
+      const { status, data, message } = await appFetch<boolean>(
         `/api/board/${toSnakeCase(boardType).toUpperCase()}`,
         {
           method: 'post',
@@ -72,6 +72,9 @@ export default function BoardWriteUI({
       if (status === 201 && data) {
         alert('게시글이 작성되었습니다.');
         router.push(`/board/${boardType}?page=1`);
+      } else {
+        alert(message);
+        return;
       }
     }
   };
@@ -122,7 +125,19 @@ export default function BoardWriteUI({
               {/* 첨부파일 입력란 */}
               <div className="border-t border-gray-50 pt-8">
                 <div className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                  <svg
+                    className="w-5 h-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                    />
+                  </svg>
                   파일 첨부
                 </div>
                 <div className="flex items-center justify-center w-full">
@@ -149,7 +164,9 @@ export default function BoardWriteUI({
                       <p className="mb-1 text-sm md:text-base">
                         <span className="font-bold">파일 선택</span> 또는 드래그
                       </p>
-                      <p className="text-xs text-gray-400">이미지 파일 (JPG, PNG, GIF)</p>
+                      <p className="text-xs text-gray-400">
+                        이미지 파일 (JPG, PNG, GIF)
+                      </p>
                     </div>
                   </label>
                   <FileInput
@@ -169,7 +186,17 @@ export default function BoardWriteUI({
                         className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100"
                       >
                         <div className="flex items-center gap-3 truncate">
-                          <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" /></svg>
+                          <svg
+                            className="w-4 h-4 text-blue-400 flex-shrink-0"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
                           <span className="text-sm font-medium text-gray-700 truncate">
                             {file.name}
                           </span>

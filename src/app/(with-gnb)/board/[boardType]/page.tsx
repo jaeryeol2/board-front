@@ -53,6 +53,7 @@ export default async function BoardPage({
   const boardType = (await params).boardType;
   const page = Number((await searchParams)?.page ?? 1);
   const rowsPerPage = 20;
+  const { data: info } = await fetchBoardInfoData(boardType);
   const { data } = await fetchBoardListData(boardType, {
     page,
     rowsPerPage,
@@ -68,6 +69,7 @@ export default async function BoardPage({
       list={data?.list ?? []}
       page={page}
       rowsPerPage={rowsPerPage}
+      boardName={info?.menuName ?? ''}
     />
   );
 }

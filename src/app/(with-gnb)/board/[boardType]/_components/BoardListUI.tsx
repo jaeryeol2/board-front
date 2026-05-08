@@ -5,7 +5,6 @@ import Button from '@/components/base/Button';
 import Pagination from '@/components/common/client/Pagination';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { Board } from '@/types/board';
-import { conditionGet } from '@/utils/conditionGet';
 import { isNotEmpty } from '@/utils/isEmpty';
 import { format } from 'date-fns';
 import {
@@ -21,6 +20,7 @@ type BoardListProps = {
   list: Array<Board>;
   page: number;
   rowsPerPage: number;
+  boardName: string;
 };
 
 /**
@@ -32,6 +32,7 @@ export default function BoardListUI({
   list,
   page,
   rowsPerPage,
+  boardName,
 }: Readonly<BoardListProps>) {
   const router = useRouter();
   const path = usePathname();
@@ -43,7 +44,6 @@ export default function BoardListUI({
   const { isLogin } = useContext(GlobalContext);
   const canWrite = isLogin && boardType !== 'board-popular';
   const isNotAnony = boardType !== 'board-anony';
-  const cond = conditionGet<string>();
 
   const handlePage = (page: number) => {
     router.push(`/board/${boardType}?page=${page}`);
@@ -66,13 +66,7 @@ export default function BoardListUI({
     <div className="py-6 md:py-8 px-4 md:px-0">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl md:text-2xl font-bold text-gray-900">
-          {cond
-            .when(boardType === 'board-popular')
-            .do(() => '인기 게시판')
-            .when(boardType === 'board-anony')
-            .do(() => '익명 게시판')
-            .other(() => '자유 게시판')
-            .get()}
+          {boardName}
         </h1>
         {canWrite && (
           <Button
