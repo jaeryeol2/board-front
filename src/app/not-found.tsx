@@ -12,11 +12,13 @@ export default function NotFound() {
         페이지를 찾을 수 없어요
       </h2>
       <p className="mb-10 max-w-sm break-keep text-gray-500 text-sm md:text-lg leading-relaxed">
-        요청하신 페이지가 사라졌거나,<br className="hidden md:block" /> 잘못된 경로를 이용하셨어요.
+        요청하신 페이지가 사라졌거나,
+        <br className="hidden md:block" /> 잘못된 경로를 이용하셨어요.
       </p>
       <AppLink
         href="/"
         className="w-full md:w-auto rounded-2xl bg-blue-600 px-10 py-4 text-base md:text-lg font-bold text-white transition-all hover:bg-blue-700 shadow-lg shadow-blue-100 active:scale-[0.98]"
+        replace
       >
         홈으로 돌아가기
       </AppLink>
