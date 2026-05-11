@@ -14,6 +14,7 @@ export function TraficUser({ userCount }: Readonly<{ userCount: number }>) {
       const { data } = await appFetch<number>('/api/user/user-count');
       setCount(data ?? 0);
     };
+
     if (isMounted.current) {
       fetchData();
     } else {

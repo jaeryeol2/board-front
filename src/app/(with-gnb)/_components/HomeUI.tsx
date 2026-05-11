@@ -18,7 +18,7 @@ export default function HomeUI({ menus }: Readonly<HomeProps>) {
     <main className="w-full max-w-7xl mx-auto p-4 md:p-10">
       <div className="mb-10 text-center md:text-left">
         <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">
-          커뮤니티 소식
+          소식
         </h1>
         <p className="text-gray-500">다양한 주제의 이야기를 만나보세요.</p>
       </div>
