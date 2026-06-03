@@ -14,18 +14,27 @@ import { ChangeEvent, SubmitEvent, useState } from 'react';
 
 type BoardWriteUIProps = {
   boardType: string;
+  initialData?: {
+    title: string;
+    content: string;
+  } | null;
+  isModify?: boolean;
+  postId?: string;
 };
 
 /**
- * 게시글 작성 UI 컴포넌트
+ * 게시글 작성/수정 UI 컴포넌트
  * @param boardType 현재 게시판 타입
  */
 export default function BoardWriteUI({
   boardType,
+  initialData,
+  isModify = false,
+  postId,
 }: Readonly<BoardWriteUIProps>) {
   const router = useRouter();
-  const [title, setTitle] = useState<string>('');
-  const [content, setContent] = useState<string>('');
+  const [title, setTitle] = useState<string>(initialData?.title ?? '');
+  const [content, setContent] = useState<string>(initialData?.content ?? '');
   const [attachments, setAttachments] = useState<FileList | null>(null);
   const { validator } = useValidator();
 
@@ -51,7 +60,10 @@ export default function BoardWriteUI({
       .verification(() => isEmpty(title), '제목을 입력해주세요.')
       .verification(() => isEmpty(content), '내용을 입력해주세요.');
 
-    if (valid.validate() && confirm('등록하시겠습니까?')) {
+    if (
+      valid.validate() &&
+      confirm(isModify ? '수정하시겠습니까?' : '등록하시겠습니까?')
+    ) {
       form.set('title', title);
       form.set('content', content);
 
@@ -61,17 +73,26 @@ export default function BoardWriteUI({
         }
       }
 
-      const { status, data, message } = await appFetch<boolean>(
-        `/api/board/${toSnakeCase(boardType).toUpperCase()}`,
-        {
-          method: 'post',
-          body: form,
-        },
-      );
+      const url = isModify
+        ? `/api/board/${toSnakeCase(boardType).toUpperCase()}/${postId}`
+        : `/api/board/${toSnakeCase(boardType).toUpperCase()}`;
 
-      if (status === 201 && data) {
-        alert('게시글이 작성되었습니다.');
-        router.push(`/board/${boardType}?page=1`);
+      const method = isModify ? 'put' : 'post';
+
+      const { status, data, message } = await appFetch<boolean>(url, {
+        method,
+        body: form,
+      });
+
+      if ((isModify ? status === 200 : status === 201) && data) {
+        alert(
+          isModify ? '게시글이 수정되었습니다.' : '게시글이 작성되었습니다.',
+        );
+        router.push(
+          isModify
+            ? `/board/${boardType}/${postId}`
+            : `/board/${boardType}?page=1`,
+        );
       } else {
         alert(message);
         return;
@@ -92,10 +113,12 @@ export default function BoardWriteUI({
         <div className="bg-white p-5 md:p-10 rounded-2xl border border-gray-100 shadow-sm max-w-4xl mx-auto">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-4">
-              게시글 작성
+              {isModify ? '게시글 수정' : '게시글 작성'}
             </h1>
             <p className="text-sm md:text-base text-gray-500 mb-8 md:mb-12">
-              새로운 소식을 공유하고 다른 사람들과 소통해보세요.
+              {isModify
+                ? '게시글의 내용을 수정해보세요.'
+                : '새로운 소식을 공유하고 다른 사람들과 소통해보세요.'}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10">
@@ -219,7 +242,7 @@ export default function BoardWriteUI({
                   취소
                 </Button>
                 <Submit className="w-full md:w-auto px-10 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-md shadow-blue-200 transition-all active:scale-95">
-                  작성 완료
+                  {isModify ? '수정 완료' : '작성 완료'}
                 </Submit>
               </div>
             </form>

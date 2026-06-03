@@ -30,6 +30,7 @@ export const generateMetadata = async ({
     description: data?.content,
   };
 };
+
 export default async function BoardDetailPage({
   params,
 }: Readonly<ParamsType<BoardDetailParam>>) {
