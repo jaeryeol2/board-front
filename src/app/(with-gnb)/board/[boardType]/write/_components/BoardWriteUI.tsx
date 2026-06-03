@@ -8,6 +8,7 @@ import Textarea from '@/components/base/Textarea';
 import { useValidator } from '@/hooks/useValidator';
 import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
+import { condition } from '@/utils/condition';
 import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, SubmitEvent, useState } from 'react';
@@ -55,6 +56,7 @@ export default function BoardWriteUI({
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const cond = condition();
     const form = new FormData();
     const valid = validator
       .verification(() => isEmpty(title), '제목을 입력해주세요.')
@@ -84,19 +86,26 @@ export default function BoardWriteUI({
         body: form,
       });
 
-      if ((isModify ? status === 200 : status === 201) && data) {
-        alert(
-          isModify ? '게시글이 수정되었습니다.' : '게시글이 작성되었습니다.',
-        );
-        router.push(
-          isModify
-            ? `/board/${boardType}/${postId}`
-            : `/board/${boardType}?page=1`,
-        );
-      } else {
-        alert(message);
-        return;
-      }
+      const result = cond
+        .when(
+          () => (isModify ? status === 200 : status === 201) && (data ?? false),
+        )
+        .do(() => {
+          alert(
+            isModify ? '게시글이 수정되었습니다.' : '게시글이 작성되었습니다.',
+          );
+
+          router.push(
+            isModify
+              ? `/board/${boardType}/${postId}`
+              : `/board/${boardType}?page=1`,
+          );
+        })
+        .other(() => {
+          alert(message);
+        });
+
+      result.execute();
     }
   };
 

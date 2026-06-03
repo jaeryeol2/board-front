@@ -3,16 +3,51 @@
 import AppImage from '@/components/base/AppImage';
 import Button from '@/components/base/Button';
 import { GlobalContext } from '@/contexts/GlobalContext';
-import { BoardDetail } from '@/types/board';
+import { BoardDetail, BoardFile } from '@/types/board';
 import { isNotEmpty } from '@/utils/isEmpty';
 import { format } from 'date-fns';
 import { useParams, useRouter } from 'next/navigation';
-import { useContext, useRef } from 'react';
+import { SyntheticEvent, useContext, useRef, useState } from 'react';
 import CommentSection from './CommentSection';
 
 type BoardDetailProps = {
   board: BoardDetail;
 };
+
+/**
+ * 개별 이미지 반응형 렌더링 아이템 컴포넌트
+ * 기본 높이(h-[300px] md:h-[500px])를 확보하되, 이미지 로딩 시 원본 비율로 높이를 동적으로 조정함
+ */
+function DetailImageItem({ file }: Readonly<{ file: BoardFile }>) {
+  const [aspectRatio, setAspectRatio] = useState<number | null>(null);
+
+  const handleImageLoad = (e: SyntheticEvent<HTMLImageElement, Event>) => {
+    const img = e.currentTarget;
+    if (img.naturalWidth && img.naturalHeight) {
+      setAspectRatio(img.naturalWidth / img.naturalHeight);
+    }
+  };
+
+  return (
+    <div
+      className="relative w-full h-[300px] md:h-[500px] rounded-xl overflow-hidden group border border-gray-100 shadow-sm bg-gray-50/50"
+      style={{
+        aspectRatio: aspectRatio ? `${aspectRatio}` : undefined,
+        height: aspectRatio ? 'auto' : undefined,
+      }}
+    >
+      <AppImage
+        src={file.fileUrl}
+        alt={file.originalFileName}
+        fill
+        style={{ objectFit: 'cover' }}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        onLoad={handleImageLoad}
+        className="transition-transform duration-500 group-hover:scale-105"
+      />
+    </div>
+  );
+}
 
 export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
   const router = useRouter();
@@ -116,21 +151,9 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
 
           {board.fileList && board.fileList.length > 0 && (
             <div className="mt-10 md:mt-12">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-4 max-w-3xl mx-auto">
                 {board.fileList.map((file) => (
-                  <div
-                    key={file.id}
-                    className="relative w-full aspect-video rounded-xl overflow-hidden group border border-gray-100 shadow-sm"
-                  >
-                    <AppImage
-                      src={file.fileUrl}
-                      alt={file.originalFileName}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
+                  <DetailImageItem key={file.id} file={file} />
                 ))}
               </div>
             </div>

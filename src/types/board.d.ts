@@ -13,7 +13,7 @@ export type Board = {
   fileUrl: string;
 };
 
-type BoardComment = {
+export type BoardComment = {
   id: number;
   parentId: number;
   content: string;
@@ -23,7 +23,7 @@ type BoardComment = {
   updatedAt: string;
 };
 
-type BoardFile = {
+export type BoardFile = {
   id: number;
   boardId: number;
   fileUrl: string;
