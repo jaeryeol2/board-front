@@ -48,7 +48,7 @@ export default function LoginUI() {
           }
         } else {
           alert(
-            data && 'message' in (data as FetchErrorType)
+            data && typeof data !== 'boolean'
               ? (data as FetchErrorType).message
               : message,
           );
