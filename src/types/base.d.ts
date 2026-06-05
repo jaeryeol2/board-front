@@ -51,3 +51,9 @@ export type SearchParamsType = {
 };
 
 export type SlugType = ParamsType & SearchParamsType;
+
+export type FetchErrorType = {
+  status: number;
+  code: string;
+  message: string;
+};

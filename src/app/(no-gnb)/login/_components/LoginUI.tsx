@@ -6,6 +6,7 @@ import Password from '@/components/base/Password';
 import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
 import { useValidator } from '@/hooks/useValidator';
+import { FetchErrorType } from '@/types/base';
 import { appFetch } from '@/utils/appFetch';
 import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
 import { useSearchParams } from 'next/navigation';
@@ -31,15 +32,14 @@ export default function LoginUI() {
 
     try {
       if (checker.validate()) {
-        const { status, data, message } = await appFetch<boolean>(
-          '/api/login',
-          {
-            method: 'post',
-            body: user,
-          },
-        );
+        const { status, data, message } = await appFetch<
+          boolean | FetchErrorType
+        >('/api/login', {
+          method: 'post',
+          body: user,
+        });
 
-        if (status === 200 && data) {
+        if (status === 200 && typeof data === 'boolean' && data) {
           // 아이디 저장 체크박스 상태에 따라 localStorage에 아이디를 저장하거나 삭제합니다.
           if (rememberId) {
             localStorage.setItem('savedUserId', user.userId);
@@ -47,7 +47,11 @@ export default function LoginUI() {
             localStorage.removeItem('savedUserId');
           }
         } else {
-          alert(message);
+          alert(
+            data && 'message' in (data as FetchErrorType)
+              ? (data as FetchErrorType).message
+              : message,
+          );
           return;
         }
       }
