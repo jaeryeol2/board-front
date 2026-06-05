@@ -95,7 +95,7 @@ export default function BoardWriteUI({
             isModify ? '게시글이 수정되었습니다.' : '게시글이 작성되었습니다.',
           );
 
-          router.push(
+          router.replace(
             isModify
               ? `/board/${boardType}/${postId}`
               : `/board/${boardType}?page=1`,
