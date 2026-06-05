@@ -6,6 +6,7 @@ import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
 import Textarea from '@/components/base/Textarea';
 import { useValidator } from '@/hooks/useValidator';
+import { BoardDetail } from '@/types/board';
 import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
 import { condition } from '@/utils/condition';
@@ -15,10 +16,7 @@ import { ChangeEvent, SubmitEvent, useState } from 'react';
 
 type BoardWriteUIProps = {
   boardType: string;
-  initialData?: {
-    title: string;
-    content: string;
-  } | null;
+  initialData?: BoardDetail | null;
   isModify?: boolean;
   postId?: string;
 };
@@ -45,7 +43,22 @@ export default function BoardWriteUI({
    */
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setAttachments(e.target.files);
+      setAttachments((prevList: FileList | null) => {
+        if (isNotEmpty(prevList)) {
+          const dataTransfer = new DataTransfer();
+
+          for (const item of [
+            ...Array.from(prevList),
+            ...Array.from(e.target.files!),
+          ]) {
+            dataTransfer.items.add(item);
+          }
+
+          return dataTransfer.files;
+        }
+
+        return e.target.files;
+      });
     }
   };
 
@@ -64,7 +77,7 @@ export default function BoardWriteUI({
 
     if (
       valid.validate() &&
-      confirm(isModify ? '수정하시겠습니까?' : '등록하시겠습니까?')
+      confirm(`${isModify ? '수정' : '등록'}하시겠습니까?`)
     ) {
       form.set('title', title);
       form.set('content', content);
@@ -91,9 +104,7 @@ export default function BoardWriteUI({
           () => (isModify ? status === 200 : status === 201) && (data ?? false),
         )
         .do(() => {
-          alert(
-            isModify ? '게시글이 수정되었습니다.' : '게시글이 작성되었습니다.',
-          );
+          alert(`게시글이 ${isModify ? '수정' : '작성'}되었습니다.`);
 
           router.replace(
             isModify
@@ -210,36 +221,62 @@ export default function BoardWriteUI({
                     accept="image/*"
                   />
                 </div>
-                {attachments && attachments.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    {Array.from(attachments).map((file, index) => (
-                      <div
-                        key={`${index}-${file.name}`}
-                        className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100"
-                      >
-                        <div className="flex items-center gap-3 truncate">
-                          <svg
-                            className="w-4 h-4 text-blue-400 flex-shrink-0"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span className="text-sm font-medium text-gray-700 truncate">
-                            {file.name}
-                          </span>
-                        </div>
-                        <span className="text-blue-400 text-xs font-bold flex-shrink-0">
-                          {(file.size / 1024).toFixed(1)} KB
+
+                <div className="mt-4 space-y-2">
+                  {initialData?.fileList.map((file, index) => (
+                    <div
+                      key={`${index}-${file.originalFileName}`}
+                      className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100"
+                    >
+                      <div className="flex items-center gap-3 truncate">
+                        <svg
+                          className="w-4 h-4 text-blue-400 flex-shrink-0"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span className="text-sm font-medium text-gray-700 truncate">
+                          {file.originalFileName}
                         </span>
                       </div>
-                    ))}
-                  </div>
-                )}
+                      {/* <span className="text-blue-400 text-xs font-bold flex-shrink-0">
+                          {(file.size / 1024).toFixed(1)} KB
+                        </span> */}
+                    </div>
+                  ))}
+
+                  {Array.from(attachments ?? []).map((file, index) => (
+                    <div
+                      key={`${index}-${file.name}`}
+                      className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100"
+                    >
+                      <div className="flex items-center gap-3 truncate">
+                        <svg
+                          className="w-4 h-4 text-blue-400 flex-shrink-0"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span className="text-sm font-medium text-gray-700 truncate">
+                          {file.name}
+                        </span>
+                      </div>
+                      <span className="text-blue-400 text-xs font-bold flex-shrink-0">
+                        {(file.size / 1024).toFixed(1)} KB
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* 버튼 영역 */}

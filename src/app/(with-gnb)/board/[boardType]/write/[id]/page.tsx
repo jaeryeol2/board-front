@@ -1,4 +1,5 @@
 import { ParamsType } from '@/types/base';
+import { BoardDetail } from '@/types/board';
 import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
 import { isNotEmpty } from '@/utils/isEmpty';
@@ -11,14 +12,6 @@ type BoardDetailParam = {
   boardType: string;
   id: string;
 };
-
-interface BoardDetail {
-  id: number;
-  title: string;
-  content: string;
-  boardTypeCode: string;
-  writerId: string;
-}
 
 const fetchData = cache(async ({ boardType, id }: BoardDetailParam) => {
   return await appFetch<BoardDetail>(
