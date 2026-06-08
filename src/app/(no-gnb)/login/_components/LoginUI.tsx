@@ -17,6 +17,7 @@ export default function LoginUI() {
   const { validator } = useValidator();
   const [user, setUser] = useState(() => ({ userId: '', password: '' }));
   const [rememberId, setRememberId] = useState(() => false);
+
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
@@ -60,8 +61,9 @@ export default function LoginUI() {
 
       if (hasUserId) {
         setUser((u) => ({ ...u, userId }));
-        setRememberId(() => hasUserId);
       }
+
+      setRememberId(() => hasUserId);
     };
 
     initLoginPage();

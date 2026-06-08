@@ -14,12 +14,19 @@ export function TraficUser({ userCount }: Readonly<{ userCount: number }>) {
       const { data } = await appFetch<number>('/api/user/user-count');
       setCount(data ?? 0);
     };
+    // const handleRemoveTraficUser = async () => {
+    //   appFetch<boolean>('/api/user/user-count', {
+    //     method: 'delete',
+    //   });
+    // };
 
     if (isMounted.current) {
       fetchData();
     } else {
       isMounted.current = true;
     }
+
+    // window.addEventListener('beforeunload', handleRemoveTraficUser);
   }, [path]);
 
   return (
