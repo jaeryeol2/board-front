@@ -54,7 +54,7 @@ export default function LoginUI() {
   };
 
   useEffect(() => {
-    const setUserInfo = () => {
+    const initLoginPage = () => {
       const userId = localStorage.getItem('savedUserId');
       const hasUserId = isNotEmpty(userId);
 
@@ -64,7 +64,7 @@ export default function LoginUI() {
       }
     };
 
-    setUserInfo();
+    initLoginPage();
   }, []);
 
   return (
