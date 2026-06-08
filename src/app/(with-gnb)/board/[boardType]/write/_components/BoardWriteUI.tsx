@@ -12,7 +12,7 @@ import { toSnakeCase } from '@/utils/caseConverter';
 import { condition } from '@/utils/condition';
 import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, SubmitEvent, useState } from 'react';
+import { Activity, ChangeEvent, SubmitEvent, useState } from 'react';
 
 type BoardWriteUIProps = {
   boardType: string;
@@ -221,62 +221,70 @@ export default function BoardWriteUI({
                     accept="image/*"
                   />
                 </div>
-
-                <div className="mt-4 space-y-2">
-                  {initialData?.fileList.map((file, index) => (
-                    <div
-                      key={`${index}-${file.originalFileName}`}
-                      className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100"
-                    >
-                      <div className="flex items-center gap-3 truncate">
-                        <svg
-                          className="w-4 h-4 text-blue-400 flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span className="text-sm font-medium text-gray-700 truncate">
-                          {file.originalFileName}
-                        </span>
-                      </div>
-                      {/* <span className="text-blue-400 text-xs font-bold flex-shrink-0">
+                <Activity
+                  mode={
+                    (initialData?.fileList ?? []).length > 0 ||
+                    (attachments ?? []).length > 0
+                      ? 'visible'
+                      : 'hidden'
+                  }
+                >
+                  <div className="mt-4 space-y-2">
+                    {initialData?.fileList.map((file, index) => (
+                      <div
+                        key={`${index}-${file.originalFileName}`}
+                        className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100"
+                      >
+                        <div className="flex items-center gap-3 truncate">
+                          <svg
+                            className="w-4 h-4 text-blue-400 flex-shrink-0"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <span className="text-sm font-medium text-gray-700 truncate">
+                            {file.originalFileName}
+                          </span>
+                        </div>
+                        {/* <span className="text-blue-400 text-xs font-bold flex-shrink-0">
                           {(file.size / 1024).toFixed(1)} KB
                         </span> */}
-                    </div>
-                  ))}
+                      </div>
+                    ))}
 
-                  {Array.from(attachments ?? []).map((file, index) => (
-                    <div
-                      key={`${index}-${file.name}`}
-                      className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100"
-                    >
-                      <div className="flex items-center gap-3 truncate">
-                        <svg
-                          className="w-4 h-4 text-blue-400 flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span className="text-sm font-medium text-gray-700 truncate">
-                          {file.name}
+                    {Array.from(attachments ?? []).map((file, index) => (
+                      <div
+                        key={`${index}-${file.name}`}
+                        className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100"
+                      >
+                        <div className="flex items-center gap-3 truncate">
+                          <svg
+                            className="w-4 h-4 text-blue-400 flex-shrink-0"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <span className="text-sm font-medium text-gray-700 truncate">
+                            {file.name}
+                          </span>
+                        </div>
+                        <span className="text-blue-400 text-xs font-bold flex-shrink-0">
+                          {(file.size / 1024).toFixed(1)} KB
                         </span>
                       </div>
-                      <span className="text-blue-400 text-xs font-bold flex-shrink-0">
-                        {(file.size / 1024).toFixed(1)} KB
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </Activity>
               </div>
 
               {/* 버튼 영역 */}

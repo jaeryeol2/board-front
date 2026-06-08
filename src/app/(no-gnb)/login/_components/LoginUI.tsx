@@ -10,19 +10,13 @@ import { FetchErrorType } from '@/types/base';
 import { appFetch } from '@/utils/appFetch';
 import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
 import { useSearchParams } from 'next/navigation';
-import { SubmitEvent, useState } from 'react';
+import { SubmitEvent, useEffect, useState } from 'react';
 
 export default function LoginUI() {
   const query = useSearchParams();
   const { validator } = useValidator();
-  const [user, setUser] = useState(() => {
-    const savedUserId = localStorage.getItem('savedUserId');
-
-    return { userId: savedUserId ?? '', password: '' };
-  });
-  const [rememberId, setRememberId] = useState(() =>
-    isNotEmpty(localStorage.getItem('savedUserId')),
-  );
+  const [user, setUser] = useState(() => ({ userId: '', password: '' }));
+  const [rememberId, setRememberId] = useState(() => false);
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
@@ -47,11 +41,7 @@ export default function LoginUI() {
             localStorage.removeItem('savedUserId');
           }
         } else {
-          alert(
-            data && typeof data !== 'boolean'
-              ? (data as FetchErrorType).message
-              : message,
-          );
+          alert(data && typeof data !== 'boolean' ? data.message : message);
           return;
         }
       }
@@ -62,6 +52,20 @@ export default function LoginUI() {
 
     loginAction(decodeURIComponent(query.get('redirect') ?? '/'));
   };
+
+  useEffect(() => {
+    const setUserInfo = () => {
+      const userId = localStorage.getItem('savedUserId');
+      const hasUserId = isNotEmpty(userId);
+
+      if (hasUserId) {
+        setUser((u) => ({ ...u, userId }));
+        setRememberId(() => hasUserId);
+      }
+    };
+
+    setUserInfo();
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
