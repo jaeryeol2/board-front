@@ -48,7 +48,7 @@ export const isEmpty = <T>(data: T): boolean => {
       return (data as string).replaceAll(/\s/g, '').length === 0;
 
     case 'object':
-      return checkObjectEmptiness(data as object);
+      return checkObjectEmptiness(data);
 
     case 'number':
     case 'bigint':
