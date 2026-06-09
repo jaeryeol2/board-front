@@ -3,6 +3,10 @@ import { ACCESS_TOKEN, GUEST_ID, REFRESH_TOKEN } from '@/constants/common';
 import { ResponseApi } from '@/types/base';
 import { FetchError, FetchOptions, ofetch } from 'ofetch';
 
+interface AppFetchOptions extends FetchOptions {
+  method: 'get' | 'post' | 'put' | 'patch' | 'delete';
+}
+
 //  ofetch create
 //   https://github.com/unjs/ofetch
 const $fetch = ofetch.create({
@@ -82,7 +86,7 @@ const returnError = (error: unknown) => {
 
 const native = async (
   path: string,
-  options?: FetchOptions,
+  options?: AppFetchOptions,
 ): Promise<Response> => {
   const result = await $fetch.raw(path, options).catch((error) => ({
     headers: error.response?.headers || {},
@@ -106,7 +110,7 @@ const native = async (
 
 const fetch = async <R = unknown>(
   path: string,
-  options?: FetchOptions,
+  options?: AppFetchOptions,
 ): Promise<ResponseApi<R>> => {
   try {
     const response = await $fetch(path, options);
