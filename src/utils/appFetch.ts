@@ -21,8 +21,6 @@ type AppFetchOptions = QueryFetchOptions & BodyFetchOptons;
 type FetchType = {
   <R>(path: string, options?: QueryFetchOptions): Promise<ResponseApi<R>>;
   <R>(path: string, options?: BodyFetchOptons): Promise<ResponseApi<R>>;
-  (path: string, options?: QueryFetchOptions): Promise<Response>;
-  (path: string, options?: BodyFetchOptons): Promise<Response>;
 };
 
 type NativeType = {
