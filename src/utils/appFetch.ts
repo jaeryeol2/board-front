@@ -3,9 +3,32 @@ import { ACCESS_TOKEN, GUEST_ID, REFRESH_TOKEN } from '@/constants/common';
 import { ResponseApi } from '@/types/base';
 import { FetchError, FetchOptions, ofetch } from 'ofetch';
 
-interface AppFetchOptions extends FetchOptions {
-  method: 'get' | 'post' | 'put' | 'patch' | 'delete';
+interface QueryFetchOptions extends Omit<
+  FetchOptions,
+  'method' | 'body' | 'params'
+> {
+  method?: 'get' | 'delete';
 }
+interface BodyFetchOptons extends Omit<
+  FetchOptions,
+  'method' | 'query' | 'params'
+> {
+  method: 'post' | 'put' | 'patch';
+}
+
+type AppFetchOptions = QueryFetchOptions & BodyFetchOptons;
+
+type FetchType = {
+  <R>(path: string, options?: QueryFetchOptions): Promise<ResponseApi<R>>;
+  <R>(path: string, options?: BodyFetchOptons): Promise<ResponseApi<R>>;
+  (path: string, options?: QueryFetchOptions): Promise<Response>;
+  (path: string, options?: BodyFetchOptons): Promise<Response>;
+};
+
+type NativeType = {
+  (path: string, options?: QueryFetchOptions): Promise<Response>;
+  (path: string, options?: BodyFetchOptons): Promise<Response>;
+};
 
 //  ofetch create
 //   https://github.com/unjs/ofetch
@@ -84,7 +107,7 @@ const returnError = (error: unknown) => {
   return defaultError;
 };
 
-const native = async (
+const native = (async (
   path: string,
   options?: AppFetchOptions,
 ): Promise<Response> => {
@@ -106,9 +129,9 @@ const native = async (
     statusText,
     headers: responseHeaders,
   });
-};
+}) as NativeType;
 
-const fetch = async <R = unknown>(
+const fetch = (async <R = unknown>(
   path: string,
   options?: AppFetchOptions,
 ): Promise<ResponseApi<R>> => {
@@ -130,7 +153,7 @@ const fetch = async <R = unknown>(
   } catch (error) {
     return returnError(error);
   }
-};
+}) as FetchType;
 
 /**
  * app fetch
