@@ -35,6 +35,8 @@ const $fetch = ofetch.create({
   retry: 3,
   retryDelay: 1000,
   timeout: 2000,
+  // 400, 401, 403 등의 클라이언트 오류나 인증 만료는 재시도하지 않도록 제한
+  retryStatusCodes: [408, 409, 425, 429, 500, 502, 503, 504],
   // onRequest({ request, options }) {}
   // onResponse({ request, options, response }) {}
   // onRequestError({ request, options, error }) {}
@@ -70,11 +72,18 @@ const $fetch = ofetch.create({
       throw new FetchError(error.message, { cause: error.cause });
     }
 
-    const data = response._data as ResponseApi<null>;
-    const errorMessage = data?.message || response.statusText || 'API Error';
+    // null guard 추가
+    const data = response?._data as ResponseApi<null>;
+    const errorMessage =
+      data?.message || response?.statusText || error?.message || 'API Error';
     const err = new FetchError(errorMessage);
 
     err.response = response;
+
+    // 백엔드의 구체적인 비즈니스 오류 본문을 보존하여 전파
+    if (data) {
+      err.data = data;
+    }
 
     throw err;
   },
@@ -91,7 +100,8 @@ const returnError = (error: unknown) => {
     return {
       status: error.response?.status || error.status || 500,
       message: error.message || 'Fetch Error',
-      data: null,
+      // 백엔드가 제공한 비즈니스 데이터를 클라이언트단에 최종 노출
+      data: error.data || null,
     };
   }
 
