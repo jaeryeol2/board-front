@@ -185,6 +185,7 @@ const fetch = (async <R = unknown>(
         const refreshToken = await getCookie(REFRESH_TOKEN).catch(
           () => undefined,
         );
+
         refreshPromise = native('/api/auth/access', {
           method: 'post',
           headers: {
@@ -203,6 +204,10 @@ const fetch = (async <R = unknown>(
       if (clone.ok) {
         const opt = Object.assign({}, options);
         const nextHeaders = new Headers(opt.headers);
+        const isFetchBody =
+          opt.method === 'post' ||
+          opt.method === 'put' ||
+          opt.method === 'patch';
 
         nextHeaders.delete('Authorization');
 
@@ -210,19 +215,15 @@ const fetch = (async <R = unknown>(
           if (key.toLowerCase() === SET_COOKIE.toLowerCase()) {
             const token = value.split('; ')[0];
             nextHeaders.append(SET_COOKIE.replaceAll('Set-', ''), token);
+            break;
           }
         }
 
         opt.headers = nextHeaders;
 
-        if (
-          opt.method === 'post' ||
-          opt.method === 'put' ||
-          opt.method === 'patch'
-        ) {
-          return fetch<R>(path, opt as BodyFetchOptons);
-        }
-        return fetch<R>(path, opt as QueryFetchOptions);
+        return isFetchBody
+          ? fetch<R>(path, opt as BodyFetchOptons)
+          : fetch<R>(path, opt as QueryFetchOptions);
       }
     }
 
