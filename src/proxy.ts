@@ -8,7 +8,6 @@ import {
   X_CURRENT_PATH,
   X_IS_LOGIN,
 } from './constants/common';
-import { ResponseApi } from './types/base';
 import { appFetch } from './utils/appFetch';
 import { tokenUtil } from './utils/tokenUtil';
 
@@ -27,7 +26,6 @@ export async function proxy(request: NextRequest) {
     try {
       await verifyToken(accessToken);
       const { data, message } = await appFetch<boolean>('/api/auth/check');
-
       if (data) {
         return nextResponse(request, data, header);
       }
@@ -42,13 +40,7 @@ export async function proxy(request: NextRequest) {
       const { data, message } = await appFetch<boolean>('/api/auth/check');
 
       if (data) {
-        const response = await appFetch.native('/api/auth/access', {
-          method: 'post',
-        });
-        const result = (await response.json()) as ResponseApi<boolean>;
-
-        setRequestCookie(request, response.headers);
-        return nextResponse(request, result?.data ?? false, response.headers);
+        return nextResponse(request, data, header);
       }
 
       throw new Error(message);

@@ -1,5 +1,10 @@
 import { getCookie, getIp } from '@/actions/common';
-import { ACCESS_TOKEN, GUEST_ID, REFRESH_TOKEN } from '@/constants/common';
+import {
+  ACCESS_TOKEN,
+  GUEST_ID,
+  REFRESH_TOKEN,
+  SET_COOKIE,
+} from '@/constants/common';
 import { ResponseApi } from '@/types/base';
 import { FetchError, FetchOptions, ofetch } from 'ofetch';
 
@@ -16,7 +21,7 @@ interface BodyFetchOptons extends Omit<
   method: 'post' | 'put' | 'patch';
 }
 
-type AppFetchOptions = QueryFetchOptions & BodyFetchOptons;
+type AppFetchOptions = QueryFetchOptions | BodyFetchOptons;
 
 type FetchType = {
   <R>(path: string, options?: QueryFetchOptions): Promise<ResponseApi<R>>;
@@ -44,10 +49,9 @@ const $fetch = ofetch.create({
   async onRequest({ request, options }) {
     console.log('api request path: ', request);
 
-    const [ip, accessToken, refreshToken, guestId] = await Promise.all([
+    const [ip, accessToken, guestId] = await Promise.all([
       getIp().catch(() => 'Unknown IP'),
       getCookie(ACCESS_TOKEN).catch(() => undefined),
-      getCookie(REFRESH_TOKEN).catch(() => undefined),
       getCookie(GUEST_ID).catch(() => undefined),
     ]);
 
@@ -57,10 +61,10 @@ const $fetch = ofetch.create({
     if (accessToken) {
       headers.set('Authorization', `Bearer ${accessToken}`);
     }
-    if (refreshToken) {
-      // Refresh Token은 전용 헤더나 쿠키 포맷에 맞춰 설정
-      headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken}`);
-    }
+    // if (refreshToken) {
+    //   // Refresh Token은 전용 헤더나 쿠키 포맷에 맞춰 설정
+    //   headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken}`);
+    // }
     if (guestId) {
       headers.set('X-Guest-Id', guestId);
     }
@@ -129,7 +133,20 @@ const native = (async (
   const { headers, status, statusText, _data } = result;
   const data = typeof _data === 'object' ? JSON.stringify(_data) : _data;
 
-  const responseHeaders = new Headers(headers);
+  const responseHeaders = new Headers();
+  if (headers) {
+    const entries =
+      headers instanceof Headers
+        ? headers.entries()
+        : Object.entries(headers as Record<string, string>);
+
+    for (const [key, value] of entries) {
+      const sanitizedValue = value.replace(/[^\x00-\xff]/g, (char) => {
+        return char.charCodeAt(0) === 8211 ? '-' : '';
+      });
+      responseHeaders.append(key, sanitizedValue);
+    }
+  }
   responseHeaders.delete('content-length');
 
   return new Response(data, {
@@ -138,6 +155,8 @@ const native = (async (
     headers: responseHeaders,
   });
 }) as NativeType;
+
+let refreshPromise: Promise<Response> | null = null;
 
 const fetch = (async <R = unknown>(
   path: string,
@@ -159,8 +178,55 @@ const fetch = (async <R = unknown>(
       data: response as R,
     };
   } catch (error) {
-    // TODO access token 만료시 refresh token으로 access token 쿠키 굽는 로직넣기
-    return returnError(error);
+    const errorInfo = returnError(error);
+
+    if (errorInfo.status === 401 && path !== '/api/auth/access') {
+      if (!refreshPromise) {
+        const refreshToken = await getCookie(REFRESH_TOKEN).catch(
+          () => undefined,
+        );
+        refreshPromise = native('/api/auth/access', {
+          method: 'post',
+          headers: {
+            Cookie: refreshToken
+              ? REFRESH_TOKEN.concat('=').concat(refreshToken)
+              : '',
+          },
+        }).finally(() => {
+          refreshPromise = null;
+        });
+      }
+
+      const response = await refreshPromise;
+      const clone = response.clone();
+
+      if (clone.ok) {
+        const opt = Object.assign({}, options);
+        const nextHeaders = new Headers(opt.headers);
+
+        nextHeaders.delete('Authorization');
+
+        for (const [key, value] of clone.headers.entries()) {
+          if (key.toLowerCase() === SET_COOKIE.toLowerCase()) {
+            const token = value.split('; ')[0];
+            nextHeaders.append(SET_COOKIE.replaceAll('Set-', ''), token);
+          }
+        }
+
+        opt.headers = nextHeaders;
+
+        if (
+          opt.method === 'post' ||
+          opt.method === 'put' ||
+          opt.method === 'patch'
+        ) {
+          return fetch<R>(path, opt as BodyFetchOptons);
+        }
+        return fetch<R>(path, opt as QueryFetchOptions);
+      }
+    }
+
+    return errorInfo;
   }
 }) as FetchType;
 
