@@ -12,10 +12,16 @@ export const clearCacheAll = async () => {
   await clearCache('/', 'layout');
 };
 
+/**
+ * Next.js Server Action Context에서 동작하는 쿠키 설정 함수.
+ * 클라이언트(브라우저) 쿠키 저장소에 직접 접근하는 대신, Node.js 런타임 서버(엣지런타임) 측의 HTTP Response Header 버퍼(Server-side Cookie Buffer)에
+ * `Set-Cookie` 메타데이터를 선언적으로 주입하는 Node.js 서버 쿠키 조작(Server-side Cookie Manipulation) 프로세스입니다.
+ * 최종적으로 웹 브라우저(User Agent)가 해당 응답을 수신하는 시점에 클라이언트 측 쿠키 저장소로 동기화 및 영속화(Persistence)됩니다.
+ */
 export const setCookie = async (
   key: string,
   value: string,
-  options?: ResponseCookie,
+  options?: ResponseCookie | Record<string, string | number | boolean>,
 ) => {
   const cookie = await cookies();
   cookie.set(key, value, { path: '/', ...options });

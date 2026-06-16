@@ -8,6 +8,7 @@ import {
   X_CURRENT_PATH,
   X_IS_LOGIN,
 } from './constants/common';
+import { ResponseApi } from './types/base';
 import { appFetch } from './utils/appFetch';
 import { tokenUtil } from './utils/tokenUtil';
 
@@ -26,6 +27,7 @@ export async function proxy(request: NextRequest) {
     try {
       await verifyToken(accessToken);
       const { data, message } = await appFetch<boolean>('/api/auth/check');
+
       if (data) {
         return nextResponse(request, data, header);
       }
@@ -37,10 +39,14 @@ export async function proxy(request: NextRequest) {
 
     try {
       await verifyToken(refreshToken);
-      const { data, message } = await appFetch<boolean>('/api/auth/check');
+      const response = await appFetch.native('/api/auth/check');
+      const { data, message } = (await response.json()) as ResponseApi<boolean>;
 
-      if (data) {
-        return nextResponse(request, data, header);
+      if (response.ok && data) {
+        const responseHeaders = response.headers;
+
+        setRequestCookie(request, responseHeaders);
+        return nextResponse(request, data, responseHeaders);
       }
 
       throw new Error(message);
@@ -128,7 +134,7 @@ const nextResponse = (
     },
     headers: {
       [X_CURRENT_PATH]: path,
-      [X_IS_LOGIN]: `${isLogin ?? false}`,
+      [X_IS_LOGIN]: `${isLogin}`,
     },
   });
 

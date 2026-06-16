@@ -1,6 +1,7 @@
 import { getCookie, getIp } from '@/actions/common';
 import {
   ACCESS_TOKEN,
+  AUTHORIZATION,
   GUEST_ID,
   REFRESH_TOKEN,
   SET_COOKIE,
@@ -59,12 +60,8 @@ const $fetch = ofetch.create({
     headers.set('X-Forwarded-For', ip);
 
     if (accessToken) {
-      headers.set('Authorization', `Bearer ${accessToken}`);
+      headers.set(AUTHORIZATION, `Bearer ${accessToken}`);
     }
-    // if (refreshToken) {
-    //   // Refresh Token은 전용 헤더나 쿠키 포맷에 맞춰 설정
-    //   headers.set('Cookie', `${REFRESH_TOKEN}=${refreshToken}`);
-    // }
     if (guestId) {
       headers.set('X-Guest-Id', guestId);
     }
@@ -119,10 +116,44 @@ const returnError = (error: unknown) => {
   return defaultError;
 };
 
+const setAccessTokenHeaders = (headers: Headers, response: Response) => {
+  const optHeaders = response.headers;
+
+  headers.delete(AUTHORIZATION);
+
+  for (const cookie of optHeaders.getSetCookie()) {
+    const cookieArray = cookie
+      .split(';')
+      .map((str) => str.trim())
+      .filter(Boolean);
+    const info = cookieArray[0].split('=').map((item) => item.trim());
+    const key = info[0];
+    const value = info[1] ?? '';
+
+    if (key === ACCESS_TOKEN) {
+      headers.set(AUTHORIZATION, `Bearer ${value}`);
+      continue;
+    }
+
+    headers.set(key, value);
+  }
+};
+
+const appendSetCookieHeaders = (target: Headers, source: Headers) => {
+  // 토큰 재발급 응답에서 반드시 브라우저에 전달되어 영속화되어야 하는 Set-Cookie 헤더만 선별 복사합니다.
+  // 전체 헤더를 무조건 append할 경우 content-type, content-length 등 본문 데이터 구조 관련 헤더들이 오염될 우려가 있습니다.
+  for (const cookie of source.getSetCookie()) {
+    target.append(SET_COOKIE, cookie);
+  }
+};
+
+let clientRefreshPromise: Promise<Response> | null = null;
 const native = (async (
   path: string,
   options?: AppFetchOptions,
 ): Promise<Response> => {
+  let accessResponse: Response | undefined = undefined;
+
   const result = await $fetch.raw(path, options).catch((error) => ({
     headers: error.response?.headers || {},
     status: error.response?.status || 500,
@@ -133,21 +164,77 @@ const native = (async (
   const { headers, status, statusText, _data } = result;
   const data = typeof _data === 'object' ? JSON.stringify(_data) : _data;
 
-  const responseHeaders = new Headers();
-  if (headers) {
-    const entries =
-      headers instanceof Headers
-        ? headers.entries()
-        : Object.entries(headers as Record<string, string>);
+  const responseHeaders = new Headers(headers);
+  responseHeaders.delete('content-length');
 
-    for (const [key, value] of entries) {
-      const sanitizedValue = value.replace(/[^\x00-\xff]/g, (char) => {
-        return char.charCodeAt(0) === 8211 ? '-' : '';
+  if (
+    'status' in _data &&
+    _data.status === 401 &&
+    path !== '/api/auth/access'
+  ) {
+    const isClient = typeof window !== 'undefined';
+
+    const fetchRefresh = async () => {
+      const refreshToken = await getCookie(REFRESH_TOKEN);
+
+      return native('/api/auth/access', {
+        method: 'post',
+        headers: new Headers({
+          Cookie: refreshToken ? `${REFRESH_TOKEN}=${refreshToken}` : '',
+        }),
       });
-      responseHeaders.append(key, sanitizedValue);
+    };
+
+    if (isClient) {
+      // 클라이언트(브라우저) 환경:
+      // 여러 병렬 API 요청이 동시에 401을 반환할 때, 중복으로 토큰 갱신 API(/api/auth/access)를
+      // 호출하지 않도록 전역 Promise로 락(Lock)을 공유하여 단 한 번만 실행되도록 제어합니다.
+      if (!clientRefreshPromise) {
+        clientRefreshPromise = fetchRefresh().finally(() => {
+          clientRefreshPromise = null;
+        });
+      }
+
+      accessResponse = await clientRefreshPromise;
+    } else {
+      // 서버(SSR) 환경:
+      // 서버 메모리는 모든 사용자의 HTTP 요청에 공유되므로, 전역 변수로 락을 공유하면
+      // 다른 사용자 간의 토큰/쿠키 컨텍스트가 교차 오염되는 보안 위험(Cross-Request State Pollution)이 발생합니다.
+      // 따라서 서버 사이드에서는 전역 락을 공유하지 않고 각 요청별로 독립 실행하여 안전하게 격리합니다.
+      accessResponse = await fetchRefresh();
+    }
+    const clone = accessResponse.clone();
+
+    if (clone.ok) {
+      const opt = Object.assign({}, options) as AppFetchOptions;
+      const nextHeaders = new Headers(options?.headers);
+      const isFetchBody =
+        options?.method === 'post' ||
+        options?.method === 'put' ||
+        options?.method === 'patch';
+
+      setAccessTokenHeaders(nextHeaders, clone);
+      opt.headers = nextHeaders;
+
+      const finalResponse = isFetchBody
+        ? await native(path, opt as BodyFetchOptons)
+        : await native(path, opt as QueryFetchOptions);
+
+      // 재귀 호출로 받아온 최종 Response의 헤더에, 이 단계에서 획득한 refreshResponse의 Set-Cookie 헤더들을 복사/병합합니다.
+      const finalHeaders = new Headers(finalResponse.headers);
+      appendSetCookieHeaders(finalHeaders, clone.headers);
+
+      return new Response(finalResponse.body, {
+        status: finalResponse.status,
+        statusText: finalResponse.statusText,
+        headers: finalHeaders,
+      });
     }
   }
-  responseHeaders.delete('content-length');
+
+  if (accessResponse) {
+    appendSetCookieHeaders(responseHeaders, accessResponse.headers);
+  }
 
   return new Response(data, {
     status,
@@ -155,8 +242,6 @@ const native = (async (
     headers: responseHeaders,
   });
 }) as NativeType;
-
-let refreshPromise: Promise<Response> | null = null;
 
 const fetch = (async <R = unknown>(
   path: string,
@@ -181,44 +266,21 @@ const fetch = (async <R = unknown>(
     const errorInfo = returnError(error);
 
     if (errorInfo.status === 401 && path !== '/api/auth/access') {
-      if (!refreshPromise) {
-        const refreshToken = await getCookie(REFRESH_TOKEN).catch(
-          () => undefined,
-        );
-
-        refreshPromise = native('/api/auth/access', {
-          method: 'post',
-          headers: {
-            Cookie: refreshToken
-              ? REFRESH_TOKEN.concat('=').concat(refreshToken)
-              : '',
-          },
-        }).finally(() => {
-          refreshPromise = null;
-        });
-      }
-
-      const response = await refreshPromise;
+      const response = await native('/api/auth/access', {
+        method: 'post',
+      });
       const clone = response.clone();
+      const opt = Object.assign({}, options);
+      const isFetchBody =
+        opt.method === 'post' || opt.method === 'put' || opt.method === 'patch';
+
+      opt.headers = clone.headers;
 
       if (clone.ok) {
-        const opt = Object.assign({}, options);
-        const nextHeaders = new Headers(opt.headers);
-        const isFetchBody =
-          opt.method === 'post' ||
-          opt.method === 'put' ||
-          opt.method === 'patch';
+        const opt = Object.assign({}, options) as AppFetchOptions;
+        const nextHeaders = new Headers(options?.headers);
 
-        nextHeaders.delete('Authorization');
-
-        for (const [key, value] of clone.headers.entries()) {
-          if (key.toLowerCase() === SET_COOKIE.toLowerCase()) {
-            const token = value.split('; ')[0];
-            nextHeaders.append(SET_COOKIE.replaceAll('Set-', ''), token);
-            break;
-          }
-        }
-
+        setAccessTokenHeaders(nextHeaders, clone);
         opt.headers = nextHeaders;
 
         return isFetchBody
