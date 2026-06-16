@@ -1,5 +1,8 @@
+import Unauthorized from '@/components/common/client/Unauthorized';
+import { X_IS_LOGIN } from '@/constants/common';
 import { ParamsType } from '@/types/base';
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import BoardWriteUI from './_components/BoardWriteUI';
 
 export const generateMetadata = async (): Promise<Metadata> => {
@@ -13,6 +16,11 @@ export default async function BoardWrite({
   params,
 }: Readonly<ParamsType<{ boardType: string }>>) {
   const boardType = (await params).boardType;
+  const isLogin = JSON.parse((await headers()).get(X_IS_LOGIN) ?? 'false');
+
+  if (!isLogin) {
+    return <Unauthorized />;
+  }
 
   return <BoardWriteUI boardType={boardType} />;
 }
