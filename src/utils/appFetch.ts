@@ -122,11 +122,12 @@ const setAccessTokenHeaders = (headers: Headers, response: Response) => {
   headers.delete(AUTHORIZATION);
 
   for (const cookie of optHeaders.getSetCookie()) {
-    const cookieArray = cookie
-      .split(';')
-      .map((str) => str.trim())
-      .filter(Boolean);
-    const info = cookieArray[0].split('=').map((item) => item.trim());
+    const cookieInfo =
+      cookie
+        .split(';')
+        .map((str) => str.trim())
+        .find(Boolean) ?? '';
+    const info = cookieInfo.split('=').map((item) => item.trim());
     const key = info[0];
     const value = info[1] ?? '';
 
@@ -172,7 +173,7 @@ const native = (async (
     _data.status === 401 &&
     path !== '/api/auth/access'
   ) {
-    const isClient = typeof window !== 'undefined';
+    const isClient = typeof globalThis.window !== 'undefined';
 
     const fetchRefresh = async () => {
       const refreshToken = await getCookie(REFRESH_TOKEN);
@@ -189,11 +190,11 @@ const native = (async (
       // 클라이언트(브라우저) 환경:
       // 여러 병렬 API 요청이 동시에 401을 반환할 때, 중복으로 토큰 갱신 API(/api/auth/access)를
       // 호출하지 않도록 전역 Promise로 락(Lock)을 공유하여 단 한 번만 실행되도록 제어합니다.
-      if (!clientRefreshPromise) {
-        clientRefreshPromise = fetchRefresh().finally(() => {
+      clientRefreshPromise =
+        clientRefreshPromise ??
+        fetchRefresh().finally(() => {
           clientRefreshPromise = null;
         });
-      }
 
       accessResponse = await clientRefreshPromise;
     } else {
@@ -206,18 +207,16 @@ const native = (async (
     const clone = accessResponse.clone();
 
     if (clone.ok) {
-      const opt = Object.assign({}, options) as AppFetchOptions;
+      const opt = { ...options } as AppFetchOptions;
       const nextHeaders = new Headers(options?.headers);
       const isFetchBody =
-        options?.method === 'post' ||
-        options?.method === 'put' ||
-        options?.method === 'patch';
+        opt.method === 'post' || opt.method === 'put' || opt.method === 'patch';
 
       setAccessTokenHeaders(nextHeaders, clone);
       opt.headers = nextHeaders;
 
       const finalResponse = isFetchBody
-        ? await native(path, opt as BodyFetchOptons)
+        ? await native(path, opt)
         : await native(path, opt as QueryFetchOptions);
 
       // 재귀 호출로 받아온 최종 Response의 헤더에, 이 단계에서 획득한 refreshResponse의 Set-Cookie 헤더들을 복사/병합합니다.
@@ -270,21 +269,20 @@ const fetch = (async <R = unknown>(
         method: 'post',
       });
       const clone = response.clone();
-      const opt = Object.assign({}, options);
+      const opt = { ...options } as AppFetchOptions;
       const isFetchBody =
         opt.method === 'post' || opt.method === 'put' || opt.method === 'patch';
 
       opt.headers = clone.headers;
 
       if (clone.ok) {
-        const opt = Object.assign({}, options) as AppFetchOptions;
         const nextHeaders = new Headers(options?.headers);
 
         setAccessTokenHeaders(nextHeaders, clone);
         opt.headers = nextHeaders;
 
         return isFetchBody
-          ? fetch<R>(path, opt as BodyFetchOptons)
+          ? fetch<R>(path, opt)
           : fetch<R>(path, opt as QueryFetchOptions);
       }
     }

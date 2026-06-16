@@ -39,7 +39,12 @@ export async function proxy(request: NextRequest) {
 
     try {
       await verifyToken(refreshToken);
-      const response = await appFetch.native('/api/auth/check');
+      const response = await appFetch.native('/api/auth/access', {
+        method: 'post',
+        headers: {
+          Cookie: `${REFRESH_TOKEN}=${refreshToken}`,
+        },
+      });
       const { data, message } = (await response.json()) as ResponseApi<boolean>;
 
       if (response.ok && data) {
