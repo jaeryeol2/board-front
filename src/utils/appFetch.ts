@@ -88,6 +88,12 @@ const fetchInterceptor: Pick<
   },
 };
 
+/**
+ * $fetch 인스턴스 설정
+ * - retry/retryStatusCodes: 408, 500 등 지정된 일시적 서버 에러 발생 시 ofetch가 3회 자동 재시도합니다.
+ * - 401 (Unauthorized) 에러는 ofetch의 자동 재시도 대상에서 제외되며,
+ *   하단의 native 및 fetch 함수 내에서 토큰 갱신(refreshAccessToken) 후 딱 1회 수동 재시도됩니다.
+ */
 const $fetch = ofetch.create({
   baseURL: process.env.NEXT_BASE_API_URL,
   retry: 3,
@@ -226,6 +232,37 @@ const mergeFetchInterceptor = (fetchOptions: AppFetchOptions) => {
 // =================================================================
 
 let clientRefreshPromise: Promise<Response> | null = null;
+
+/**
+ * 401 에러 발생 시 토큰을 갱신하는 공통 헬퍼 함수
+ */
+const refreshAccessToken = async (native: NativeType): Promise<Response> => {
+  const isClient = globalThis?.window !== undefined;
+
+  const fetchRefresh = async () => {
+    const refreshToken = await getCookie(REFRESH_TOKEN).catch(() => undefined);
+
+    return native('/api/auth/access', {
+      method: 'post',
+      headers: new Headers({
+        Cookie: refreshToken ? `${REFRESH_TOKEN}=${refreshToken}` : '',
+      }),
+    });
+  };
+
+  if (isClient) {
+    clientRefreshPromise =
+      clientRefreshPromise ??
+      fetchRefresh().finally(() => {
+        clientRefreshPromise = null;
+      });
+
+    return clientRefreshPromise;
+  }
+
+  return fetchRefresh();
+};
+
 const native = (async (
   path: string,
   options?: AppFetchOptions,
@@ -245,42 +282,15 @@ const native = (async (
   const responseHeaders = new Headers(headers);
   responseHeaders.delete('content-length');
 
+  const errorData = _data as { status?: number } | null;
+
   if (
-    'status' in _data &&
-    _data.status === 401 &&
+    errorData &&
+    'status' in errorData &&
+    errorData.status === 401 &&
     path !== '/api/auth/access'
   ) {
-    const isClient = globalThis?.window !== undefined;
-
-    const fetchRefresh = async () => {
-      const refreshToken = await getCookie(REFRESH_TOKEN);
-
-      return native('/api/auth/access', {
-        method: 'post',
-        headers: new Headers({
-          Cookie: refreshToken ? `${REFRESH_TOKEN}=${refreshToken}` : '',
-        }),
-      });
-    };
-
-    if (isClient) {
-      // 클라이언트(브라우저) 환경:
-      // 여러 병렬 API 요청이 동시에 401을 반환할 때, 중복으로 토큰 갱신 API(/api/auth/access)를
-      // 호출하지 않도록 전역 Promise로 락(Lock)을 공유하여 단 한 번만 실행되도록 제어합니다.
-      clientRefreshPromise =
-        clientRefreshPromise ??
-        fetchRefresh().finally(() => {
-          clientRefreshPromise = null;
-        });
-
-      accessResponse = await clientRefreshPromise;
-    } else {
-      // 서버(SSR) 환경:
-      // 서버 메모리는 모든 사용자의 HTTP 요청에 공유되므로, 전역 변수로 락을 공유하면
-      // 다른 사용자 간의 토큰/쿠키 컨텍스트가 교차 오염되는 보안 위험(Cross-Request State Pollution)이 발생합니다.
-      // 따라서 서버 사이드에서는 전역 락을 공유하지 않고 각 요청별로 독립 실행하여 안전하게 격리합니다.
-      accessResponse = await fetchRefresh();
-    }
+    accessResponse = await refreshAccessToken(native);
     const clone = accessResponse.clone();
 
     if (clone.ok) {
@@ -296,7 +306,6 @@ const native = (async (
         ? await native(path, opt)
         : await native(path, opt as QueryFetchOptions);
 
-      // 재귀 호출로 받아온 최종 Response의 헤더에, 이 단계에서 획득한 refreshResponse의 Set-Cookie 헤더들을 복사/병합합니다.
       const finalHeaders = new Headers(finalResponse.headers);
       appendSetCookieHeaders(finalHeaders, clone.headers);
 
@@ -344,9 +353,7 @@ const fetch = (async <R = unknown>(
     const errorInfo = returnError(error);
 
     if (errorInfo.status === 401 && path !== '/api/auth/access') {
-      const response = await native('/api/auth/access', {
-        method: 'post',
-      });
+      const response = await refreshAccessToken(native);
       const clone = response.clone();
       const opt = { ...options } as AppFetchOptions;
       const isFetchBody =
