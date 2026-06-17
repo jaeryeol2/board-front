@@ -173,7 +173,7 @@ const native = (async (
     _data.status === 401 &&
     path !== '/api/auth/access'
   ) {
-    const isClient = typeof globalThis.window !== 'undefined';
+    const isClient = globalThis?.window !== undefined;
 
     const fetchRefresh = async () => {
       const refreshToken = await getCookie(REFRESH_TOKEN);
