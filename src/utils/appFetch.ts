@@ -1,13 +1,15 @@
 import { getCookie, getIp } from '@/actions/common';
-import {
-  ACCESS_TOKEN,
-  AUTHORIZATION,
-  GUEST_ID,
-  REFRESH_TOKEN,
-  SET_COOKIE,
-} from '@/constants/common';
-import { ResponseApi } from '@/types/base';
 import { FetchError, FetchOptions, ofetch } from 'ofetch';
+
+const ACCESS_TOKEN = 'access_token';
+const REFRESH_TOKEN = 'auth_token';
+const GUEST_ID = 'guest_tracking_id';
+const SET_COOKIE = 'Set-Cookie';
+const AUTHORIZATION = 'Authorization';
+
+// =================================================================
+// 📌 1. TYPES & INTERFACES (appFetch 관련 타입 정의)
+// =================================================================
 
 interface QueryFetchOptions extends Omit<
   FetchOptions,
@@ -15,38 +17,36 @@ interface QueryFetchOptions extends Omit<
 > {
   method?: 'get' | 'delete';
 }
-interface BodyFetchOptons extends Omit<
+interface BodyFetchOptions extends Omit<
   FetchOptions,
   'method' | 'query' | 'params'
 > {
   method: 'post' | 'put' | 'patch';
 }
 
-type AppFetchOptions = QueryFetchOptions | BodyFetchOptons;
-
+type ResponseApi<T> = {
+  status: number;
+  message: string;
+  data: T | null;
+};
+type AppFetchOptions = QueryFetchOptions | BodyFetchOptions;
 type FetchType = {
   <R>(path: string, options?: QueryFetchOptions): Promise<ResponseApi<R>>;
-  <R>(path: string, options?: BodyFetchOptons): Promise<ResponseApi<R>>;
+  <R>(path: string, options?: BodyFetchOptions): Promise<ResponseApi<R>>;
 };
-
 type NativeType = {
   (path: string, options?: QueryFetchOptions): Promise<Response>;
-  (path: string, options?: BodyFetchOptons): Promise<Response>;
+  (path: string, options?: BodyFetchOptions): Promise<Response>;
 };
 
-//  ofetch create
-//   https://github.com/unjs/ofetch
-const $fetch = ofetch.create({
-  baseURL: process.env.NEXT_BASE_API_URL,
-  retry: 3,
-  retryDelay: 1000,
-  timeout: 2000,
-  // 400, 401, 403 등의 클라이언트 오류나 인증 만료는 재시도하지 않도록 제한
-  retryStatusCodes: [408, 409, 425, 429, 500, 502, 503, 504],
-  // onRequest({ request, options }) {}
-  // onResponse({ request, options, response }) {}
-  // onRequestError({ request, options, error }) {}
-  // onResponseError({ request, response, options }) {}
+// =================================================================
+// 📌 2. OFETCH INSTANCE & BASE INTERCEPTOR CONFIG (기본 인스턴스 및 설정)
+// =================================================================
+
+const fetchInterceptor: Pick<
+  FetchOptions,
+  'onRequest' | 'onResponse' | 'onRequestError' | 'onResponseError'
+> = {
   async onRequest({ request, options }) {
     console.log('api request path: ', request);
 
@@ -73,7 +73,6 @@ const $fetch = ofetch.create({
       throw new FetchError(error.message, { cause: error.cause });
     }
 
-    // null guard 추가
     const data = response?._data as ResponseApi<null>;
     const errorMessage =
       data?.message || response?.statusText || error?.message || 'API Error';
@@ -81,14 +80,26 @@ const $fetch = ofetch.create({
 
     err.response = response;
 
-    // 백엔드의 구체적인 비즈니스 오류 본문을 보존하여 전파
     if (data) {
       err.data = data;
     }
 
     throw err;
   },
+};
+
+const $fetch = ofetch.create({
+  baseURL: process.env.NEXT_BASE_API_URL,
+  retry: 3,
+  retryDelay: 1000,
+  timeout: 2000,
+  retryStatusCodes: [408, 409, 425, 429, 500, 502, 503, 504],
+  ...fetchInterceptor,
 });
+
+// =================================================================
+// 📌 3. HELPER FUNCTIONS (쿠키, 헤더 및 에러 처리 유틸리티)
+// =================================================================
 
 const returnError = (error: unknown) => {
   const defaultError = {
@@ -101,7 +112,6 @@ const returnError = (error: unknown) => {
     return {
       status: error.response?.status || error.status || 500,
       message: error.message || 'Fetch Error',
-      // 백엔드가 제공한 비즈니스 데이터를 클라이언트단에 최종 노출
       data: error.data || null,
     };
   }
@@ -141,12 +151,79 @@ const setAccessTokenHeaders = (headers: Headers, response: Response) => {
 };
 
 const appendSetCookieHeaders = (target: Headers, source: Headers) => {
-  // 토큰 재발급 응답에서 반드시 브라우저에 전달되어 영속화되어야 하는 Set-Cookie 헤더만 선별 복사합니다.
-  // 전체 헤더를 무조건 append할 경우 content-type, content-length 등 본문 데이터 구조 관련 헤더들이 오염될 우려가 있습니다.
   for (const cookie of source.getSetCookie()) {
     target.append(SET_COOKIE, cookie);
   }
 };
+
+// =================================================================
+// 📌 4. INTERCEPTOR COMPOSER (기본 & 커스텀 인터셉터 병합)
+// =================================================================
+
+/**
+ * 기본 공통 인터셉터(fetchInterceptor)와 API 요청 시 전달된 커스텀 인터셉터(fetchOptions)를 병합하는 함수입니다.
+ * ofetch는 인터셉터에 단일 함수뿐만 아니라 함수 배열(MaybeArray)도 지원하므로,
+ * 두 종류의 인터셉터가 모두 존재할 경우 배열로 합쳐 순차적으로 동작하도록 제어합니다.
+ *
+ * @param fetchOptions - 병합할 대상이 되는 개별 API 요청의 fetch 옵션 객체
+ */
+const mergeFetchInterceptor = (fetchOptions: AppFetchOptions) => {
+  /**
+   * 단일 값 혹은 배열로 전달된 인터셉터를 하나의 안전한 배열로 결합하는 제네릭 헬퍼 함수입니다.
+   * 린트 규칙 준수를 위해 중첩 삼항 연산자를 사용하지 않고 명시적인 분기로 배열화합니다.
+   */
+  const composeInterceptors = <T>(
+    base: T | T[] | undefined,
+    custom: T | T[] | undefined,
+  ): T[] | undefined => {
+    let baseArr: T[] = [];
+    let customArr: T[] = [];
+    if (base) {
+      baseArr = Array.isArray(base) ? base : [base];
+    }
+    if (custom) {
+      customArr = Array.isArray(custom) ? custom : [custom];
+    }
+
+    return [...baseArr, ...customArr];
+  };
+
+  // [onRequest] 공통 요청 전처리 인터셉터(IP, 토큰 설정 등)와 커스텀 요청 인터셉터를 병합합니다.
+  if (fetchInterceptor.onRequest || fetchOptions.onRequest) {
+    fetchOptions.onRequest = composeInterceptors(
+      fetchInterceptor.onRequest,
+      fetchOptions.onRequest,
+    );
+  }
+
+  // [onRequestError] 요청 에러 인터셉터를 병합합니다.
+  if (fetchInterceptor.onRequestError || fetchOptions.onRequestError) {
+    fetchOptions.onRequestError = composeInterceptors(
+      fetchInterceptor.onRequestError,
+      fetchOptions.onRequestError,
+    );
+  }
+
+  // [onResponse] 응답 성공 시 동작하는 인터셉터를 병합합니다.
+  if (fetchInterceptor.onResponse || fetchOptions.onResponse) {
+    fetchOptions.onResponse = composeInterceptors(
+      fetchInterceptor.onResponse,
+      fetchOptions.onResponse,
+    );
+  }
+
+  // [onResponseError] 공통 응답 에러 처리 로직과 커스텀 응답 에러 인터셉터를 병합합니다.
+  if (fetchInterceptor.onResponseError || fetchOptions.onResponseError) {
+    fetchOptions.onResponseError = composeInterceptors(
+      fetchInterceptor.onResponseError,
+      fetchOptions.onResponseError,
+    );
+  }
+};
+
+// =================================================================
+// 📌 5. CORE FETCH IMPLEMENTATIONS (native & appFetch 핵심 구현)
+// =================================================================
 
 let clientRefreshPromise: Promise<Response> | null = null;
 const native = (async (
@@ -247,7 +324,9 @@ const fetch = (async <R = unknown>(
   options?: AppFetchOptions,
 ): Promise<ResponseApi<R>> => {
   try {
-    const response = await $fetch(path, options);
+    const mergeOptions = { ...options } as AppFetchOptions;
+    mergeFetchInterceptor(mergeOptions);
+    const response = await $fetch(path, mergeOptions);
 
     if (!response) {
       throw new Error('do not get response data.');
