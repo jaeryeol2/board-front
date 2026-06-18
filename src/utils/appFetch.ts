@@ -116,9 +116,9 @@ const returnError = (error: unknown) => {
 
   if (error instanceof FetchError) {
     return {
-      status: error.response?.status || error.status || 500,
-      message: error.message || 'Fetch Error',
-      data: error.data || null,
+      status: error.response?.status ?? error.status ?? 500,
+      message: error.response?._data?.message ?? error.message ?? 'Fetch Error',
+      data: error.data,
     };
   }
 
