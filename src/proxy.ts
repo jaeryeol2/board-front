@@ -19,9 +19,9 @@ export const config = {
 export async function proxy(request: NextRequest) {
   const header = new Headers();
   const { verifyToken } = tokenUtil();
-  const accessToken = request.cookies.get(ACCESS_TOKEN)?.value || '';
-  const refreshToken = request.cookies.get(REFRESH_TOKEN)?.value || '';
-  const guestId = request.cookies.get(GUEST_ID)?.value || '';
+  const accessToken = request.cookies.get(ACCESS_TOKEN)?.value ?? '';
+  const refreshToken = request.cookies.get(REFRESH_TOKEN)?.value ?? '';
+  const guestId = request.cookies.get(GUEST_ID)?.value;
 
   if (!guestId) {
     try {
