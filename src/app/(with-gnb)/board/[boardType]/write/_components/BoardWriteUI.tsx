@@ -55,6 +55,7 @@ export default function BoardWriteUI({
           'w-full text-base md:text-lg text-gray-800 bg-transparent border-none focus:ring-0 placeholder-gray-300 min-h-[300px] md:min-h-[400px] resize-none leading-relaxed',
       },
     },
+    immediatelyRender: true,
   });
 
   /**
