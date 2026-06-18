@@ -357,14 +357,16 @@ const fetch = (async <R = unknown>(
     if (errorInfo.status === 401 && path !== '/api/auth/access') {
       const response = await refreshAccessToken(native);
       const clone = response.clone();
-      const opt = { ...options } as AppFetchOptions;
-      const isFetchBody =
-        opt.method === 'post' || opt.method === 'put' || opt.method === 'patch';
-
-      opt.headers = clone.headers;
 
       if (clone.ok) {
+        const opt = { ...options } as AppFetchOptions;
         const nextHeaders = new Headers(options?.headers);
+        const isFetchBody =
+          opt.method === 'post' ||
+          opt.method === 'put' ||
+          opt.method === 'patch';
+
+        opt.headers = clone.headers;
 
         setAccessTokenHeaders(nextHeaders, clone);
         opt.headers = nextHeaders;
