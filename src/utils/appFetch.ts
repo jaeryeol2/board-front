@@ -75,7 +75,10 @@ const fetchInterceptor: Pick<
 
     const data = response?._data as ResponseApi<null>;
     const errorMessage =
-      data?.message || response?.statusText || error?.message || 'API Error';
+      data?.message ??
+      response?.statusText ??
+      error?.message ??
+      'API Fetch Error.';
     const err = new FetchError(errorMessage);
 
     err.response = response;
