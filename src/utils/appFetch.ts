@@ -158,7 +158,9 @@ const setAccessTokenHeaders = (headers: Headers, response: Response) => {
 
 const appendSetCookieHeaders = (target: Headers, source: Headers) => {
   for (const cookie of source.getSetCookie()) {
-    target.append(SET_COOKIE, cookie);
+    if (cookie) {
+      target.append(SET_COOKIE, cookie);
+    }
   }
 };
 
@@ -272,17 +274,16 @@ const native = (async (
   const result = await $fetch.raw(path, options).catch((error) => ({
     headers: error.response?.headers || {},
     status: error.response?.status || 500,
-    statusText: error.message,
+    statusText: error.response?.statusText || '',
     _data: returnError(error),
   }));
 
   const { headers, status, statusText, _data } = result;
   const data = typeof _data === 'object' ? JSON.stringify(_data) : _data;
-
   const responseHeaders = new Headers(headers);
-  responseHeaders.delete('content-length');
-
   const errorData = _data as { status?: number } | null;
+
+  responseHeaders.delete('content-length');
 
   if (
     errorData &&
@@ -307,6 +308,7 @@ const native = (async (
         : await native(path, opt as QueryFetchOptions);
 
       const finalHeaders = new Headers(finalResponse.headers);
+
       appendSetCookieHeaders(finalHeaders, clone.headers);
 
       return new Response(finalResponse.body, {
