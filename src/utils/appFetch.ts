@@ -24,11 +24,6 @@ interface BodyFetchOptions extends Omit<
   method: 'post' | 'put' | 'patch';
 }
 
-type ResponseApi<T> = {
-  status: number;
-  message: string;
-  data: T | null;
-};
 type AppFetchOptions = QueryFetchOptions | BodyFetchOptions;
 type FetchType = {
   <R>(path: string, options?: QueryFetchOptions): Promise<ResponseApi<R>>;
@@ -37,6 +32,11 @@ type FetchType = {
 type NativeType = {
   (path: string, options?: QueryFetchOptions): Promise<Response>;
   (path: string, options?: BodyFetchOptions): Promise<Response>;
+};
+type ResponseApi<T> = {
+  status: number;
+  message: string;
+  data: T | null;
 };
 
 // =================================================================
