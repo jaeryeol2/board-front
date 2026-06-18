@@ -4,13 +4,14 @@ import Button from '@/components/base/Button';
 import FileInput from '@/components/base/FileInput';
 import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
-import Textarea from '@/components/base/Textarea';
 import { useValidator } from '@/hooks/useValidator';
 import { BoardDetail } from '@/types/board';
 import { appFetch } from '@/utils/appFetch';
 import { toSnakeCase } from '@/utils/caseConverter';
 import { condition } from '@/utils/condition';
 import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import { useRouter } from 'next/navigation';
 import { Activity, ChangeEvent, SubmitEvent, useState } from 'react';
 
@@ -36,6 +37,25 @@ export default function BoardWriteUI({
   const [content, setContent] = useState<string>(initialData?.content ?? '');
   const [attachments, setAttachments] = useState<FileList | null>(null);
   const { validator } = useValidator();
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
+    ],
+    content,
+    onUpdate({ editor }) {
+      setContent(editor.getText());
+    },
+    editorProps: {
+      attributes: {
+        class:
+          'w-full text-base md:text-lg text-gray-800 bg-transparent border-none focus:ring-0 placeholder-gray-300 min-h-[300px] md:min-h-[400px] resize-none leading-relaxed',
+      },
+    },
+  });
 
   /**
    * 파일 선택 변경 핸들러
@@ -156,13 +176,14 @@ export default function BoardWriteUI({
 
               {/* 내용 입력란 */}
               <div className="mt-6 md:mt-8">
-                <Textarea
+                <EditorContent editor={editor} />
+                {/* <Textarea
                   placeholder="당신의 이야기를 들려주세요..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   className="w-full text-base md:text-lg text-gray-800 bg-transparent border-none focus:ring-0 placeholder-gray-300 min-h-[300px] md:min-h-[400px] resize-none leading-relaxed"
                   required
-                />
+                /> */}
               </div>
 
               {/* 첨부파일 입력란 */}

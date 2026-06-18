@@ -11,6 +11,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tiptap/pm": "^3.27.0",
+    "@tiptap/react": "^3.27.0",
+    "@tiptap/starter-kit": "^3.27.0",
     "date-fns": "^4.1.0",
     "immer": "^11.1.4",
     "jose": "^6.2.2",
@@ -33,5 +36,8 @@
     "eslint-config-next": "16.2.2",
     "tailwindcss": "^4.3.1",
     "typescript": "^6"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
   }
 }
