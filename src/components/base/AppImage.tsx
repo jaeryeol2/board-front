@@ -8,12 +8,14 @@ export default function AppImage({
   alt,
   src,
   onError,
+  loading,
   ...props
 }: Readonly<ImageProps>) {
   const [hasError, setHasError] = useState(false);
   const [prevSrc, setPrevSrc] = useState(src);
   const ALT_IMAGE = '/images/alt-image.png';
   const displaySrc = hasError ? ALT_IMAGE : src;
+  const imageLoading = loading ?? 'eager';
 
   if (src !== prevSrc) {
     setPrevSrc(src);
@@ -32,6 +34,12 @@ export default function AppImage({
   };
 
   return (
-    <Image {...props} src={displaySrc} alt={alt} onError={handleErrorImage} />
+    <Image
+      loading={imageLoading}
+      src={displaySrc}
+      alt={alt}
+      onError={handleErrorImage}
+      {...props}
+    />
   );
 }
