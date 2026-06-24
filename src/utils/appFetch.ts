@@ -25,14 +25,7 @@ interface BodyFetchOptions extends Omit<
 }
 
 type AppFetchOptions = QueryFetchOptions | BodyFetchOptions;
-type FetchType = {
-  <R>(path: string, options?: QueryFetchOptions): Promise<ResponseApi<R>>;
-  <R>(path: string, options?: BodyFetchOptions): Promise<ResponseApi<R>>;
-};
-type NativeType = {
-  (path: string, options?: QueryFetchOptions): Promise<Response>;
-  (path: string, options?: BodyFetchOptions): Promise<Response>;
-};
+
 type ResponseApi<T> = {
   status: number;
   message: string;
@@ -241,7 +234,12 @@ let clientRefreshPromise: Promise<Response> | null = null;
 /**
  * 401 에러 발생 시 토큰을 갱신하는 공통 헬퍼 함수
  */
-const refreshAccessToken = async (native: NativeType): Promise<Response> => {
+const refreshAccessToken = async (
+  native: (
+    path: string,
+    options?: AppFetchOptions | undefined,
+  ) => Promise<Response>,
+): Promise<Response> => {
   const isClient = globalThis?.window !== undefined;
 
   const fetchRefresh = async () => {
@@ -268,7 +266,7 @@ const refreshAccessToken = async (native: NativeType): Promise<Response> => {
   return fetchRefresh();
 };
 
-const native = (async (
+const native = async (
   path: string,
   options?: AppFetchOptions,
 ): Promise<Response> => {
@@ -300,15 +298,11 @@ const native = (async (
     if (clone.ok) {
       const opt = { ...options } as AppFetchOptions;
       const nextHeaders = new Headers(options?.headers);
-      const isFetchBody =
-        opt.method === 'post' || opt.method === 'put' || opt.method === 'patch';
 
       setAccessTokenHeaders(nextHeaders, clone);
       opt.headers = nextHeaders;
 
-      const finalResponse = isFetchBody
-        ? await native(path, opt)
-        : await native(path, opt as QueryFetchOptions);
+      const finalResponse = await native(path, opt);
 
       const finalHeaders = new Headers(finalResponse.headers);
 
@@ -331,9 +325,9 @@ const native = (async (
     statusText,
     headers: responseHeaders,
   });
-}) as NativeType;
+};
 
-const fetch = (async <R = unknown>(
+const fetch = async <R = unknown>(
   path: string,
   options?: AppFetchOptions,
 ): Promise<ResponseApi<R>> => {
@@ -364,25 +358,19 @@ const fetch = (async <R = unknown>(
       if (clone.ok) {
         const opt = { ...options } as AppFetchOptions;
         const nextHeaders = new Headers(options?.headers);
-        const isFetchBody =
-          opt.method === 'post' ||
-          opt.method === 'put' ||
-          opt.method === 'patch';
 
         opt.headers = clone.headers;
 
         setAccessTokenHeaders(nextHeaders, clone);
         opt.headers = nextHeaders;
 
-        return isFetchBody
-          ? fetch<R>(path, opt)
-          : fetch<R>(path, opt as QueryFetchOptions);
+        return fetch<R>(path, opt);
       }
     }
 
     return errorInfo;
   }
-}) as FetchType;
+};
 
 /**
  * app fetch
