@@ -327,7 +327,7 @@ const native = async (
   });
 };
 
-const fetch = async <R = unknown>(
+const fetchData = async <R = unknown>(
   path: string,
   options?: AppFetchOptions,
 ): Promise<ResponseApi<R>> => {
@@ -364,7 +364,7 @@ const fetch = async <R = unknown>(
         setAccessTokenHeaders(nextHeaders, clone);
         opt.headers = nextHeaders;
 
-        return fetch<R>(path, opt);
+        return fetchData<R>(path, opt);
       }
     }
 
@@ -379,6 +379,6 @@ const fetch = async <R = unknown>(
  * @param options
  * @returns
  */
-export const appFetch = Object.assign(fetch, {
+export const appFetch = Object.assign(fetchData, {
   native,
 });
