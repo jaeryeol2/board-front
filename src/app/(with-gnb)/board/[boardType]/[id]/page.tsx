@@ -14,7 +14,7 @@ type BoardDetailParam = {
   id: number;
 };
 const fetchData = cache(async (boardType: string, id: number) => {
-  return await appFetch<BoardDetail>(
+  return appFetch<BoardDetail>(
     `/api/board/${toSnakeCase(boardType).toUpperCase()}/${id}`,
   );
 });

@@ -6,7 +6,7 @@ import { cache } from 'react';
 import NoticeListUI from './_components/NoticeListUI';
 
 const fetchData = cache(async (query: BoardFilter) => {
-  return await appFetch<{ total: number; list: Array<Notice> }>('/api/notice', {
+  return appFetch<{ total: number; list: Array<Notice> }>('/api/notice', {
     method: 'get',
     query,
   });

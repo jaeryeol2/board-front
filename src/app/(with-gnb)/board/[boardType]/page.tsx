@@ -11,14 +11,13 @@ import { cache } from 'react';
 import BoardListUI from './_components/BoardListUI';
 
 const fetchBoardInfoData = cache(async (boardType: string) => {
-  return await appFetch<Menu>(
-    `/api/menus/${toSnakeCase(boardType).toUpperCase()}`,
-    { next: { revalidate: 3600 } },
-  );
+  return appFetch<Menu>(`/api/menus/${toSnakeCase(boardType).toUpperCase()}`, {
+    next: { revalidate: 3600 },
+  });
 });
 const fetchBoardListData = cache(
   async (boardType: string, query: BoardFilter) => {
-    return await appFetch<{ total: number; list: Array<Board> }>(
+    return appFetch<{ total: number; list: Array<Board> }>(
       `/api/board/${toSnakeCase(boardType).toUpperCase()}`,
       {
         query,
