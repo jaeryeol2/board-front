@@ -339,8 +339,18 @@ const fetchData = async <R = unknown>(
     if (!response) {
       throw new Error('do not get response data.');
     }
-    if (typeof response === 'object' && 'data' in response) {
-      return response as ResponseApi<R>;
+    if (typeof response === 'object') {
+      if ('data' in response) {
+        return response as ResponseApi<R>;
+      } else {
+        const resObject = response as Omit<ResponseApi<R>, 'data'>;
+
+        return {
+          status: resObject.status,
+          message: resObject.message,
+          data: null,
+        };
+      }
     }
 
     return {

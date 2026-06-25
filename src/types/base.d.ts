@@ -30,6 +30,7 @@ export type UserAgentType = {
 
 export type ResponseApi<T> = {
   status: number;
+  code: string;
   message: string;
   data: T | null;
 };
