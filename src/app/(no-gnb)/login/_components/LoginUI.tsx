@@ -6,24 +6,48 @@ import Password from '@/components/base/Password';
 import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
 import { useValidator } from '@/hooks/useValidator';
-import { FetchErrorType } from '@/types/base';
+import { FetchErrorType, ReducerActionType } from '@/types/base';
 import { appFetch } from '@/utils/appFetch';
 import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
 import { useSearchParams } from 'next/navigation';
-import { SubmitEvent, useEffect, useState } from 'react';
+import { SubmitEvent, useEffect, useReducer, useState } from 'react';
+
+type LoginType = {
+  userId: string;
+  password: string;
+};
+type ActionType = { type: 'reset' };
+
+const reducer = (
+  state: LoginType,
+  actions: ReducerActionType<LoginType> | ActionType,
+) => {
+  if (actions.type === 'reset') {
+    return { userId: '', password: '' };
+  } else {
+    return {
+      ...state,
+      [actions.type]: actions.payload,
+    };
+  }
+};
 
 export default function LoginUI() {
   const query = useSearchParams();
   const { validator } = useValidator();
-  const [user, setUser] = useState(() => ({ userId: '', password: '' }));
   const [rememberId, setRememberId] = useState(() => false);
+
+  const [state, dispatch] = useReducer(reducer, {
+    userId: '',
+    password: '',
+  });
 
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
     const checker = validator
-      .verification(() => isEmpty(user.userId), '아이디를 입력해주세요.')
-      .verification(() => isEmpty(user.password), '비밀번호를 입력해주세요.');
+      .verification(() => isEmpty(state.userId), '아이디를 입력해주세요.')
+      .verification(() => isEmpty(state.password), '비밀번호를 입력해주세요.');
 
     try {
       if (checker.validate()) {
@@ -31,13 +55,13 @@ export default function LoginUI() {
           boolean | FetchErrorType
         >('/api/login', {
           method: 'post',
-          body: user,
+          body: state,
         });
 
         if (status === 200 && typeof data === 'boolean' && data) {
           // 아이디 저장 체크박스 상태에 따라 localStorage에 아이디를 저장하거나 삭제합니다.
           if (rememberId) {
-            localStorage.setItem('savedUserId', user.userId);
+            localStorage.setItem('savedUserId', state.userId);
           } else {
             localStorage.removeItem('savedUserId');
           }
@@ -60,7 +84,7 @@ export default function LoginUI() {
       const hasUserId = isNotEmpty(userId);
 
       if (hasUserId) {
-        setUser((u) => ({ ...u, userId }));
+        dispatch({ type: 'userId', payload: userId });
       }
 
       setRememberId(() => hasUserId);
@@ -75,26 +99,26 @@ export default function LoginUI() {
         <Text
           label="아이디"
           placeholder="아이디를 입력하세요"
-          onInput={(e) =>
-            setUser((u) => ({
-              ...u,
-              userId: (e.target as HTMLInputElement).value,
-            }))
-          }
-          value={user.userId}
+          onInput={(e) => {
+            dispatch({
+              type: 'userId',
+              payload: (e.target as HTMLInputElement).value,
+            });
+          }}
+          value={state.userId}
         />
       </div>
       <div className="flex flex-col gap-2">
         <Password
           label="비밀번호"
           placeholder="비밀번호를 입력하세요"
-          onInput={(e) =>
-            setUser((u) => ({
-              ...u,
-              password: (e.target as HTMLInputElement).value,
-            }))
-          }
-          value={user.password}
+          onInput={(e) => {
+            dispatch({
+              type: 'password',
+              payload: (e.target as HTMLInputElement).value,
+            });
+          }}
+          value={state.password}
         />
       </div>
       <div className="flex items-center justify-end">
