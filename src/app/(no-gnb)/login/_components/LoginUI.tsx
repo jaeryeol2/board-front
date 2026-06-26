@@ -53,7 +53,7 @@ export default function LoginUI() {
       if (checker.validate()) {
         const { status, data, message } = await appFetch<
           boolean | FetchErrorType
-        >('/api/login', {
+        >('/api/user/login', {
           method: 'post',
           body: state,
         });

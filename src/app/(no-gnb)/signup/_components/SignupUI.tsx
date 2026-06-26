@@ -68,7 +68,7 @@ export default function SignupUI() {
     try {
       if (checker.validate()) {
         const { status, message, data } = await appFetch<boolean>(
-          '/api/signup',
+          '/api/user/signup',
           {
             method: 'post',
             body: {

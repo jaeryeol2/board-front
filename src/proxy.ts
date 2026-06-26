@@ -57,7 +57,7 @@ export async function proxy(request: NextRequest) {
       throw new Error(message);
     } catch (error) {
       console.warn('refresh token error : ', returnError(error).message);
-      const response = await appFetch.native('/api/token-expire', {
+      const response = await appFetch.native('/api/auth/token-expire', {
         method: 'post',
       });
 

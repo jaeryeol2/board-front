@@ -36,7 +36,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
   }, [isMobileMenuOpen]);
 
   const handleLogout = async () => {
-    const { data } = await appFetch<boolean>('/api/logout', {
+    const { data } = await appFetch<boolean>('/api/user/logout', {
       method: 'post',
     }).catch(() => ({
       data: false,
