@@ -35,7 +35,7 @@ export type ResponseApi<T> = {
   data: T | null;
 };
 
-export type ReducerActionType<T = { [key: string]: unknown }> = {
+export type ReducerActionType<T extends Record<string, unknown> = never> = {
   [key in keyof T]: T[key] extends undefined
     ? { type: key }
     : {
