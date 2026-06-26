@@ -57,4 +57,5 @@ export type FetchErrorType = {
   status: number;
   code: string;
   message: string;
+  data: null;
 };
