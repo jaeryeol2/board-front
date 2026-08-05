@@ -5,7 +5,7 @@ import Button from '@/components/base/Button';
 import Pagination from '@/components/common/client/Pagination';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { Board } from '@/types/board';
-import { isNotEmpty } from '@/utils/isEmpty';
+import { isNotEmpty } from '@/utils/is-empty';
 import { format } from 'date-fns';
 import {
   useParams,

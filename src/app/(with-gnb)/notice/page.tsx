@@ -1,6 +1,6 @@
 import { BoardFilter } from '@/types/board';
 import { Notice } from '@/types/notice';
-import { appFetch } from '@/utils/appFetch';
+import { appFetch } from '@/utils/app-fetch';
 import { SearchParameters } from 'ofetch';
 import { cache } from 'react';
 import NoticeListUI from './_components/NoticeListUI';

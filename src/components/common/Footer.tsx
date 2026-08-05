@@ -1,4 +1,4 @@
-import { appFetch } from '@/utils/appFetch';
+import { appFetch } from '@/utils/app-fetch';
 import AppLink from '../base/AppLink';
 import { TraficUser } from './client/TraficUser';
 

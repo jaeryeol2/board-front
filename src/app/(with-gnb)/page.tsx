@@ -1,5 +1,5 @@
 import { HomeType } from '@/types/home';
-import { appFetch } from '@/utils/appFetch';
+import { appFetch } from '@/utils/app-fetch';
 import { cache } from 'react';
 import HomeUI from './_components/HomeUI';
 

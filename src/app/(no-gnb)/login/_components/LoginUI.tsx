@@ -7,8 +7,8 @@ import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
 import { useValidator } from '@/hooks/useValidator';
 import { FetchErrorType, ReducerActionType } from '@/types/base';
-import { appFetch } from '@/utils/appFetch';
-import { isEmpty, isNotEmpty } from '@/utils/isEmpty';
+import { appFetch } from '@/utils/app-fetch';
+import { isEmpty, isNotEmpty } from '@/utils/is-empty';
 import { useSearchParams } from 'next/navigation';
 import { SubmitEvent, useEffect, useReducer, useState } from 'react';
 

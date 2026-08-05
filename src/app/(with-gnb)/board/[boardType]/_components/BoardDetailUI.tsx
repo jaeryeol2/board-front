@@ -4,7 +4,7 @@ import { BoardImageItem } from '@/app/(with-gnb)/board/[boardType]/_components/B
 import Button from '@/components/base/Button';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { BoardDetail } from '@/types/board';
-import { isNotEmpty } from '@/utils/isEmpty';
+import { isNotEmpty } from '@/utils/is-empty';
 import { format } from 'date-fns';
 import { useParams, useRouter } from 'next/navigation';
 import { useContext, useRef } from 'react';

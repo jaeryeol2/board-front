@@ -2,7 +2,7 @@
 
 import Pagination from '@/components/common/client/Pagination';
 import { Notice } from '@/types/notice';
-import { isNotEmpty } from '@/utils/isEmpty';
+import { isNotEmpty } from '@/utils/is-empty';
 import { format } from 'date-fns';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';

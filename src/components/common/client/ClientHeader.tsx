@@ -5,7 +5,7 @@ import AppLink from '@/components/base/AppLink';
 import Button from '@/components/base/Button';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { Menu, MenuItem } from '@/types/global';
-import { appFetch } from '@/utils/appFetch';
+import { appFetch } from '@/utils/app-fetch';
 import { usePathname } from 'next/navigation';
 import {
   Fragment,

@@ -1,9 +1,9 @@
 import Unauthorized from '@/components/common/client/Unauthorized';
 import { ParamsType } from '@/types/base';
 import { BoardDetail } from '@/types/board';
-import { appFetch } from '@/utils/appFetch';
-import { toSnakeCase } from '@/utils/caseConverter';
-import { isNotEmpty } from '@/utils/isEmpty';
+import { appFetch } from '@/utils/app-fetch';
+import { toSnakeCase } from '@/utils/case-converter';
+import { isNotEmpty } from '@/utils/is-empty';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';

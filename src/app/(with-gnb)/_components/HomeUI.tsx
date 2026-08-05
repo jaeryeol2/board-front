@@ -2,8 +2,8 @@
 
 import AppLink from '@/components/base/AppLink';
 import { HomeType } from '@/types/home';
-import { toKebabCase } from '@/utils/caseConverter';
-import { isEmpty } from '@/utils/isEmpty';
+import { toKebabCase } from '@/utils/case-converter';
+import { isEmpty } from '@/utils/is-empty';
 
 type HomeProps = {
   menus: Array<HomeType>;

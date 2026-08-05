@@ -3,8 +3,8 @@ import { GlobalProvider } from '@/contexts/GlobalContext';
 import UserAgentProvider from '@/contexts/UserAgentContext';
 import { ChildrenType } from '@/types/base';
 import { UserInfoType } from '@/types/user';
-import { appFetch } from '@/utils/appFetch';
-import { isNotEmpty } from '@/utils/isEmpty';
+import { appFetch } from '@/utils/app-fetch';
+import { isNotEmpty } from '@/utils/is-empty';
 import { headers } from 'next/headers';
 import { userAgent } from 'next/server';
 

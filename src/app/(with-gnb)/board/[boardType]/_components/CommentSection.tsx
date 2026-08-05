@@ -6,7 +6,7 @@ import Pagination from '@/components/common/client/Pagination';
 import SectionLoading from '@/components/common/SectionLoading';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { BoardComment } from '@/types/board';
-import { appFetch } from '@/utils/appFetch';
+import { appFetch } from '@/utils/app-fetch';
 import { format } from 'date-fns';
 import {
   ComponentPropsWithRef,

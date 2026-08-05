@@ -1,7 +1,7 @@
 import Unauthorized from '@/components/common/client/Unauthorized';
 import { PersonalUserInfoType } from '@/types/user';
-import { appFetch } from '@/utils/appFetch';
-import { isNotEmpty } from '@/utils/isEmpty';
+import { appFetch } from '@/utils/app-fetch';
+import { isNotEmpty } from '@/utils/is-empty';
 import { notFound } from 'next/navigation';
 import MypageUI from './_components/MypageUI';
 

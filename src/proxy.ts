@@ -9,8 +9,8 @@ import {
   X_IS_LOGIN,
 } from './constants/common';
 import { ResponseApi } from './types/base';
-import { appFetch } from './utils/appFetch';
-import { tokenUtil } from './utils/tokenUtil';
+import { appFetch } from './utils/app-fetch';
+import { tokenUtil } from './utils/token-util';
 
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|.*.png$|.*.ico|.*.json).*)'],

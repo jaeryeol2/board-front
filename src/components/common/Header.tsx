@@ -1,5 +1,5 @@
 import { Menu } from '@/types/global';
-import { appFetch } from '@/utils/appFetch';
+import { appFetch } from '@/utils/app-fetch';
 import { cache } from 'react';
 import ClientHeader from './client/ClientHeader';
 
