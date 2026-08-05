@@ -5,7 +5,7 @@ import Checkbox from '@/components/base/Checkbox';
 import Password from '@/components/base/Password';
 import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
-import { useValidator } from '@/hooks/useValidator';
+import { useValidator } from '@/hooks/use-validator';
 import { FetchErrorType, ReducerActionType } from '@/types/base';
 import { appFetch } from '@/utils/app-fetch';
 import { isEmpty, isNotEmpty } from '@/utils/is-empty';

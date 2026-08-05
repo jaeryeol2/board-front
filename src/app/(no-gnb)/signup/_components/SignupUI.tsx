@@ -4,7 +4,7 @@ import Email from '@/components/base/Email';
 import Password from '@/components/base/Password';
 import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
-import { useValidator } from '@/hooks/useValidator';
+import { useValidator } from '@/hooks/use-validator';
 import { ReducerActionType } from '@/types/base';
 import { appFetch } from '@/utils/app-fetch';
 import { isEmpty } from '@/utils/is-empty';

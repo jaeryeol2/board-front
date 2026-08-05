@@ -4,7 +4,7 @@ import Button from '@/components/base/Button';
 import FileInput from '@/components/base/FileInput';
 import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
-import { useValidator } from '@/hooks/useValidator';
+import { useValidator } from '@/hooks/use-validator';
 import { BoardDetail } from '@/types/board';
 import { appFetch } from '@/utils/app-fetch';
 import { toSnakeCase } from '@/utils/case-converter';
