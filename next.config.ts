@@ -1,10 +1,13 @@
 import type { NextConfig } from 'next';
+import path from 'node:path';
 
 const nextConfig: NextConfig = {
   /* config options here */
   experimental: {},
   output: 'standalone',
-
+  turbopack: {
+    root: path.join(__dirname, '..'),
+  },
   async rewrites() {
     // ※ 참고: Next.js에서 '라우트 검사(파일시스템 검사)'란 요청된 URL이 App Router(app/),
     // Pages Router(pages/), 또는 정적 파일(public/)에 실제로 매핑되는 파일(코드)이 존재하는지 확인하는 과정을 뜻합니다.

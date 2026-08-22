@@ -5,6 +5,7 @@ import Button from '@/components/base/Button';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { BoardDetail } from '@/types/board';
 import { isNotEmpty } from '@/utils/is-empty';
+import { sanitizeHtml } from '@/utils/sanitize-html';
 import { format } from 'date-fns';
 import { useParams, useRouter } from 'next/navigation';
 import { useContext, useRef } from 'react';
@@ -108,11 +109,10 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
 
           <hr className="my-6 md:my-8 border-gray-50" />
 
-          <div className="prose prose-blue max-w-none text-gray-800 min-h-[200px] leading-relaxed break-keep">
-            <p className="whitespace-pre-wrap text-base md:text-lg">
-              {board.content}
-            </p>
-          </div>
+          <div
+            className="prose prose-blue max-w-none text-gray-800 min-h-[200px] leading-relaxed break-keep [&_img]:rounded-xl [&_img]:my-4 [&_img]:border [&_img]:border-gray-100 [&_img]:shadow-sm"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(board.content) }}
+          />
 
           {board.fileList && board.fileList.length > 0 && (
             <div className="mt-10 md:mt-12">

@@ -4,6 +4,7 @@ import Button from '@/components/base/Button';
 import FileInput from '@/components/base/FileInput';
 import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
+import { useFileDrop } from '@/hooks/use-file-drop';
 import { useValidator } from '@/hooks/use-validator';
 import { BoardDetail } from '@/types/board';
 import { appFetch } from '@/utils/app-fetch';
@@ -13,13 +14,38 @@ import { isEmpty, isNotEmpty } from '@/utils/is-empty';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useRouter } from 'next/navigation';
-import { Activity, ChangeEvent, SubmitEvent, useState } from 'react';
+import {
+  Activity,
+  ChangeEvent,
+  SubmitEvent,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
+import BoardAttachmentItem from './BoardAttachmentItem';
+import { CustomImage } from './custom-image';
 
 type BoardWriteUIProps = {
   boardType: string;
   initialData?: BoardDetail | null;
   isModify?: boolean;
   postId?: string;
+};
+
+/**
+ * HTML 문자열에서 img 태그의 src URL 목록 추출
+ */
+const extractImageUrls = (html: string): string[] => {
+  if (!html) return [];
+  const urls: string[] = [];
+  const regex = /<img[^>]+src=["']([^"']+)["']/gi;
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(html)) !== null) {
+    if (match[1]) {
+      urls.push(match[1]);
+    }
+  }
+  return urls;
 };
 
 /**
@@ -36,7 +62,39 @@ export default function BoardWriteUI({
   const [title, setTitle] = useState<string>(initialData?.title ?? '');
   const [content, setContent] = useState<string>(initialData?.content ?? '');
   const [attachments, setAttachments] = useState<FileList | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
+  const editorImageInputRef = useRef<HTMLInputElement>(null);
+  const uploadedImagesRef = useRef<Set<string>>(new Set());
+  const prevImageUrlsRef = useRef<Set<string>>(
+    new Set(extractImageUrls(initialData?.content ?? '')),
+  );
   const { validator } = useValidator();
+
+  /**
+   * S3 이미지 단일 업로드 헬퍼
+   */
+  const uploadImageFile = useCallback(async (file: File): Promise<string | null> => {
+    try {
+      setIsUploadingImage(true);
+      const form = new FormData();
+      form.set('file', file);
+      const { status, data } = await appFetch<string>('/api/board/image', {
+        method: 'post',
+        body: form,
+      });
+
+      if (status === 200 && data) {
+        uploadedImagesRef.current.add(data);
+        return data;
+      }
+    } catch (err) {
+      console.error('Image upload failed:', err);
+    } finally {
+      setIsUploadingImage(false);
+    }
+    return null;
+  }, []);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -44,19 +102,140 @@ export default function BoardWriteUI({
           levels: [1, 2, 3],
         },
       }),
+      CustomImage.configure({
+        allowBase64: false,
+        HTMLAttributes: {
+          class: 'rounded-xl max-w-full my-4 border border-gray-100 shadow-sm object-cover',
+        },
+      }),
     ],
     content,
-    onUpdate({ editor }) {
-      setContent(editor.getText());
+    onUpdate({ editor: currentEditor }) {
+      const html = currentEditor.getHTML();
+      setContent(html);
+
+      // 에디터에서 이미지가 삭제되었는지 diff 비교 후 S3 삭제 호출
+      const currentUrls = new Set(extractImageUrls(html));
+      prevImageUrlsRef.current.forEach((prevUrl) => {
+        if (!currentUrls.has(prevUrl) && uploadedImagesRef.current.has(prevUrl)) {
+          appFetch<boolean>(`/api/board/image?url=${encodeURIComponent(prevUrl)}`, {
+            method: 'delete',
+          }).catch((e) => console.error('Delete image failed:', e));
+          uploadedImagesRef.current.delete(prevUrl);
+        }
+      });
+      prevImageUrlsRef.current = currentUrls;
     },
     editorProps: {
       attributes: {
         class:
           'w-full text-base md:text-lg text-gray-800 bg-transparent border-none focus:ring-0 placeholder-gray-300 min-h-[300px] md:min-h-[400px] resize-none leading-relaxed',
       },
+      handlePaste(view, event) {
+        const items = Array.from(event.clipboardData?.items ?? []);
+        const imageItem = items.find((item) => item.type.startsWith('image/'));
+        if (imageItem) {
+          const file = imageItem.getAsFile();
+          if (file) {
+            uploadImageFile(file).then((url) => {
+              if (url) {
+                view.dispatch(
+                  view.state.tr.replaceSelectionWith(
+                    view.state.schema.nodes.image.create({ src: url }),
+                  ),
+                );
+              }
+            });
+            return true;
+          }
+        }
+        return false;
+      },
+      handleDrop(view, event) {
+        const files = Array.from(event.dataTransfer?.files ?? []);
+        const imageFile = files.find((f) => f.type.startsWith('image/'));
+        if (imageFile) {
+          event.preventDefault();
+          uploadImageFile(imageFile).then((url) => {
+            if (url) {
+              const coordinates = view.posAtCoords({
+                left: event.clientX,
+                top: event.clientY,
+              });
+              if (coordinates) {
+                view.dispatch(
+                  view.state.tr.insert(
+                    coordinates.pos,
+                    view.state.schema.nodes.image.create({ src: url }),
+                  ),
+                );
+              }
+            }
+          });
+          return true;
+        }
+        return false;
+      },
     },
     immediatelyRender: true,
   });
+
+  /**
+   * 툴바에서 이미지 추가 핸들러
+   */
+  const handleEditorImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && editor) {
+      const url = await uploadImageFile(file);
+      if (url) {
+        editor.chain().focus().setImage({ src: url }).run();
+      }
+      e.target.value = '';
+    }
+  };
+
+  /**
+   * 파일 목록에 새로운 파일들 추가
+   * @param newFiles 추가할 파일 배열
+   */
+  const addFiles = useCallback((newFiles: File[]) => {
+    setAttachments((prevList: FileList | null) => {
+      const dataTransfer = new DataTransfer();
+
+      if (isNotEmpty(prevList)) {
+        for (const item of Array.from(prevList)) {
+          dataTransfer.items.add(item);
+        }
+      }
+
+      for (const file of newFiles) {
+        dataTransfer.items.add(file);
+      }
+
+      return dataTransfer.files;
+    });
+  }, []);
+
+  const { isDragging, dropProps } = useFileDrop({
+    onDropFiles: addFiles,
+  });
+
+  /**
+   * 신규 첨부파일 개별 삭제 핸들러
+   * @param targetIndex 삭제할 파일의 인덱스
+   */
+  const handleRemoveAttachment = useCallback((targetIndex: number) => {
+    setAttachments((prevList: FileList | null) => {
+      if (!prevList) return null;
+      const dataTransfer = new DataTransfer();
+      Array.from(prevList).forEach((file, index) => {
+        if (index !== targetIndex) {
+          dataTransfer.items.add(file);
+        }
+      });
+      return dataTransfer.files.length > 0 ? dataTransfer.files : null;
+    });
+  }, []);
 
   /**
    * 파일 선택 변경 핸들러
@@ -64,22 +243,8 @@ export default function BoardWriteUI({
    */
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setAttachments((prevList: FileList | null) => {
-        if (isNotEmpty(prevList)) {
-          const dataTransfer = new DataTransfer();
-
-          for (const item of [
-            ...Array.from(prevList),
-            ...Array.from(e.target.files!),
-          ]) {
-            dataTransfer.items.add(item);
-          }
-
-          return dataTransfer.files;
-        }
-
-        return e.target.files;
-      });
+      addFiles(Array.from(e.target.files));
+      e.target.value = '';
     }
   };
 
@@ -145,6 +310,14 @@ export default function BoardWriteUI({
    * 취소 버튼 클릭 핸들러
    */
   const handleCancel = (): void => {
+    // 세션 동안 업로드된 이미지 중 작성 취소 시 미사용 이미지 일괄 삭제
+    if (uploadedImagesRef.current.size > 0) {
+      Array.from(uploadedImagesRef.current).forEach((url) => {
+        appFetch<boolean>(`/api/board/image?url=${encodeURIComponent(url)}`, {
+          method: 'delete',
+        }).catch((e) => console.error('Cleanup image error:', e));
+      });
+    }
     router.back(); // 이전 페이지로 돌아가기
   };
 
@@ -177,14 +350,44 @@ export default function BoardWriteUI({
 
               {/* 내용 입력란 */}
               <div className="mt-6 md:mt-8">
+                {/* 에디터 툴바 */}
+                <div className="flex items-center justify-between pb-2 border-b border-gray-100 mb-4">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => editorImageInputRef.current?.click()}
+                      disabled={isUploadingImage}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 rounded-lg transition-colors border border-gray-200 cursor-pointer disabled:opacity-50"
+                    >
+                      <svg
+                        className="w-4 h-4 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      {isUploadingImage ? '이미지 업로드 중...' : '본문 사진 추가'}
+                    </button>
+                    <input
+                      ref={editorImageInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleEditorImageChange}
+                    />
+                  </div>
+                  <span className="text-xs text-gray-400">
+                    이미지를 에디터로 드래그하거나 붙여넣기(Ctrl+V)할 수 있습니다
+                  </span>
+                </div>
+
                 <EditorContent editor={editor} />
-                {/* <Textarea
-                  placeholder="당신의 이야기를 들려주세요..."
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className="w-full text-base md:text-lg text-gray-800 bg-transparent border-none focus:ring-0 placeholder-gray-300 min-h-[300px] md:min-h-[400px] resize-none leading-relaxed"
-                  required
-                /> */}
               </div>
 
               {/* 첨부파일 입력란 */}
@@ -209,7 +412,12 @@ export default function BoardWriteUI({
                   <label
                     htmlFor="attachments"
                     aria-label="파일 첨부"
-                    className="flex flex-col items-center justify-center w-full h-32 md:h-48 border-2 border-gray-100 border-dashed rounded-2xl cursor-pointer bg-gray-50/50 hover:bg-blue-50/50 hover:border-blue-200 transition-all group"
+                    {...dropProps}
+                    className={`flex flex-col items-center justify-center w-full h-32 md:h-48 border-2 border-dashed rounded-2xl cursor-pointer transition-all group ${
+                      isDragging
+                        ? 'border-blue-500 bg-blue-50/80 ring-2 ring-blue-300'
+                        : 'border-gray-100 bg-gray-50/50 hover:bg-blue-50/50 hover:border-blue-200'
+                    }`}
                   >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-400 group-hover:text-blue-500">
                       <svg
@@ -230,7 +438,7 @@ export default function BoardWriteUI({
                         <span className="font-bold">파일 선택</span> 또는 드래그
                       </p>
                       <p className="text-xs text-gray-400">
-                        이미지 파일 (JPG, PNG, GIF)
+                        이미지 및 일반 파일 첨부 지원
                       </p>
                     </div>
                   </label>
@@ -240,7 +448,6 @@ export default function BoardWriteUI({
                     className="hidden"
                     multiple
                     onChange={handleFileChange}
-                    accept="image/*"
                   />
                 </div>
                 <Activity
@@ -252,58 +459,19 @@ export default function BoardWriteUI({
                   }
                 >
                   <div className="mt-4 space-y-2">
-                    {initialData?.fileList.map((file, index) => (
-                      <div
-                        key={`${index}-${file.originalFileName}`}
-                        className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100"
-                      >
-                        <div className="flex items-center gap-3 truncate">
-                          <svg
-                            className="w-4 h-4 text-blue-400 flex-shrink-0"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span className="text-sm font-medium text-gray-700 truncate">
-                            {file.originalFileName}
-                          </span>
-                        </div>
-                        {/* <span className="text-blue-400 text-xs font-bold flex-shrink-0">
-                          {(file.size / 1024).toFixed(1)} KB
-                        </span> */}
-                      </div>
+                    {initialData?.fileList.map((file) => (
+                      <BoardAttachmentItem
+                        key={`initial-${file.id}-${file.originalFileName}`}
+                        file={file}
+                      />
                     ))}
 
                     {Array.from(attachments ?? []).map((file, index) => (
-                      <div
-                        key={`${index}-${file.name}`}
-                        className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100"
-                      >
-                        <div className="flex items-center gap-3 truncate">
-                          <svg
-                            className="w-4 h-4 text-blue-400 flex-shrink-0"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span className="text-sm font-medium text-gray-700 truncate">
-                            {file.name}
-                          </span>
-                        </div>
-                        <span className="text-blue-400 text-xs font-bold flex-shrink-0">
-                          {(file.size / 1024).toFixed(1)} KB
-                        </span>
-                      </div>
+                      <BoardAttachmentItem
+                        key={`new-${index}-${file.name}-${file.lastModified}`}
+                        file={file}
+                        onRemove={() => handleRemoveAttachment(index)}
+                      />
                     ))}
                   </div>
                 </Activity>
