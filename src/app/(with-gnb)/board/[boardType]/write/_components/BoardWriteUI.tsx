@@ -73,27 +73,30 @@ export default function BoardWriteUI({
   /**
    * S3 이미지 단일 업로드 헬퍼
    */
-  const uploadImageFile = useCallback(async (file: File): Promise<string | null> => {
-    try {
-      setIsUploadingImage(true);
-      const form = new FormData();
-      form.set('file', file);
-      const { status, data } = await appFetch<string>('/api/board/image', {
-        method: 'post',
-        body: form,
-      });
+  const uploadImageFile = useCallback(
+    async (file: File): Promise<string | null> => {
+      try {
+        setIsUploadingImage(true);
+        const form = new FormData();
+        form.set('file', file);
+        const { status, data } = await appFetch<string>('/api/board/image', {
+          method: 'post',
+          body: form,
+        });
 
-      if (status === 200 && data) {
-        uploadedImagesRef.current.add(data);
-        return data;
+        if (status === 200 && data) {
+          uploadedImagesRef.current.add(data);
+          return data;
+        }
+      } catch (err) {
+        console.error('Image upload failed:', err);
+      } finally {
+        setIsUploadingImage(false);
       }
-    } catch (err) {
-      console.error('Image upload failed:', err);
-    } finally {
-      setIsUploadingImage(false);
-    }
-    return null;
-  }, []);
+      return null;
+    },
+    [],
+  );
 
   const editor = useEditor({
     extensions: [
@@ -105,7 +108,8 @@ export default function BoardWriteUI({
       CustomImage.configure({
         allowBase64: false,
         HTMLAttributes: {
-          class: 'rounded-xl max-w-full my-4 border border-gray-100 shadow-sm object-cover',
+          class:
+            'rounded-xl max-w-full my-4 border border-gray-100 shadow-sm object-cover',
         },
       }),
     ],
@@ -117,9 +121,15 @@ export default function BoardWriteUI({
       // 에디터에서 이미지가 삭제되었는지 diff 비교 후 S3 삭제 호출
       const currentUrls = new Set(extractImageUrls(html));
       prevImageUrlsRef.current.forEach((prevUrl) => {
-        if (!currentUrls.has(prevUrl) && uploadedImagesRef.current.has(prevUrl)) {
-          appFetch<boolean>(`/api/board/image?url=${encodeURIComponent(prevUrl)}`, {
+        if (
+          !currentUrls.has(prevUrl) &&
+          uploadedImagesRef.current.has(prevUrl)
+        ) {
+          appFetch<boolean>('/api/board/image', {
             method: 'delete',
+            query: {
+              url: prevUrl,
+            },
           }).catch((e) => console.error('Delete image failed:', e));
           uploadedImagesRef.current.delete(prevUrl);
         }
@@ -372,7 +382,9 @@ export default function BoardWriteUI({
                           d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                         />
                       </svg>
-                      {isUploadingImage ? '이미지 업로드 중...' : '본문 사진 추가'}
+                      {isUploadingImage
+                        ? '이미지 업로드 중...'
+                        : '본문 사진 추가'}
                     </button>
                     <input
                       ref={editorImageInputRef}
@@ -383,7 +395,8 @@ export default function BoardWriteUI({
                     />
                   </div>
                   <span className="text-xs text-gray-400">
-                    이미지를 에디터로 드래그하거나 붙여넣기(Ctrl+V)할 수 있습니다
+                    이미지를 에디터로 드래그하거나 붙여넣기(Ctrl+V)할 수
+                    있습니다
                   </span>
                 </div>
 
