@@ -120,7 +120,7 @@ export default function BoardWriteUI({
 
       // 에디터에서 이미지가 삭제되었는지 diff 비교 후 S3 삭제 호출
       const currentUrls = new Set(extractImageUrls(html));
-      prevImageUrlsRef.current.forEach((prevUrl) => {
+      for (const prevUrl of prevImageUrlsRef.current) {
         if (
           !currentUrls.has(prevUrl) &&
           uploadedImagesRef.current.has(prevUrl)
@@ -133,7 +133,7 @@ export default function BoardWriteUI({
           }).catch((e) => console.error('Delete image failed:', e));
           uploadedImagesRef.current.delete(prevUrl);
         }
-      });
+      }
       prevImageUrlsRef.current = currentUrls;
     },
     editorProps: {
@@ -237,13 +237,16 @@ export default function BoardWriteUI({
   const handleRemoveAttachment = useCallback((targetIndex: number) => {
     setAttachments((prevList: FileList | null) => {
       if (!prevList) return null;
+      const remainingFiles = Array.from(prevList).filter(
+        (_, index) => index !== targetIndex,
+      );
+      if (remainingFiles.length === 0) return null;
+
       const dataTransfer = new DataTransfer();
-      Array.from(prevList).forEach((file, index) => {
-        if (index !== targetIndex) {
-          dataTransfer.items.add(file);
-        }
-      });
-      return dataTransfer.files.length > 0 ? dataTransfer.files : null;
+      for (const file of remainingFiles) {
+        dataTransfer.items.add(file);
+      }
+      return dataTransfer.files;
     });
   }, []);
 
@@ -321,12 +324,13 @@ export default function BoardWriteUI({
    */
   const handleCancel = (): void => {
     // 세션 동안 업로드된 이미지 중 작성 취소 시 미사용 이미지 일괄 삭제
-    if (uploadedImagesRef.current.size > 0) {
-      Array.from(uploadedImagesRef.current).forEach((url) => {
-        appFetch<boolean>(`/api/board/image?url=${encodeURIComponent(url)}`, {
-          method: 'delete',
-        }).catch((e) => console.error('Cleanup image error:', e));
-      });
+    for (const url of uploadedImagesRef.current) {
+      appFetch<boolean>('/api/board/image', {
+        method: 'delete',
+        query: {
+          url,
+        },
+      }).catch((e) => console.error('Cleanup image error:', e));
     }
     router.back(); // 이전 페이지로 돌아가기
   };

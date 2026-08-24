@@ -45,16 +45,24 @@ const isValidAttribute = (tagName: string, attrName: string): boolean => {
   }
   const tagAllowed = ALLOWED_ATTRIBUTES[tagName];
   const globalAllowed = ALLOWED_ATTRIBUTES['*'];
-  return (tagAllowed?.has(attrName) ?? false) || (globalAllowed?.has(attrName) ?? false);
+  return (
+    (tagAllowed?.has(attrName) ?? false) ||
+    (globalAllowed?.has(attrName) ?? false)
+  );
 };
 
 const sanitizeAttributes = (element: HTMLElement, tagName: string): void => {
-  Array.from(element.attributes).forEach((attr) => {
+  const invalidAttrs = Array.from(element.attributes).filter((attr) => {
     const attrName = attr.name.toLowerCase();
-    if (!isValidAttribute(tagName, attrName) || isDangerousUrl(attrName, attr.value)) {
-      element.removeAttribute(attr.name);
-    }
+    return (
+      !isValidAttribute(tagName, attrName) ||
+      isDangerousUrl(attrName, attr.value)
+    );
   });
+
+  for (const attr of invalidAttrs) {
+    element.removeAttribute(attr.name);
+  }
 };
 
 const sanitizeNode = (node: Node): void => {
@@ -71,7 +79,9 @@ const sanitizeNode = (node: Node): void => {
   }
 
   sanitizeAttributes(element, tagName);
-  Array.from(element.childNodes).forEach(sanitizeNode);
+  for (const child of Array.from(element.childNodes)) {
+    sanitizeNode(child);
+  }
 };
 
 /**
@@ -86,6 +96,8 @@ export const sanitizeHtml = (dirtyHtml: string): string => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(dirtyHtml, 'text/html');
 
-  Array.from(doc.body.childNodes).forEach(sanitizeNode);
+  for (const child of Array.from(doc.body.childNodes)) {
+    sanitizeNode(child);
+  }
   return doc.body.innerHTML;
 };
