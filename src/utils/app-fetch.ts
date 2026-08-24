@@ -17,10 +17,7 @@ interface QueryFetchOptions extends Omit<
 > {
   method?: 'get' | 'delete';
 }
-interface BodyFetchOptions extends Omit<
-  FetchOptions,
-  'method' | 'query' | 'params'
-> {
+interface BodyFetchOptions extends Omit<FetchOptions, 'method' | 'params'> {
   method: 'post' | 'put' | 'patch';
 }
 
