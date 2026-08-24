@@ -7,7 +7,9 @@ export default function WithGnbLayout({ children }: Readonly<ChildrenType>) {
   return (
     <WrapLayout>
       <Header />
-      {children}
+      <main className="container mx-auto max-w-7xl flex-grow px-4 py-6 md:py-10">
+        {children}
+      </main>
       <Footer />
     </WrapLayout>
   );

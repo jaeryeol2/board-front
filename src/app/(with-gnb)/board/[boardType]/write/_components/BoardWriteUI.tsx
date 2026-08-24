@@ -336,178 +336,175 @@ export default function BoardWriteUI({
   };
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="py-6 md:py-12 px-4 md:px-0">
-        <div className="bg-white p-5 md:p-10 rounded-2xl border border-gray-100 shadow-sm max-w-4xl mx-auto">
-          <div className="max-w-3xl mx-auto">
-            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-4">
-              {isModify ? '게시글 수정' : '게시글 작성'}
-            </h1>
-            <p className="text-sm md:text-base text-gray-500 mb-8 md:mb-12">
-              {isModify
-                ? '게시글의 내용을 수정해보세요.'
-                : '새로운 소식을 공유하고 다른 사람들과 소통해보세요.'}
-            </p>
+    <div className="w-full max-w-4xl mx-auto">
+      <div className="bg-white p-6 md:p-10 rounded-[18px] border border-[#e0e0e0]">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-2xl md:text-3xl font-semibold text-[#1d1d1f] mb-2 tracking-tight">
+            {isModify ? '게시글 수정' : '게시글 작성'}
+          </h1>
+          <p className="text-[15px] text-[#7a7a7a] mb-8 md:mb-10">
+            {isModify
+              ? '게시글의 내용을 수정해보세요.'
+              : '새로운 소식을 공유하고 다른 사람들과 소통해보세요.'}
+          </p>
 
-            <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10">
-              {/* 제목 입력란 */}
-              <div className="border-b-2 border-gray-100 focus-within:border-blue-600 transition-colors duration-300">
-                <Text
-                  id="title"
-                  className="w-full pt-2 pb-3 text-xl md:text-3xl font-bold bg-transparent border-none focus:ring-0 placeholder-gray-300"
-                  placeholder="제목을 입력하세요"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
+            {/* 제목 입력란 */}
+            <div className="border-b border-[#e0e0e0] focus-within:border-[#0066cc] transition-colors duration-200">
+              <Text
+                id="title"
+                className="w-full pt-2 pb-3 text-xl md:text-2xl font-semibold text-[#1d1d1f] bg-transparent border-none focus:ring-0 placeholder:text-[#86868b]"
+                placeholder="제목을 입력하세요"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+            </div>
 
-              {/* 내용 입력란 */}
-              <div className="mt-6 md:mt-8">
-                {/* 에디터 툴바 */}
-                <div className="flex items-center justify-between pb-2 border-b border-gray-100 mb-4">
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => editorImageInputRef.current?.click()}
-                      disabled={isUploadingImage}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 rounded-lg transition-colors border border-gray-200 cursor-pointer disabled:opacity-50"
+            {/* 내용 입력란 */}
+            <div className="mt-6">
+              {/* 에디터 툴바 */}
+              <div className="flex items-center justify-between pb-2 border-b border-[#e0e0e0] mb-4">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => editorImageInputRef.current?.click()}
+                    disabled={isUploadingImage}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#1d1d1f] hover:text-[#0066cc] bg-[#f5f5f7] hover:bg-[#e0e0e0] rounded-full transition-colors border border-[#e0e0e0] cursor-pointer disabled:opacity-50"
+                  >
+                    <svg
+                      className="w-3.5 h-3.5 text-[#7a7a7a]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <svg
-                        className="w-4 h-4 text-gray-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      {isUploadingImage
-                        ? '이미지 업로드 중...'
-                        : '본문 사진 추가'}
-                    </button>
-                    <input
-                      ref={editorImageInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleEditorImageChange}
-                    />
-                  </div>
-                  <span className="text-xs text-gray-400">
-                    이미지를 에디터로 드래그하거나 붙여넣기(Ctrl+V)할 수
-                    있습니다
-                  </span>
-                </div>
-
-                <EditorContent editor={editor} />
-              </div>
-
-              {/* 첨부파일 입력란 */}
-              <div className="border-t border-gray-50 pt-8">
-                <div className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <svg
-                    className="w-5 h-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                    />
-                  </svg>
-                  파일 첨부
-                </div>
-                <div className="flex items-center justify-center w-full">
-                  <label
-                    htmlFor="attachments"
-                    aria-label="파일 첨부"
-                    {...dropProps}
-                    className={`flex flex-col items-center justify-center w-full h-32 md:h-48 border-2 border-dashed rounded-2xl cursor-pointer transition-all group ${
-                      isDragging
-                        ? 'border-blue-500 bg-blue-50/80 ring-2 ring-blue-300'
-                        : 'border-gray-100 bg-gray-50/50 hover:bg-blue-50/50 hover:border-blue-200'
-                    }`}
-                  >
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-400 group-hover:text-blue-500">
-                      <svg
-                        className="w-8 h-8 md:w-10 md:h-10 mb-3 transition-transform group-hover:-translate-y-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h1.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293h4.586a4 4 0 014 4v5a4 4 0 01-4 4H7z"
-                        ></path>
-                      </svg>
-                      <p className="mb-1 text-sm md:text-base">
-                        <span className="font-bold">파일 선택</span> 또는 드래그
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        이미지 및 일반 파일 첨부 지원
-                      </p>
-                    </div>
-                  </label>
-                  <FileInput
-                    id="attachments"
-                    name="attachments"
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    {isUploadingImage
+                      ? '이미지 업로드 중...'
+                      : '본문 사진 추가'}
+                  </button>
+                  <input
+                    ref={editorImageInputRef}
+                    type="file"
+                    accept="image/*"
                     className="hidden"
-                    multiple
-                    onChange={handleFileChange}
+                    onChange={handleEditorImageChange}
                   />
                 </div>
-                <Activity
-                  mode={
-                    (initialData?.fileList ?? []).length > 0 ||
-                    (attachments ?? []).length > 0
-                      ? 'visible'
-                      : 'hidden'
-                  }
-                >
-                  <div className="mt-4 space-y-2">
-                    {initialData?.fileList.map((file) => (
-                      <BoardAttachmentItem
-                        key={`initial-${file.id}-${file.originalFileName}`}
-                        file={file}
-                      />
-                    ))}
+                <span className="text-xs text-[#7a7a7a]">
+                  이미지를 에디터로 드래그하거나 붙여넣기(Ctrl+V)할 수 있습니다
+                </span>
+              </div>
 
-                    {Array.from(attachments ?? []).map((file, index) => (
-                      <BoardAttachmentItem
-                        key={`new-${index}-${file.name}-${file.lastModified}`}
-                        file={file}
-                        onRemove={() => handleRemoveAttachment(index)}
-                      />
-                    ))}
+              <EditorContent editor={editor} />
+            </div>
+
+            {/* 첨부파일 입력란 */}
+            <div className="border-t border-[#f0f0f0] pt-6">
+              <div className="text-[15px] font-semibold text-[#1d1d1f] mb-3 flex items-center gap-2">
+                <svg
+                  className="w-4 h-4 text-[#7a7a7a]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                  />
+                </svg>
+                파일 첨부
+              </div>
+              <div className="flex items-center justify-center w-full">
+                <label
+                  htmlFor="attachments"
+                  aria-label="파일 첨부"
+                  {...dropProps}
+                  className={`flex flex-col items-center justify-center w-full h-32 md:h-40 border border-dashed rounded-[18px] cursor-pointer transition-all group ${
+                    isDragging
+                      ? 'border-[#0066cc] bg-[#f5f5f7] ring-2 ring-[#0066cc]/20'
+                      : 'border-[#e0e0e0] bg-[#fafafc] hover:bg-white hover:border-[#0066cc]'
+                  }`}
+                >
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6 text-[#7a7a7a] group-hover:text-[#0066cc]">
+                    <svg
+                      className="w-8 h-8 mb-2 transition-transform group-hover:-translate-y-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h1.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293h4.586a4 4 0 014 4v5a4 4 0 01-4 4H7z"
+                      ></path>
+                    </svg>
+                    <p className="mb-1 text-[14px]">
+                      <span className="font-semibold text-[#1d1d1f]">파일 선택</span> 또는 드래그
+                    </p>
+                    <p className="text-xs text-[#7a7a7a]">
+                      이미지 및 일반 파일 첨부 지원
+                    </p>
                   </div>
-                </Activity>
+                </label>
+                <FileInput
+                  id="attachments"
+                  name="attachments"
+                  className="hidden"
+                  multiple
+                  onChange={handleFileChange}
+                />
               </div>
+              <Activity
+                mode={
+                  (initialData?.fileList ?? []).length > 0 ||
+                  (attachments ?? []).length > 0
+                    ? 'visible'
+                    : 'hidden'
+                }
+              >
+                <div className="mt-4 space-y-2">
+                  {initialData?.fileList.map((file) => (
+                    <BoardAttachmentItem
+                      key={`initial-${file.id}-${file.originalFileName}`}
+                      file={file}
+                    />
+                  ))}
 
-              {/* 버튼 영역 */}
-              <div className="flex flex-col-reverse md:flex-row justify-end gap-3 pt-8 border-t border-gray-100 mt-8 md:mt-12">
-                <Button
-                  className="w-full md:w-auto px-8 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-colors"
-                  onClick={handleCancel}
-                >
-                  취소
-                </Button>
-                <Submit className="w-full md:w-auto px-10 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-md shadow-blue-200 transition-all active:scale-95">
-                  {isModify ? '수정 완료' : '작성 완료'}
-                </Submit>
-              </div>
-            </form>
-          </div>
+                  {Array.from(attachments ?? []).map((file, index) => (
+                    <BoardAttachmentItem
+                      key={`new-${index}-${file.name}-${file.lastModified}`}
+                      file={file}
+                      onRemove={() => handleRemoveAttachment(index)}
+                    />
+                  ))}
+                </div>
+              </Activity>
+            </div>
+
+            {/* 버튼 영역 */}
+            <div className="flex flex-col-reverse md:flex-row justify-end gap-3 pt-6 border-t border-[#f0f0f0] mt-8">
+              <Button
+                className="w-full md:w-auto px-6 py-2.5 bg-[#f5f5f7] text-[#1d1d1f] rounded-full font-medium text-[15px] hover:bg-[#e0e0e0] transition-colors shadow-none"
+                onClick={handleCancel}
+              >
+                취소
+              </Button>
+              <Submit className="w-full md:w-auto px-8 py-2.5 bg-[#0066cc] text-white rounded-full font-medium text-[15px] hover:bg-[#0071e3] transition-all active:scale-95 shadow-none">
+                {isModify ? '수정 완료' : '작성 완료'}
+              </Submit>
+            </div>
+          </form>
         </div>
       </div>
     </div>

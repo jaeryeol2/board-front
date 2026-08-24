@@ -10,8 +10,8 @@ export default function SectionLoading({
       <div className="relative">
         {children}
         {loading && (
-          <div className="absolute z-10 inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-500 border-t-transparent"></div>
+          <div className="absolute z-10 inset-0 flex items-center justify-center bg-white/70 backdrop-blur-xs">
+            <div className="h-10 w-10 animate-spin rounded-full border-3 border-solid border-[#0066cc] border-t-transparent"></div>
           </div>
         )}
       </div>

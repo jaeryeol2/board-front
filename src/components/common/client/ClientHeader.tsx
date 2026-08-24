@@ -70,13 +70,13 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
   }, [menus]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-100 bg-white">
-      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+    <header className="sticky top-0 z-50 border-b border-[#e0e0e0] bg-white/80 backdrop-blur-md transition-colors">
+      <div className="container mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
         {/* Left Section: Logo and Menu */}
         <div className="flex items-center space-x-8">
           <AppLink
             href="/"
-            className="text-xl font-extrabold text-blue-600 md:text-2xl"
+            className="text-lg font-semibold text-[#1d1d1f] tracking-tight hover:text-[#0066cc] transition-colors"
           >
             The Lounge.
           </AppLink>
@@ -88,18 +88,18 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
         </div>
 
         {/* Right Section: Auth Links (PC) */}
-        <div className="hidden items-center space-x-2 lg:flex sm:space-x-4">
+        <div className="hidden items-center space-x-2 lg:flex sm:space-x-3">
           {isLogin ? (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 text-[14px]">
               <AppLink
                 href="/mypage"
-                className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+                className="font-medium text-[#7a7a7a] transition-colors hover:text-[#1d1d1f]"
               >
                 {userInfo?.userName ?? '회원'}님
               </AppLink>
-              <span className="text-gray-300">|</span>
+              <span className="text-[#e0e0e0]">|</span>
               <Button
-                className="bg-transparent text-sm font-medium text-gray-500 transition-colors hover:text-gray-900 px-0 py-0 shadow-none border-none"
+                className="bg-transparent text-[14px] font-medium text-[#7a7a7a] transition-colors hover:text-[#1d1d1f] px-0 py-0 shadow-none border-none"
                 onClick={handleLogout}
               >
                 로그아웃
@@ -109,13 +109,13 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
             <>
               <AppLink
                 href="/login"
-                className="rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                className="rounded-full px-4 py-1.5 text-[14px] font-medium text-[#1d1d1f] transition-colors hover:bg-black/5"
               >
                 로그인
               </AppLink>
               <AppLink
                 href="/signup"
-                className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 shadow-sm"
+                className="rounded-full bg-[#0066cc] px-4 py-1.5 text-[14px] font-medium text-white transition-all hover:bg-[#0071e3] active:scale-95 shadow-none"
               >
                 회원가입
               </AppLink>
@@ -127,7 +127,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
         <div className="flex items-center lg:hidden">
           <Button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:outline-none bg-transparent shadow-none border-none px-2 py-2"
+            className="rounded-full p-2 text-[#1d1d1f] hover:bg-black/5 focus:outline-none bg-transparent shadow-none border-none"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
@@ -186,18 +186,18 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
 
         {/* Drawer Content */}
         <div
-          className={`absolute inset-y-0 right-0 w-[280px] max-w-[80%] bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
+          className={`absolute inset-y-0 right-0 w-[280px] max-w-[80%] bg-[#f5f5f7] border-l border-[#e0e0e0] shadow-2xl transition-transform duration-300 ease-in-out ${
             isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
-          <div className="flex h-16 items-center justify-between border-b border-gray-100 px-6">
-            <span className="text-lg font-bold text-blue-600">Menu</span>
+          <div className="flex h-14 items-center justify-between border-b border-[#e0e0e0] px-6 bg-white">
+            <span className="text-base font-semibold text-[#1d1d1f]">Menu</span>
             <Button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="rounded-full p-2 text-gray-400 hover:bg-gray-100 bg-transparent shadow-none border-none px-2 py-2"
+              className="rounded-full p-2 text-[#7a7a7a] hover:bg-black/5 bg-transparent shadow-none border-none"
             >
               <svg
-                className="h-6 w-6"
+                className="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -212,20 +212,20 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
             </Button>
           </div>
 
-          <nav className="flex flex-col p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-4rem)]">
+          <nav className="flex flex-col p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-3.5rem)]">
             {menuTree.map((menu) => (
               <div key={menu.id} className="flex flex-col">
                 {menu.children && menu.children.length > 0 ? (
                   <div className="mb-2">
-                    <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-gray-400">
+                    <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#7a7a7a]">
                       {menu.menuName}
                     </div>
-                    <div className="ml-2 flex flex-col space-y-1">
+                    <div className="ml-1 flex flex-col space-y-0.5">
                       {menu.children.map((child) => (
                         <AppLink
                           key={child.id}
                           href={child.href}
-                          className="rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                          className="rounded-[11px] px-3.5 py-2.5 text-[14px] font-normal text-[#1d1d1f] hover:bg-white hover:text-[#0066cc] transition-colors"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
                           {child.menuName}
@@ -236,7 +236,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
                 ) : (
                   <AppLink
                     href={menu.href}
-                    className="rounded-xl px-4 py-3 text-[15px] font-bold text-gray-800 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    className="rounded-[11px] px-3.5 py-2.5 text-[14px] font-medium text-[#1d1d1f] hover:bg-white hover:text-[#0066cc] transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {menu.menuName}
@@ -245,18 +245,18 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
               </div>
             ))}
 
-            <div className="my-4 border-t border-gray-100 pt-4 px-2">
+            <div className="my-3 border-t border-[#e0e0e0] pt-3 px-1">
               {isLogin ? (
-                <div className="flex flex-col space-y-2">
-                  <div className="px-2 py-1 mb-2">
-                    <p className="text-xs text-gray-400 mb-1">내 정보</p>
-                    <p className="text-sm font-bold text-gray-800">
+                <div className="flex flex-col space-y-1.5">
+                  <div className="px-3 py-1 mb-1">
+                    <p className="text-[11px] text-[#7a7a7a]">내 정보</p>
+                    <p className="text-[14px] font-semibold text-[#1d1d1f]">
                       {userInfo?.userName ?? '회원'}님
                     </p>
                   </div>
                   <AppLink
                     href="/mypage"
-                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-gray-700 hover:bg-gray-50"
+                    className="flex items-center gap-3 rounded-[11px] px-3.5 py-2.5 text-[14px] font-medium text-[#1d1d1f] hover:bg-white"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     마이페이지
@@ -266,23 +266,23 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
                       handleLogout();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-red-600 hover:bg-red-50 transition-colors text-left bg-transparent shadow-none border-none w-full"
+                    className="flex items-center gap-3 rounded-[11px] px-3.5 py-2.5 text-[14px] font-medium text-red-600 hover:bg-red-50 transition-colors text-left bg-transparent shadow-none border-none w-full"
                   >
                     로그아웃
                   </Button>
                 </div>
               ) : (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 pt-1">
                   <AppLink
                     href="/login"
-                    className="flex h-12 items-center justify-center rounded-xl border border-gray-200 text-[15px] font-bold text-gray-700 hover:bg-gray-50"
+                    className="flex h-10 items-center justify-center rounded-full border border-[#e0e0e0] bg-white text-[14px] font-medium text-[#1d1d1f] hover:bg-gray-50"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     로그인
                   </AppLink>
                   <AppLink
                     href="/signup"
-                    className="flex h-12 items-center justify-center rounded-xl bg-blue-600 text-[15px] font-bold text-white hover:bg-blue-700 shadow-lg shadow-blue-100"
+                    className="flex h-10 items-center justify-center rounded-full bg-[#0066cc] text-[14px] font-medium text-white hover:bg-[#0071e3]"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     회원가입
@@ -302,12 +302,12 @@ function HeaderMenuItem({ item }: Readonly<{ item: MenuItem }>) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null); // For hover delay
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isActive =
     item.href !== '/' && pathname.startsWith(item.href)
-      ? 'text-blue-600 font-semibold'
-      : 'text-gray-500 font-medium';
+      ? 'text-[#0066cc] font-semibold'
+      : 'text-[#1d1d1f]/80 font-normal';
 
   const handleOpen = useCallback(() => {
     if (timeoutRef.current) {
@@ -319,7 +319,7 @@ function HeaderMenuItem({ item }: Readonly<{ item: MenuItem }>) {
   const handleClose = useCallback(() => {
     timeoutRef.current = setTimeout(() => {
       setIsOpen(false);
-    }, 100); // Small delay to allow moving mouse from button to menu
+    }, 100);
   }, []);
 
   const handleToggle = useCallback(() => {
@@ -330,7 +330,7 @@ function HeaderMenuItem({ item }: Readonly<{ item: MenuItem }>) {
     (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isOpen) {
         setIsOpen(false);
-        buttonRef.current?.focus(); // Return focus to the button
+        buttonRef.current?.focus();
       }
     },
     [isOpen],
@@ -338,7 +338,6 @@ function HeaderMenuItem({ item }: Readonly<{ item: MenuItem }>) {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // 클릭이 메뉴 외부와 버튼 외부에서 발생했을 때만 메뉴를 닫습니다.
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target as Node) &&
@@ -349,11 +348,11 @@ function HeaderMenuItem({ item }: Readonly<{ item: MenuItem }>) {
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown); // Add keydown listener
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown); // Clean up
+      document.removeEventListener('keydown', handleKeyDown);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -364,17 +363,17 @@ function HeaderMenuItem({ item }: Readonly<{ item: MenuItem }>) {
     return (
       <div className="relative">
         <Button
-          ref={buttonRef} // Assign ref to the button
+          ref={buttonRef}
           onClick={handleToggle}
-          onMouseEnter={handleOpen} // Open on hover
-          onMouseLeave={handleClose} // Close on leave (with delay)
-          className={`flex items-center rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 hover:text-gray-900 ${isActive}`}
-          aria-haspopup="menu" // Indicate that this button opens a menu
-          aria-expanded={isOpen} // Indicate whether the menu is currently open
+          onMouseEnter={handleOpen}
+          onMouseLeave={handleClose}
+          className={`flex items-center rounded-full px-3.5 py-1.5 text-[14px] transition-colors hover:bg-black/5 hover:text-[#0066cc] bg-transparent shadow-none border-none ${isActive}`}
+          aria-haspopup="menu"
+          aria-expanded={isOpen}
         >
           {item.menuName}
           <svg
-            className={`ml-1 h-4 w-4 transform text-gray-400 transition-transform duration-200 ${
+            className={`ml-1 h-3.5 w-3.5 transform text-[#7a7a7a] transition-transform duration-200 ${
               isOpen ? 'rotate-180' : ''
             }`}
             xmlns="http://www.w3.org/2000/svg"
@@ -389,27 +388,27 @@ function HeaderMenuItem({ item }: Readonly<{ item: MenuItem }>) {
           </svg>
         </Button>
         {isOpen && (
-          <div className="absolute left-0 top-full z-10 mt-2 w-48 origin-top-left rounded-lg border border-gray-100 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-            <div // Assign menuRef to the actual dropdown div
+          <div className="absolute left-0 top-full z-10 mt-1.5 w-48 origin-top-left rounded-[14px] border border-[#e0e0e0] bg-white/95 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+            <div
               ref={menuRef}
-              onMouseEnter={handleOpen} // Keep open if mouse enters menu
-              onMouseLeave={handleClose} // Close if mouse leaves menu (with delay)
-              role="menu" // Add role and orientation to the actual menu container
+              onMouseEnter={handleOpen}
+              onMouseLeave={handleClose}
+              role="menu"
               aria-orientation="vertical"
-              tabIndex={-1} // Make the menu focusable
-              className="py-1"
+              tabIndex={-1}
+              className="p-1.5"
             >
               {item.children.map((child, index) => (
                 <Fragment key={child.id}>
                   <AppLink
                     href={child.href}
-                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-gray-100"
-                    role="menuitem" // Indicate this is a menu item
+                    className="block w-full rounded-[8px] px-3.5 py-2 text-left text-[13px] text-[#1d1d1f] transition-colors hover:bg-black/5 hover:text-[#0066cc]"
+                    role="menuitem"
                   >
                     {child.menuName}
                   </AppLink>
                   {index < item.children!.length - 1 && (
-                    <hr className="mx-2 border-gray-100" />
+                    <hr className="my-1 border-[#f0f0f0]" />
                   )}
                 </Fragment>
               ))}
@@ -423,7 +422,7 @@ function HeaderMenuItem({ item }: Readonly<{ item: MenuItem }>) {
   return (
     <AppLink
       href={item.href}
-      className={`rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 hover:text-gray-900 ${isActive}`}
+      className={`rounded-full px-3.5 py-1.5 text-[14px] transition-colors hover:bg-black/5 hover:text-[#0066cc] ${isActive}`}
     >
       {item.menuName}
     </AppLink>

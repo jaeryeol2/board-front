@@ -63,15 +63,15 @@ export default function BoardListUI({
   }, [path, searchParams]);
 
   return (
-    <div className="py-6 md:py-8 px-4 md:px-0">
+    <div className="w-full">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl md:text-3xl font-semibold text-[#1d1d1f] tracking-tight">
           {boardName}
         </h1>
         {canWrite && (
           <Button
             onClick={handleWriteClick}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full shadow-sm transition-all"
+            className="bg-[#0066cc] hover:bg-[#0071e3] text-white px-5 py-2 rounded-full font-medium text-[14px] transition-all shadow-none"
           >
             글쓰기
           </Button>
@@ -79,37 +79,37 @@ export default function BoardListUI({
       </div>
 
       {/* PC Table View */}
-      <div className="hidden md:block relative overflow-hidden bg-white shadow-sm border border-gray-100 rounded-2xl">
-        <table className="w-full text-left text-sm text-gray-500">
-          <thead className="bg-gray-50/50 text-xs uppercase text-gray-700 border-b border-gray-100">
+      <div className="hidden md:block relative overflow-hidden bg-white border border-[#e0e0e0] rounded-[18px]">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-[#fafafc] text-[13px] font-semibold text-[#7a7a7a] border-b border-[#e0e0e0]">
             <tr>
-              <th scope="col" className="w-20 px-6 py-4 text-center">
+              <th scope="col" className="w-20 px-6 py-3.5 text-center">
                 번호
               </th>
-              <th scope="col" className="px-6 py-4">
+              <th scope="col" className="px-6 py-3.5">
                 제목
               </th>
               {isNotAnony && (
-                <th scope="col" className="w-32 px-6 py-4 text-center">
+                <th scope="col" className="w-32 px-6 py-3.5 text-center">
                   작성자
                 </th>
               )}
-              <th scope="col" className="w-32 px-6 py-4 text-center">
+              <th scope="col" className="w-32 px-6 py-3.5 text-center">
                 작성일
               </th>
-              <th scope="col" className="w-24 px-6 py-4 text-center">
+              <th scope="col" className="w-24 px-6 py-3.5 text-center">
                 조회수
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-[#f0f0f0]">
             {paginatedList.length > 0 ? (
               paginatedList.map((board: Board, index: number) => (
                 <tr
                   key={board.id}
-                  className="group bg-white hover:bg-blue-50/30 transition-colors"
+                  className="group bg-white hover:bg-[#fafafc] transition-colors"
                 >
-                  <td className="px-6 py-4 text-center text-gray-400">
+                  <td className="px-6 py-4 text-center text-[13px] text-[#7a7a7a]">
                     {total - (page - 1) * rowsPerPage - index}
                   </td>
                   <td className="px-6 py-4">
@@ -118,11 +118,10 @@ export default function BoardListUI({
                       className="flex items-center gap-3 group/link"
                     >
                       {isNotEmpty(board.fileUrl) && (
-                        <div className="w-12 h-8 flex-shrink-0 rounded bg-gray-100 overflow-hidden">
-                          {/* Placeholder for thumbnail */}
-                          <div className="w-full h-full bg-blue-50 flex items-center justify-center">
+                        <div className="w-10 h-7 flex-shrink-0 rounded-[6px] bg-[#f5f5f7] border border-[#e0e0e0] overflow-hidden">
+                          <div className="w-full h-full flex items-center justify-center text-[#7a7a7a]">
                             <svg
-                              className="w-4 h-4 text-blue-200"
+                              className="w-3.5 h-3.5"
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
@@ -131,29 +130,29 @@ export default function BoardListUI({
                           </div>
                         </div>
                       )}
-                      <span className="font-medium text-gray-900 group-hover/link:text-blue-600 transition-colors truncate max-w-md">
+                      <span className="font-medium text-[#1d1d1f] group-hover/link:text-[#0066cc] transition-colors truncate max-w-md text-[15px]">
                         {board.title}
                       </span>
                     </AppLink>
                   </td>
                   {isNotAnony && (
-                    <td className="px-6 py-4 text-center text-gray-600">
+                    <td className="px-6 py-4 text-center text-[14px] text-[#1d1d1f]">
                       {board.writerName}
                     </td>
                   )}
-                  <td className="px-6 py-4 text-center text-gray-400">
+                  <td className="px-6 py-4 text-center text-[13px] text-[#7a7a7a]">
                     {isNotEmpty(board?.createdAt)
                       ? format(new Date(board.createdAt), 'MM.dd')
                       : ''}
                   </td>
-                  <td className="px-6 py-4 text-center text-gray-400">
+                  <td className="px-6 py-4 text-center text-[13px] text-[#7a7a7a]">
                     {board.viewCount}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="py-20 text-center text-gray-400">
+                <td colSpan={5} className="py-20 text-center text-[#7a7a7a] text-[15px]">
                   게시글이 없습니다.
                 </td>
               </tr>
@@ -169,18 +168,18 @@ export default function BoardListUI({
             <AppLink
               key={board.id}
               href={`/board/${boardType}/${board.id}`}
-              className="block bg-white p-4 rounded-xl border border-gray-100 shadow-sm active:bg-gray-50 transition-colors"
+              className="block bg-white p-4 rounded-[14px] border border-[#e0e0e0] active:bg-[#fafafc] transition-colors"
             >
               <div className="flex justify-between items-start gap-3">
                 <div className="flex-1">
-                  <h3 className="text-[15px] font-semibold text-gray-900 leading-snug line-clamp-2 mb-2">
+                  <h3 className="text-[15px] font-semibold text-[#1d1d1f] leading-snug line-clamp-2 mb-2">
                     {board.title}
                   </h3>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-2 text-xs text-[#7a7a7a]">
                     {isNotAnony && (
                       <>
-                        <span>{board.writerName}</span>
-                        <span className="text-gray-200">|</span>
+                        <span className="text-[#1d1d1f] font-medium">{board.writerName}</span>
+                        <span className="text-[#e0e0e0]">|</span>
                       </>
                     )}
                     <span>
@@ -188,15 +187,15 @@ export default function BoardListUI({
                         ? format(new Date(board.createdAt), 'yyyy.MM.dd')
                         : ''}
                     </span>
-                    <span className="text-gray-200">|</span>
+                    <span className="text-[#e0e0e0]">|</span>
                     <span>조회 {board.viewCount}</span>
                   </div>
                 </div>
                 {isNotEmpty(board.fileUrl) && (
-                  <div className="w-16 h-16 flex-shrink-0 rounded-lg bg-gray-50 overflow-hidden">
-                    <div className="w-full h-full bg-blue-50 flex items-center justify-center">
+                  <div className="w-14 h-14 flex-shrink-0 rounded-[8px] bg-[#f5f5f7] border border-[#e0e0e0] overflow-hidden">
+                    <div className="w-full h-full flex items-center justify-center text-[#7a7a7a]">
                       <svg
-                        className="w-6 h-6 text-blue-100"
+                        className="w-5 h-5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -209,7 +208,7 @@ export default function BoardListUI({
             </AppLink>
           ))
         ) : (
-          <div className="py-20 text-center text-gray-400">
+          <div className="py-16 text-center text-[#7a7a7a] bg-white rounded-[14px] border border-[#e0e0e0] text-[15px]">
             게시글이 없습니다.
           </div>
         )}

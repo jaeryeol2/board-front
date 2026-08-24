@@ -92,12 +92,12 @@ export default function Pagination({
 
   return (
     <nav
-      className="flex items-center justify-center space-x-1"
+      className="flex items-center justify-center space-x-1.5"
       aria-label="Pagination"
     >
       <Button
-        className={`rounded-l-lg border border-gray-200 bg-white px-2.5 py-1.5 md:px-3 md:py-2 text-sm md:text-base leading-tight text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors ${
-          page === 1 ? 'cursor-not-allowed opacity-50' : ''
+        className={`rounded-full border border-[#e0e0e0] bg-white px-3.5 py-1.5 text-[13px] font-medium text-[#1d1d1f] hover:bg-[#fafafc] transition-all shadow-none ${
+          page === 1 ? 'cursor-not-allowed opacity-40' : ''
         }`}
         onClick={handlePrevClick}
         disabled={page === 1}
@@ -107,10 +107,10 @@ export default function Pagination({
       {pageNumbers.map((number) => (
         <Button
           key={number}
-          className={`border border-gray-200 px-3 py-1.5 md:px-4 md:py-2 text-sm md:text-base leading-tight transition-colors ${
+          className={`min-w-[34px] px-2.5 py-1.5 text-[13px] font-medium transition-all shadow-none ${
             number === page
-              ? 'bg-blue-50 text-blue-600 font-bold border-blue-200 z-10 relative'
-              : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+              ? 'rounded-full bg-[#0066cc] text-white hover:bg-[#0071e3]'
+              : 'rounded-full border border-[#e0e0e0] bg-white text-[#1d1d1f] hover:bg-[#fafafc]'
           }`}
           onClick={() => handlePageChange(number)}
         >
@@ -118,8 +118,8 @@ export default function Pagination({
         </Button>
       ))}
       <Button
-        className={`rounded-r-lg border border-gray-200 bg-white px-2.5 py-1.5 md:px-3 md:py-2 text-sm md:text-base leading-tight text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors ${
-          page === totalPages ? 'cursor-not-allowed opacity-50' : ''
+        className={`rounded-full border border-[#e0e0e0] bg-white px-3.5 py-1.5 text-[13px] font-medium text-[#1d1d1f] hover:bg-[#fafafc] transition-all shadow-none ${
+          page === totalPages ? 'cursor-not-allowed opacity-40' : ''
         }`}
         onClick={handleNextClick}
         disabled={page === totalPages}

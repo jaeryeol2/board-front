@@ -35,39 +35,39 @@ export default function NoticeListUI({
   }, [path, searchParams]);
 
   return (
-    <div className="py-6 md:py-8 px-4 md:px-0">
+    <div className="w-full">
       <div className="mb-6 md:mb-8">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl md:text-3xl font-semibold text-[#1d1d1f] tracking-tight">
           공지사항
         </h1>
       </div>
 
       {/* PC Table View */}
-      <div className="hidden md:block relative overflow-hidden bg-white shadow-sm border border-gray-100 rounded-2xl">
-        <table className="w-full text-sm text-left text-gray-500">
-          <thead className="bg-gray-50/50 text-xs uppercase text-gray-700 border-b border-gray-100">
+      <div className="hidden md:block relative overflow-hidden bg-white border border-[#e0e0e0] rounded-[18px]">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-[#fafafc] text-[13px] font-semibold text-[#7a7a7a] border-b border-[#e0e0e0]">
             <tr>
-              <th scope="col" className="px-6 py-4">
+              <th scope="col" className="px-6 py-3.5">
                 제목
               </th>
-              <th scope="col" className="w-32 px-6 py-4 text-center">
+              <th scope="col" className="w-36 px-6 py-3.5 text-center">
                 게시일
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-[#f0f0f0]">
             {list.length > 0 ? (
               list.map((notice) => (
                 <tr
                   key={notice.id}
-                  className="group bg-white hover:bg-blue-50/30 transition-colors"
+                  className="group bg-white hover:bg-[#fafafc] transition-colors"
                 >
                   <td className="px-6 py-4">
-                    <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                    <span className="font-medium text-[#1d1d1f] group-hover:text-[#0066cc] transition-colors text-[15px]">
                       {notice.title}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-center text-gray-400">
+                  <td className="px-6 py-4 text-center text-[13px] text-[#7a7a7a]">
                     {isNotEmpty(notice?.createdAt)
                       ? format(new Date(notice.createdAt), 'yyyy.MM.dd')
                       : ''}
@@ -76,7 +76,7 @@ export default function NoticeListUI({
               ))
             ) : (
               <tr>
-                <td colSpan={2} className="py-20 text-center text-gray-400">
+                <td colSpan={2} className="py-20 text-center text-[#7a7a7a] text-[15px]">
                   등록된 공지사항이 없습니다.
                 </td>
               </tr>
@@ -91,13 +91,13 @@ export default function NoticeListUI({
           list.map((notice) => (
             <div
               key={notice.id}
-              className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition-colors"
+              className="bg-white p-4 rounded-[14px] border border-[#e0e0e0] transition-colors"
             >
-              <div className="flex flex-col gap-2">
-                <h3 className="text-[15px] font-semibold text-gray-900 leading-snug line-clamp-2">
+              <div className="flex flex-col gap-1.5">
+                <h3 className="text-[15px] font-semibold text-[#1d1d1f] leading-snug line-clamp-2">
                   {notice.title}
                 </h3>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-[#7a7a7a]">
                   {isNotEmpty(notice?.createdAt)
                     ? format(new Date(notice.createdAt), 'yyyy.MM.dd')
                     : ''}
@@ -106,7 +106,7 @@ export default function NoticeListUI({
             </div>
           ))
         ) : (
-          <div className="py-20 text-center text-gray-400 border border-gray-100 rounded-xl bg-white">
+          <div className="py-16 text-center text-[#7a7a7a] border border-[#e0e0e0] rounded-[14px] bg-white text-[15px]">
             등록된 공지사항이 없습니다.
           </div>
         )}

@@ -2,13 +2,13 @@ import LoginUI from '@/app/(no-gnb)/login/_components/LoginUI';
 
 export default function Login() {
   return (
-    <main className="flex flex-col justify-center min-h-screen p-4 md:p-8 bg-gray-50">
-      <div className="w-full max-w-[400px] mx-auto bg-white p-8 md:p-10 rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
-        <div className="mb-10 text-center md:text-left">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 tracking-tight">
+    <main className="flex flex-col justify-center items-center min-h-screen p-4 md:p-8 bg-[#f5f5f7]">
+      <div className="w-full max-w-[400px] mx-auto bg-white p-8 md:p-10 rounded-[20px] border border-[#e0e0e0]">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl md:text-3xl font-semibold text-[#1d1d1f] mb-2 tracking-tight">
             반가워요!
           </h1>
-          <p className="text-gray-500 text-sm md:text-base">
+          <p className="text-[#7a7a7a] text-[15px]">
             어떤 계정으로 로그인할까요?
           </p>
         </div>

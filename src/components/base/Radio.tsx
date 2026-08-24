@@ -10,7 +10,7 @@ export default function Radio(props: Readonly<RadioProps>) {
     <input
       type="radio"
       id={id}
-      className="w-5 h-5 text-blue-500 transition-all duration-200 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2 cursor-pointer"
+      className="w-4 h-4 text-[#0066cc] transition-all duration-150 bg-white border-[#e0e0e0] focus:ring-[#0066cc] focus:ring-2 cursor-pointer"
       {...props}
     />
   );

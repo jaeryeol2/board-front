@@ -100,8 +100,8 @@ export default function SignupUI() {
   }, []);
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div className="flex flex-col">
         <Text
           label="아이디"
           placeholder="아이디를 입력하세요"
@@ -114,7 +114,7 @@ export default function SignupUI() {
           value={state.userId}
         />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col">
         <Password
           label="비밀번호"
           placeholder="비밀번호를 입력하세요"
@@ -127,7 +127,7 @@ export default function SignupUI() {
           value={state.password}
         />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col">
         <Password
           label="비밀번호 확인"
           placeholder="비밀번호를 다시 입력하세요"
@@ -140,7 +140,7 @@ export default function SignupUI() {
           value={state.passwordConfirm}
         />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col">
         <Email
           label="이메일"
           placeholder="이메일을 입력하세요"
@@ -153,7 +153,7 @@ export default function SignupUI() {
           value={state.email}
         />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col">
         <Text
           label="이름"
           placeholder="이름을 입력하세요"
@@ -166,7 +166,7 @@ export default function SignupUI() {
           value={state.userName}
         />
       </div>
-      <Submit className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg mt-2">
+      <Submit className="w-full bg-[#0066cc] hover:bg-[#0071e3] text-white font-medium py-2.5 px-4 rounded-full active:scale-95 transition-all text-[15px] shadow-none mt-4">
         가입하기
       </Submit>
     </form>

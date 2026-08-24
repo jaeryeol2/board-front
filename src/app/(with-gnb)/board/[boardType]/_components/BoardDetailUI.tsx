@@ -39,99 +39,97 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
   };
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="py-6 md:py-12 px-4 md:px-0 max-w-4xl mx-auto">
-        <div className="mb-6 md:mb-8 flex justify-between items-center">
+    <div className="w-full max-w-4xl mx-auto">
+      <div className="mb-6 flex justify-between items-center">
+        <Button
+          onClick={handleGoBack}
+          className="flex items-center rounded-full bg-white border border-[#e0e0e0] px-4 py-2 text-[14px] font-medium text-[#1d1d1f] shadow-none hover:bg-[#fafafc] transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 mr-1.5 text-[#7a7a7a]"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+              clipRule="evenodd"
+            />
+          </svg>
+          목록으로
+        </Button>
+
+        {isAuthor && (
           <Button
-            onClick={handleGoBack}
-            className="flex items-center rounded-lg bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-100 transition-colors"
+            onClick={handleModify}
+            className="flex items-center rounded-full bg-[#0066cc] px-5 py-2 text-[14px] font-medium text-white shadow-none hover:bg-[#0071e3] transition-all active:scale-95"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-1.5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+              className="h-4 w-4 mr-1.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
               <path
-                fillRule="evenodd"
-                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                clipRule="evenodd"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
               />
             </svg>
-            목록으로
+            수정하기
           </Button>
+        )}
+      </div>
 
-          {isAuthor && (
-            <Button
-              onClick={handleModify}
-              className="flex items-center rounded-lg bg-blue-600 px-6 py-2 text-sm font-bold text-white shadow-md shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-              수정하기
-            </Button>
-          )}
+      <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 md:p-10">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-semibold text-[#1d1d1f] mb-3 leading-tight tracking-tight">
+            {board.title}
+          </h1>
+          <div className="flex flex-wrap items-center gap-2 text-[#7a7a7a] text-[13px]">
+            {isNotEmpty(board.writerName) && (
+              <>
+                <span className="font-semibold text-[#1d1d1f]">
+                  {board.writerName}
+                </span>
+                <span className="text-[#e0e0e0]">|</span>
+              </>
+            )}
+            <span>
+              {format(new Date(board.createdAt), 'yyyy.MM.dd HH:mm')}
+            </span>
+            <span className="text-[#e0e0e0]">|</span>
+            <span>조회 {board.viewCount}</span>
+          </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-10">
-          <div className="mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
-              {board.title}
-            </h1>
-            <div className="flex flex-wrap items-center gap-2 text-gray-500 text-sm">
-              {isNotEmpty(board.writerName) && (
-                <>
-                  <span className="font-semibold text-gray-900">
-                    {board.writerName}
-                  </span>
-                  <span className="text-gray-200">|</span>
-                </>
-              )}
-              <span>
-                {format(new Date(board.createdAt), 'yyyy.MM.dd HH:mm')}
-              </span>
-              <span className="text-gray-200">|</span>
-              <span>조회 {board.viewCount}</span>
+        <hr className="my-6 border-[#f0f0f0]" />
+
+        <div
+          className="prose prose-slate max-w-none text-[#1d1d1f] min-h-[200px] leading-relaxed break-keep [&_img]:rounded-[14px] [&_img]:my-4 [&_img]:border [&_img]:border-[#e0e0e0]"
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(board.content) }}
+        />
+
+        {board.fileList && board.fileList.length > 0 && (
+          <div className="mt-8 md:mt-10">
+            <div className="flex flex-col gap-4 max-w-3xl mx-auto">
+              {board.fileList.map((file) => (
+                <BoardImageItem key={file.id} file={file} />
+              ))}
             </div>
           </div>
+        )}
 
-          <hr className="my-6 md:my-8 border-gray-50" />
-
-          <div
-            className="prose prose-blue max-w-none text-gray-800 min-h-[200px] leading-relaxed break-keep [&_img]:rounded-xl [&_img]:my-4 [&_img]:border [&_img]:border-gray-100 [&_img]:shadow-sm"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(board.content) }}
+        <div className="mt-10">
+          <CommentSection
+            ref={commentArea}
+            boardId={board.id}
+            initialComments={board.commentList}
+            onFocusArea={handleFocusArea}
           />
-
-          {board.fileList && board.fileList.length > 0 && (
-            <div className="mt-10 md:mt-12">
-              <div className="flex flex-col gap-4 max-w-3xl mx-auto">
-                {board.fileList.map((file) => (
-                  <BoardImageItem key={file.id} file={file} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-12">
-            <CommentSection
-              ref={commentArea}
-              boardId={board.id}
-              initialComments={board.commentList}
-              onFocusArea={handleFocusArea}
-            />
-          </div>
         </div>
       </div>
     </div>

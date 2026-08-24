@@ -8,18 +8,18 @@ export default function Textarea({ label, ...props }: Readonly<TextareaProps>) {
   const id = props?.id || altId;
 
   return (
-    <>
+    <div className="w-full">
       {label && (
-        <label htmlFor={id} className="text-sm font-medium text-gray-500">
+        <label htmlFor={id} className="block text-[13px] font-semibold text-[#1d1d1f] mb-1.5">
           {label}
         </label>
       )}
       <textarea
         id={id}
         rows={12}
-        className="block w-full rounded-md border-0 bg-white px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6 transition-all resize-none"
+        className="block w-full rounded-[11px] border border-[#e0e0e0] bg-white px-3.5 py-2.5 text-[15px] text-[#1d1d1f] placeholder:text-[#86868b] focus:border-[#0066cc] focus:outline-none focus:ring-2 focus:ring-[#0066cc]/20 transition-all resize-none"
         {...props}
       />
-    </>
+    </div>
   );
 }

@@ -61,10 +61,10 @@ export default function BoardAttachmentItem({
   const showThumbnail = isImage && previewUrl && !hasImageError;
 
   return (
-    <div className="flex items-center justify-between p-3 bg-gray-50/80 hover:bg-blue-50/30 rounded-xl border border-gray-100 transition-colors group">
+    <div className="flex items-center justify-between p-3 bg-white hover:bg-[#fafafc] rounded-[11px] border border-[#e0e0e0] transition-colors group">
       <div className="flex items-center gap-3 min-w-0 flex-1">
         {showThumbnail ? (
-          <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 border border-gray-200">
+          <div className="relative w-11 h-11 rounded-[8px] overflow-hidden flex-shrink-0 bg-[#f5f5f7] border border-[#e0e0e0]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewUrl}
@@ -74,9 +74,9 @@ export default function BoardAttachmentItem({
             />
           </div>
         ) : (
-          <div className="w-12 h-12 rounded-lg flex-shrink-0 bg-blue-100/60 text-blue-600 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-[8px] flex-shrink-0 bg-[#f5f5f7] text-[#0066cc] flex items-center justify-center border border-[#e0e0e0]">
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -92,10 +92,10 @@ export default function BoardAttachmentItem({
         )}
 
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-gray-800 truncate" title={fileName}>
+          <p className="text-[14px] font-medium text-[#1d1d1f] truncate" title={fileName}>
             {fileName}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-[12px] text-[#7a7a7a] mt-0.5">
             {isImage ? '이미지 파일' : '일반 첨부파일'}
             {fileSize !== null && ` • ${formatFileSize(fileSize)}`}
           </p>
@@ -106,11 +106,11 @@ export default function BoardAttachmentItem({
         <button
           type="button"
           onClick={onRemove}
-          className="ml-2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+          className="ml-2 p-1.5 text-[#7a7a7a] hover:text-red-600 hover:bg-red-50 rounded-full transition-colors flex-shrink-0 cursor-pointer"
           aria-label={`${fileName} 삭제`}
         >
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

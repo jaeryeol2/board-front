@@ -20,7 +20,7 @@ export function BoardImageItem({ file }: Readonly<{ file: BoardFile }>) {
 
   return (
     <div
-      className="relative w-full h-[300px] md:h-[500px] rounded-xl overflow-hidden group border border-gray-100 shadow-sm bg-gray-50/50"
+      className="relative w-full h-[300px] md:h-[500px] rounded-[14px] overflow-hidden group border border-[#e0e0e0] bg-[#f5f5f7]"
       style={{
         aspectRatio: aspectRatio ? `${aspectRatio}` : undefined,
         height: aspectRatio ? 'auto' : undefined,
@@ -33,7 +33,7 @@ export function BoardImageItem({ file }: Readonly<{ file: BoardFile }>) {
         style={{ objectFit: 'cover' }}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         onLoad={handleImageLoad}
-        className="transition-transform duration-500 group-hover:scale-105"
+        className="transition-transform duration-300 group-hover:scale-102"
       />
     </div>
   );

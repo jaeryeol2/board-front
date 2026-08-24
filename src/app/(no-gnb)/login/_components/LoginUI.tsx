@@ -94,8 +94,8 @@ export default function LoginUI() {
   }, []);
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <div className="flex flex-col">
         <Text
           label="아이디"
           placeholder="아이디를 입력하세요"
@@ -108,7 +108,7 @@ export default function LoginUI() {
           value={state.userId}
         />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col">
         <Password
           label="비밀번호"
           placeholder="비밀번호를 입력하세요"
@@ -121,12 +121,11 @@ export default function LoginUI() {
           value={state.password}
         />
       </div>
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-between pt-1">
         <label
           htmlFor="remember-id"
-          className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none"
+          className="flex items-center gap-2 text-[13px] text-[#7a7a7a] cursor-pointer select-none"
         >
-          아이디 저장
           <div className="relative">
             <Checkbox
               id="remember-id"
@@ -134,12 +133,13 @@ export default function LoginUI() {
               checked={rememberId}
               onChange={(e) => setRememberId(e.target.checked)}
             />
-            <div className="block w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-500"></div>
-            <div className="absolute block w-5 h-5 transition-transform bg-white rounded-full dot left-0.5 top-0.5 peer-checked:translate-x-full"></div>
+            <div className="block w-9 h-5 bg-[#e0e0e0] rounded-full peer-checked:bg-[#0066cc] transition-colors"></div>
+            <div className="absolute block w-4 h-4 transition-transform bg-white rounded-full left-0.5 top-0.5 peer-checked:translate-x-4 shadow-sm"></div>
           </div>
+          아이디 저장
         </label>
       </div>
-      <Submit className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">
+      <Submit className="w-full bg-[#0066cc] hover:bg-[#0071e3] text-white font-medium py-2.5 px-4 rounded-full active:scale-95 transition-all text-[15px] shadow-none mt-2">
         로그인
       </Submit>
     </form>
