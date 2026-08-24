@@ -70,7 +70,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
   }, [menus]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#e0e0e0] bg-white/80 backdrop-blur-md transition-colors">
+    <header className="sticky top-0 z-50 border-b border-[#e0e0e0] bg-white md:bg-white/90 md:backdrop-blur-md transition-colors">
       <div className="container mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
         {/* Left Section: Logo and Menu */}
         <div className="flex items-center space-x-8">
@@ -171,7 +171,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
       >
         {/* Backdrop */}
         <Button
-          className={`absolute inset-0 w-full h-full bg-black/40 backdrop-blur-sm transition-opacity duration-300 border-none appearance-none outline-none rounded-none p-0 shadow-none ${
+          className={`absolute inset-0 w-full h-full bg-black/60 backdrop-blur-sm transition-opacity duration-300 border-none appearance-none outline-none rounded-none p-0 shadow-none ${
             isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={() => setIsMobileMenuOpen(false)}
@@ -186,12 +186,12 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
 
         {/* Drawer Content */}
         <div
-          className={`absolute inset-y-0 right-0 w-[280px] max-w-[80%] bg-[#f5f5f7] border-l border-[#e0e0e0] shadow-2xl transition-transform duration-300 ease-in-out ${
+          className={`absolute inset-y-0 right-0 w-[290px] max-w-[85%] bg-white border-l border-[#e0e0e0] shadow-2xl transition-transform duration-300 ease-in-out ${
             isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
           <div className="flex h-14 items-center justify-between border-b border-[#e0e0e0] px-6 bg-white">
-            <span className="text-base font-semibold text-[#1d1d1f]">Menu</span>
+            <span className="text-base font-semibold text-[#1d1d1f]">메뉴</span>
             <Button
               onClick={() => setIsMobileMenuOpen(false)}
               className="rounded-full p-2 text-[#7a7a7a] hover:bg-black/5 bg-transparent shadow-none border-none"
@@ -212,7 +212,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
             </Button>
           </div>
 
-          <nav className="flex flex-col p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-3.5rem)]">
+          <nav className="flex flex-col p-4 space-y-1 overflow-y-auto max-h-[calc(100dvh-3.5rem)] bg-white">
             {menuTree.map((menu) => (
               <div key={menu.id} className="flex flex-col">
                 {menu.children && menu.children.length > 0 ? (
@@ -225,7 +225,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
                         <AppLink
                           key={child.id}
                           href={child.href}
-                          className="rounded-[11px] px-3.5 py-2.5 text-[14px] font-normal text-[#1d1d1f] hover:bg-white hover:text-[#0066cc] transition-colors"
+                          className="rounded-[11px] px-3.5 py-2.5 text-[14px] font-normal text-[#1d1d1f] hover:bg-[#f5f5f7] hover:text-[#0066cc] transition-colors"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
                           {child.menuName}
@@ -236,7 +236,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
                 ) : (
                   <AppLink
                     href={menu.href}
-                    className="rounded-[11px] px-3.5 py-2.5 text-[14px] font-medium text-[#1d1d1f] hover:bg-white hover:text-[#0066cc] transition-colors"
+                    className="rounded-[11px] px-3.5 py-2.5 text-[14px] font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] hover:text-[#0066cc] transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {menu.menuName}
@@ -248,7 +248,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
             <div className="my-3 border-t border-[#e0e0e0] pt-3 px-1">
               {isLogin ? (
                 <div className="flex flex-col space-y-1.5">
-                  <div className="px-3 py-1 mb-1">
+                  <div className="px-3 py-1.5 mb-1 rounded-[11px] bg-[#f5f5f7]">
                     <p className="text-[11px] text-[#7a7a7a]">내 정보</p>
                     <p className="text-[14px] font-semibold text-[#1d1d1f]">
                       {userInfo?.userName ?? '회원'}님
@@ -256,7 +256,7 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
                   </div>
                   <AppLink
                     href="/mypage"
-                    className="flex items-center gap-3 rounded-[11px] px-3.5 py-2.5 text-[14px] font-medium text-[#1d1d1f] hover:bg-white"
+                    className="flex items-center gap-3 rounded-[11px] px-3.5 py-2.5 text-[14px] font-medium text-[#1d1d1f] hover:bg-[#f5f5f7]"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     마이페이지
@@ -275,14 +275,14 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
                 <div className="flex flex-col gap-2 pt-1">
                   <AppLink
                     href="/login"
-                    className="flex h-10 items-center justify-center rounded-full border border-[#e0e0e0] bg-white text-[14px] font-medium text-[#1d1d1f] hover:bg-gray-50"
+                    className="flex h-10 items-center justify-center rounded-full border border-[#e0e0e0] bg-[#f5f5f7] text-[14px] font-medium text-[#1d1d1f] hover:bg-gray-200 transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     로그인
                   </AppLink>
                   <AppLink
                     href="/signup"
-                    className="flex h-10 items-center justify-center rounded-full bg-[#0066cc] text-[14px] font-medium text-white hover:bg-[#0071e3]"
+                    className="flex h-10 items-center justify-center rounded-full bg-[#0066cc] text-[14px] font-medium text-white hover:bg-[#0071e3] transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     회원가입

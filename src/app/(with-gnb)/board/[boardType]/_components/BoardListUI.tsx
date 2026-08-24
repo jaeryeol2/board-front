@@ -64,14 +64,14 @@ export default function BoardListUI({
 
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl md:text-3xl font-semibold text-[#1d1d1f] tracking-tight">
+      <div className="flex justify-between items-center gap-3 mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#1d1d1f] tracking-tight truncate">
           {boardName}
         </h1>
         {canWrite && (
           <Button
             onClick={handleWriteClick}
-            className="bg-[#0066cc] hover:bg-[#0071e3] text-white px-5 py-2 rounded-full font-medium text-[14px] transition-all shadow-none"
+            className="flex-shrink-0 bg-[#0066cc] hover:bg-[#0071e3] text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full font-medium text-[13px] sm:text-[14px] transition-all shadow-none"
           >
             글쓰기
           </Button>
@@ -162,23 +162,23 @@ export default function BoardListUI({
       </div>
 
       {/* Mobile Card View */}
-      <div className="md:hidden space-y-3">
+      <div className="md:hidden space-y-2.5 sm:space-y-3">
         {paginatedList.length > 0 ? (
           paginatedList.map((board: Board) => (
             <AppLink
               key={board.id}
               href={`/board/${boardType}/${board.id}`}
-              className="block bg-white p-4 rounded-[14px] border border-[#e0e0e0] active:bg-[#fafafc] transition-colors"
+              className="block bg-white p-3.5 sm:p-4 rounded-[14px] border border-[#e0e0e0] active:bg-[#fafafc] transition-colors"
             >
               <div className="flex justify-between items-start gap-3">
-                <div className="flex-1">
-                  <h3 className="text-[15px] font-semibold text-[#1d1d1f] leading-snug line-clamp-2 mb-2">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-[14px] sm:text-[15px] font-semibold text-[#1d1d1f] leading-snug line-clamp-2 mb-1.5 break-words">
                     {board.title}
                   </h3>
-                  <div className="flex items-center gap-2 text-xs text-[#7a7a7a]">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-[#7a7a7a]">
                     {isNotAnony && (
                       <>
-                        <span className="text-[#1d1d1f] font-medium">{board.writerName}</span>
+                        <span className="text-[#1d1d1f] font-medium truncate max-w-[120px]">{board.writerName}</span>
                         <span className="text-[#e0e0e0]">|</span>
                       </>
                     )}
@@ -192,7 +192,7 @@ export default function BoardListUI({
                   </div>
                 </div>
                 {isNotEmpty(board.fileUrl) && (
-                  <div className="w-14 h-14 flex-shrink-0 rounded-[8px] bg-[#f5f5f7] border border-[#e0e0e0] overflow-hidden">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-[8px] bg-[#f5f5f7] border border-[#e0e0e0] overflow-hidden">
                     <div className="w-full h-full flex items-center justify-center text-[#7a7a7a]">
                       <svg
                         className="w-5 h-5"
@@ -208,14 +208,14 @@ export default function BoardListUI({
             </AppLink>
           ))
         ) : (
-          <div className="py-16 text-center text-[#7a7a7a] bg-white rounded-[14px] border border-[#e0e0e0] text-[15px]">
+          <div className="py-14 sm:py-16 text-center text-[#7a7a7a] bg-white rounded-[14px] border border-[#e0e0e0] text-[14px] sm:text-[15px]">
             게시글이 없습니다.
           </div>
         )}
       </div>
 
       {total > 0 && (
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-6 sm:mt-8">
           <Pagination
             totalItems={total}
             itemsPerPage={rowsPerPage}

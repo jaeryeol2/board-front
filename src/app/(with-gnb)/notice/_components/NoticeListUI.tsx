@@ -36,10 +36,13 @@ export default function NoticeListUI({
 
   return (
     <div className="w-full">
-      <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-semibold text-[#1d1d1f] tracking-tight">
+      <div className="mb-6 sm:mb-8 text-center sm:text-left">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1d1d1f] tracking-tight mb-2">
           공지사항
         </h1>
+        <p className="text-[15px] sm:text-[17px] text-[#7a7a7a]">
+          서비스 관련 최신 소식을 확인하세요.
+        </p>
       </div>
 
       {/* PC Table View */}
@@ -86,18 +89,18 @@ export default function NoticeListUI({
       </div>
 
       {/* Mobile Card View */}
-      <div className="md:hidden space-y-3">
+      <div className="md:hidden space-y-2.5 sm:space-y-3">
         {list.length > 0 ? (
           list.map((notice) => (
             <div
               key={notice.id}
-              className="bg-white p-4 rounded-[14px] border border-[#e0e0e0] transition-colors"
+              className="bg-white p-3.5 sm:p-4 rounded-[14px] border border-[#e0e0e0] transition-colors"
             >
               <div className="flex flex-col gap-1.5">
-                <h3 className="text-[15px] font-semibold text-[#1d1d1f] leading-snug line-clamp-2">
+                <h3 className="text-[14px] sm:text-[15px] font-semibold text-[#1d1d1f] leading-snug line-clamp-2 break-words">
                   {notice.title}
                 </h3>
-                <div className="text-xs text-[#7a7a7a]">
+                <div className="text-[11px] sm:text-xs text-[#7a7a7a]">
                   {isNotEmpty(notice?.createdAt)
                     ? format(new Date(notice.createdAt), 'yyyy.MM.dd')
                     : ''}
@@ -106,14 +109,14 @@ export default function NoticeListUI({
             </div>
           ))
         ) : (
-          <div className="py-16 text-center text-[#7a7a7a] border border-[#e0e0e0] rounded-[14px] bg-white text-[15px]">
+          <div className="py-14 sm:py-16 text-center text-[#7a7a7a] border border-[#e0e0e0] rounded-[14px] bg-white text-[14px] sm:text-[15px]">
             등록된 공지사항이 없습니다.
           </div>
         )}
       </div>
 
       {total > 0 && (
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-6 sm:mt-8">
           <Pagination
             totalItems={total}
             itemsPerPage={rowsPerPage}

@@ -1,5 +1,7 @@
 'use client';
 
+import AppImage from '@/components/base/AppImage';
+import Button from '@/components/base/Button';
 import { BoardFile } from '@/types/board';
 import { formatFileSize } from '@/utils/format-file-size';
 import { useEffect, useState } from 'react';
@@ -61,20 +63,20 @@ export default function BoardAttachmentItem({
   const showThumbnail = isImage && previewUrl && !hasImageError;
 
   return (
-    <div className="flex items-center justify-between p-3 bg-white hover:bg-[#fafafc] rounded-[11px] border border-[#e0e0e0] transition-colors group">
-      <div className="flex items-center gap-3 min-w-0 flex-1">
+    <div className="flex items-center justify-between p-2.5 sm:p-3 bg-white hover:bg-[#fafafc] rounded-[11px] border border-[#e0e0e0] transition-colors group">
+      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
         {showThumbnail ? (
-          <div className="relative w-11 h-11 rounded-[8px] overflow-hidden flex-shrink-0 bg-[#f5f5f7] border border-[#e0e0e0]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+          <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-[8px] overflow-hidden flex-shrink-0 bg-[#f5f5f7] border border-[#e0e0e0]">
+            <AppImage
               src={previewUrl}
               alt={fileName}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
               onError={() => setHasImageError(true)}
             />
           </div>
         ) : (
-          <div className="w-11 h-11 rounded-[8px] flex-shrink-0 bg-[#f5f5f7] text-[#0066cc] flex items-center justify-center border border-[#e0e0e0]">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-[8px] flex-shrink-0 bg-[#f5f5f7] text-[#0066cc] flex items-center justify-center border border-[#e0e0e0]">
             <svg
               className="w-5 h-5"
               fill="none"
@@ -92,10 +94,10 @@ export default function BoardAttachmentItem({
         )}
 
         <div className="min-w-0 flex-1">
-          <p className="text-[14px] font-medium text-[#1d1d1f] truncate" title={fileName}>
+          <p className="text-[13px] sm:text-[14px] font-medium text-[#1d1d1f] truncate" title={fileName}>
             {fileName}
           </p>
-          <p className="text-[12px] text-[#7a7a7a] mt-0.5">
+          <p className="text-[11px] sm:text-[12px] text-[#7a7a7a] mt-0.5">
             {isImage ? '이미지 파일' : '일반 첨부파일'}
             {fileSize !== null && ` • ${formatFileSize(fileSize)}`}
           </p>
@@ -103,10 +105,9 @@ export default function BoardAttachmentItem({
       </div>
 
       {onRemove && (
-        <button
-          type="button"
+        <Button
           onClick={onRemove}
-          className="ml-2 p-1.5 text-[#7a7a7a] hover:text-red-600 hover:bg-red-50 rounded-full transition-colors flex-shrink-0 cursor-pointer"
+          className="ml-2 p-1.5 text-[#7a7a7a] hover:text-red-600 hover:bg-red-50 rounded-full transition-colors flex-shrink-0 bg-transparent shadow-none border-none"
           aria-label={`${fileName} 삭제`}
         >
           <svg
@@ -122,8 +123,9 @@ export default function BoardAttachmentItem({
               d="M6 18L18 6M6 6l12 12"
             />
           </svg>
-        </button>
+        </Button>
       )}
     </div>
   );
 }
+

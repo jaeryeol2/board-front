@@ -40,14 +40,14 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-4 sm:mb-6 flex justify-between items-center gap-2">
         <Button
           onClick={handleGoBack}
-          className="flex items-center rounded-full bg-white border border-[#e0e0e0] px-4 py-2 text-[14px] font-medium text-[#1d1d1f] shadow-none hover:bg-[#fafafc] transition-colors"
+          className="flex items-center rounded-full bg-white border border-[#e0e0e0] px-3.5 sm:px-4 py-1.5 sm:py-2 text-[13px] sm:text-[14px] font-medium text-[#1d1d1f] shadow-none hover:bg-[#fafafc] transition-colors"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 mr-1.5 text-[#7a7a7a]"
+            className="h-4 w-4 mr-1 sm:mr-1.5 text-[#7a7a7a]"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -63,11 +63,11 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
         {isAuthor && (
           <Button
             onClick={handleModify}
-            className="flex items-center rounded-full bg-[#0066cc] px-5 py-2 text-[14px] font-medium text-white shadow-none hover:bg-[#0071e3] transition-all active:scale-95"
+            className="flex items-center rounded-full bg-[#0066cc] px-4 sm:px-5 py-1.5 sm:py-2 text-[13px] sm:text-[14px] font-medium text-white shadow-none hover:bg-[#0071e3] transition-all active:scale-95"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-1.5"
+              className="h-4 w-4 mr-1 sm:mr-1.5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -84,12 +84,12 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
         )}
       </div>
 
-      <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 md:p-10">
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-semibold text-[#1d1d1f] mb-3 leading-tight tracking-tight">
+      <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-4 sm:p-6 md:p-10">
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#1d1d1f] mb-2.5 leading-snug tracking-tight break-words">
             {board.title}
           </h1>
-          <div className="flex flex-wrap items-center gap-2 text-[#7a7a7a] text-[13px]">
+          <div className="flex flex-wrap items-center gap-2 text-[#7a7a7a] text-[12px] sm:text-[13px]">
             {isNotEmpty(board.writerName) && (
               <>
                 <span className="font-semibold text-[#1d1d1f]">
@@ -106,16 +106,16 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
           </div>
         </div>
 
-        <hr className="my-6 border-[#f0f0f0]" />
+        <hr className="my-4 sm:my-6 border-[#f0f0f0]" />
 
         <div
-          className="prose prose-slate max-w-none text-[#1d1d1f] min-h-[200px] leading-relaxed break-keep [&_img]:rounded-[14px] [&_img]:my-4 [&_img]:border [&_img]:border-[#e0e0e0]"
+          className="prose prose-slate max-w-none text-[#1d1d1f] min-h-[160px] sm:min-h-[200px] leading-relaxed break-words [overflow-wrap:anywhere] [&_img]:rounded-[14px] [&_img]:my-4 [&_img]:border [&_img]:border-[#e0e0e0] [&_img]:max-w-full [&_img]:h-auto"
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(board.content) }}
         />
 
         {board.fileList && board.fileList.length > 0 && (
-          <div className="mt-8 md:mt-10">
-            <div className="flex flex-col gap-4 max-w-3xl mx-auto">
+          <div className="mt-6 sm:mt-8 md:mt-10">
+            <div className="flex flex-col gap-3 sm:gap-4 max-w-3xl mx-auto">
               {board.fileList.map((file) => (
                 <BoardImageItem key={file.id} file={file} />
               ))}
@@ -123,7 +123,7 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
           </div>
         )}
 
-        <div className="mt-10">
+        <div className="mt-8 sm:mt-10">
           <CommentSection
             ref={commentArea}
             boardId={board.id}

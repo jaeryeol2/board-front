@@ -12,8 +12,8 @@ export default function Unauthorized() {
   };
 
   return (
-    <div className="w-full flex items-center justify-center min-h-[60vh] py-8">
-      <div className="w-full max-w-md bg-white rounded-[20px] border border-[#e0e0e0] p-8 md:p-10 text-center">
+    <div className="w-full flex items-center justify-center min-h-[60vh] px-4 py-8">
+      <div className="w-full max-w-md bg-white rounded-[20px] border border-[#e0e0e0] p-6 sm:p-8 md:p-10 text-center">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#f5f5f7] border border-[#e0e0e0]">
           <span className="text-3xl">🚫</span>
         </div>

@@ -92,11 +92,11 @@ export default function Pagination({
 
   return (
     <nav
-      className="flex items-center justify-center space-x-1.5"
+      className="flex items-center justify-center gap-1 sm:gap-1.5"
       aria-label="Pagination"
     >
       <Button
-        className={`rounded-full border border-[#e0e0e0] bg-white px-3.5 py-1.5 text-[13px] font-medium text-[#1d1d1f] hover:bg-[#fafafc] transition-all shadow-none ${
+        className={`h-8 sm:h-9 rounded-full border border-[#e0e0e0] bg-white px-2.5 sm:px-3.5 text-xs sm:text-[13px] font-medium text-[#1d1d1f] hover:bg-[#fafafc] transition-all shadow-none ${
           page === 1 ? 'cursor-not-allowed opacity-40' : ''
         }`}
         onClick={handlePrevClick}
@@ -107,7 +107,7 @@ export default function Pagination({
       {pageNumbers.map((number) => (
         <Button
           key={number}
-          className={`min-w-[34px] px-2.5 py-1.5 text-[13px] font-medium transition-all shadow-none ${
+          className={`h-8 sm:h-9 min-w-[28px] sm:min-w-[34px] px-1.5 sm:px-2.5 text-xs sm:text-[13px] font-medium transition-all shadow-none ${
             number === page
               ? 'rounded-full bg-[#0066cc] text-white hover:bg-[#0071e3]'
               : 'rounded-full border border-[#e0e0e0] bg-white text-[#1d1d1f] hover:bg-[#fafafc]'
@@ -118,7 +118,7 @@ export default function Pagination({
         </Button>
       ))}
       <Button
-        className={`rounded-full border border-[#e0e0e0] bg-white px-3.5 py-1.5 text-[13px] font-medium text-[#1d1d1f] hover:bg-[#fafafc] transition-all shadow-none ${
+        className={`h-8 sm:h-9 rounded-full border border-[#e0e0e0] bg-white px-2.5 sm:px-3.5 text-xs sm:text-[13px] font-medium text-[#1d1d1f] hover:bg-[#fafafc] transition-all shadow-none ${
           page === totalPages ? 'cursor-not-allowed opacity-40' : ''
         }`}
         onClick={handleNextClick}

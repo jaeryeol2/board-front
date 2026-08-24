@@ -337,12 +337,12 @@ export default function BoardWriteUI({
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="bg-white p-6 md:p-10 rounded-[18px] border border-[#e0e0e0]">
+      <div className="bg-white p-4 sm:p-6 md:p-10 rounded-[18px] border border-[#e0e0e0]">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-2xl md:text-3xl font-semibold text-[#1d1d1f] mb-2 tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#1d1d1f] mb-2 tracking-tight">
             {isModify ? '게시글 수정' : '게시글 작성'}
           </h1>
-          <p className="text-[15px] text-[#7a7a7a] mb-8 md:mb-10">
+          <p className="text-[14px] sm:text-[15px] text-[#7a7a7a] mb-6 sm:mb-8 md:mb-10">
             {isModify
               ? '게시글의 내용을 수정해보세요.'
               : '새로운 소식을 공유하고 다른 사람들과 소통해보세요.'}
@@ -353,7 +353,7 @@ export default function BoardWriteUI({
             <div className="border-b border-[#e0e0e0] focus-within:border-[#0066cc] transition-colors duration-200">
               <Text
                 id="title"
-                className="w-full pt-2 pb-3 text-xl md:text-2xl font-semibold text-[#1d1d1f] bg-transparent border-none focus:ring-0 placeholder:text-[#86868b]"
+                className="w-full pt-2 pb-3 text-lg sm:text-xl md:text-2xl font-semibold text-[#1d1d1f] bg-transparent border-none focus:ring-0 placeholder:text-[#86868b]"
                 placeholder="제목을 입력하세요"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -364,13 +364,12 @@ export default function BoardWriteUI({
             {/* 내용 입력란 */}
             <div className="mt-6">
               {/* 에디터 툴바 */}
-              <div className="flex items-center justify-between pb-2 border-b border-[#e0e0e0] mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-[#e0e0e0] mb-4">
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
+                  <Button
                     onClick={() => editorImageInputRef.current?.click()}
                     disabled={isUploadingImage}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#1d1d1f] hover:text-[#0066cc] bg-[#f5f5f7] hover:bg-[#e0e0e0] rounded-full transition-colors border border-[#e0e0e0] cursor-pointer disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#1d1d1f] hover:text-[#0066cc] bg-[#f5f5f7] hover:bg-[#e0e0e0] rounded-full transition-colors border border-[#e0e0e0] shadow-none disabled:opacity-50"
                   >
                     <svg
                       className="w-3.5 h-3.5 text-[#7a7a7a]"
@@ -388,7 +387,7 @@ export default function BoardWriteUI({
                     {isUploadingImage
                       ? '이미지 업로드 중...'
                       : '본문 사진 추가'}
-                  </button>
+                  </Button>
                   <input
                     ref={editorImageInputRef}
                     type="file"
@@ -397,7 +396,7 @@ export default function BoardWriteUI({
                     onChange={handleEditorImageChange}
                   />
                 </div>
-                <span className="text-xs text-[#7a7a7a]">
+                <span className="text-[11px] sm:text-xs text-[#7a7a7a] break-words">
                   이미지를 에디터로 드래그하거나 붙여넣기(Ctrl+V)할 수 있습니다
                 </span>
               </div>
@@ -428,15 +427,15 @@ export default function BoardWriteUI({
                   htmlFor="attachments"
                   aria-label="파일 첨부"
                   {...dropProps}
-                  className={`flex flex-col items-center justify-center w-full h-32 md:h-40 border border-dashed rounded-[18px] cursor-pointer transition-all group ${
+                  className={`flex flex-col items-center justify-center w-full h-28 sm:h-36 border border-dashed rounded-[14px] sm:rounded-[18px] cursor-pointer transition-all group ${
                     isDragging
                       ? 'border-[#0066cc] bg-[#f5f5f7] ring-2 ring-[#0066cc]/20'
                       : 'border-[#e0e0e0] bg-[#fafafc] hover:bg-white hover:border-[#0066cc]'
                   }`}
                 >
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6 text-[#7a7a7a] group-hover:text-[#0066cc]">
+                  <div className="flex flex-col items-center justify-center py-4 text-[#7a7a7a] group-hover:text-[#0066cc]">
                     <svg
-                      className="w-8 h-8 mb-2 transition-transform group-hover:-translate-y-0.5"
+                      className="w-7 h-7 sm:w-8 sm:h-8 mb-1.5 transition-transform group-hover:-translate-y-0.5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -449,10 +448,10 @@ export default function BoardWriteUI({
                         d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h1.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293h4.586a4 4 0 014 4v5a4 4 0 01-4 4H7z"
                       ></path>
                     </svg>
-                    <p className="mb-1 text-[14px]">
+                    <p className="mb-1 text-[13px] sm:text-[14px]">
                       <span className="font-semibold text-[#1d1d1f]">파일 선택</span> 또는 드래그
                     </p>
-                    <p className="text-xs text-[#7a7a7a]">
+                    <p className="text-[11px] sm:text-xs text-[#7a7a7a]">
                       이미지 및 일반 파일 첨부 지원
                     </p>
                   </div>
@@ -493,14 +492,14 @@ export default function BoardWriteUI({
             </div>
 
             {/* 버튼 영역 */}
-            <div className="flex flex-col-reverse md:flex-row justify-end gap-3 pt-6 border-t border-[#f0f0f0] mt-8">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 sm:gap-3 pt-6 border-t border-[#f0f0f0] mt-8">
               <Button
-                className="w-full md:w-auto px-6 py-2.5 bg-[#f5f5f7] text-[#1d1d1f] rounded-full font-medium text-[15px] hover:bg-[#e0e0e0] transition-colors shadow-none"
+                className="w-full sm:w-auto px-6 py-2.5 bg-[#f5f5f7] text-[#1d1d1f] rounded-full font-medium text-[15px] hover:bg-[#e0e0e0] transition-colors shadow-none"
                 onClick={handleCancel}
               >
                 취소
               </Button>
-              <Submit className="w-full md:w-auto px-8 py-2.5 bg-[#0066cc] text-white rounded-full font-medium text-[15px] hover:bg-[#0071e3] transition-all active:scale-95 shadow-none">
+              <Submit className="w-full sm:w-auto px-8 py-2.5 bg-[#0066cc] text-white rounded-full font-medium text-[15px] hover:bg-[#0071e3] transition-all active:scale-95 shadow-none">
                 {isModify ? '수정 완료' : '작성 완료'}
               </Submit>
             </div>
