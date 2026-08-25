@@ -93,7 +93,7 @@ export default function ProfileEditForm({
     .get();
 
   return (
-    <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 sm:p-8">
+    <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 sm:p-8 lg:p-10 lg:min-h-[560px]">
       <div className="mb-6 pb-4 border-b border-[#f0f0f0]">
         <h2 className="text-lg sm:text-xl font-bold text-[#1d1d1f]">
           회원정보 수정

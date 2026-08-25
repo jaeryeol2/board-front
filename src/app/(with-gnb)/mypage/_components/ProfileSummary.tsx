@@ -40,7 +40,7 @@ export default function ProfileSummary({
   return (
     <div className="flex flex-col gap-6">
       {/* Profile Overview Card */}
-      <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 sm:p-8">
+      <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 sm:p-8 lg:p-10">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
           <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#f5f5f7] border border-[#e0e0e0] flex items-center justify-center text-3xl font-semibold text-[#0066cc] flex-shrink-0">
             {personal.userName?.charAt(0) ?? 'U'}
@@ -63,7 +63,7 @@ export default function ProfileSummary({
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-[#f0f0f0] text-[14px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5 pt-5 border-t border-[#f0f0f0] text-[14px] sm:text-[15px]">
               <div className="flex items-center gap-2 text-[#7a7a7a]">
                 <span className="font-medium text-[#1d1d1f] w-16">이메일</span>
                 <span className="truncate">{personal.email || '-'}</span>
@@ -83,12 +83,12 @@ export default function ProfileSummary({
 
       {/* Activity Statistics Card */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 flex flex-col justify-between">
+        <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 sm:p-8 flex flex-col justify-between lg:min-h-[190px]">
           <div>
-            <p className="text-[14px] font-medium text-[#7a7a7a] mb-1">
+            <p className="text-[14px] sm:text-[15px] font-medium text-[#7a7a7a] mb-1.5">
               작성한 게시글
             </p>
-            <p className="text-3xl font-bold text-[#1d1d1f]">
+            <p className="text-3xl sm:text-4xl font-bold text-[#1d1d1f]">
               {contentList.length}
               <span className="text-[15px] font-normal text-[#7a7a7a] ml-1">
                 건
@@ -97,18 +97,18 @@ export default function ProfileSummary({
           </div>
           <Button
             onClick={handlePostsClick}
-            className="mt-4 w-full py-2 text-[13px] font-medium text-[#1d1d1f] bg-[#f5f5f7] rounded-[10px] hover:bg-[#e8e8ed] transition-all shadow-none"
+            className="mt-6 w-full py-2.5 text-[13px] sm:text-[14px] font-medium text-[#1d1d1f] bg-[#f5f5f7] rounded-[10px] hover:bg-[#e8e8ed] transition-all shadow-none"
           >
             게시글 목록 보기
           </Button>
         </div>
 
-        <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 flex flex-col justify-between">
+        <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 sm:p-8 flex flex-col justify-between lg:min-h-[190px]">
           <div>
-            <p className="text-[14px] font-medium text-[#7a7a7a] mb-1">
+            <p className="text-[14px] sm:text-[15px] font-medium text-[#7a7a7a] mb-1.5">
               작성한 댓글
             </p>
-            <p className="text-3xl font-bold text-[#1d1d1f]">
+            <p className="text-3xl sm:text-4xl font-bold text-[#1d1d1f]">
               {commentList.length}
               <span className="text-[15px] font-normal text-[#7a7a7a] ml-1">
                 건
@@ -117,7 +117,7 @@ export default function ProfileSummary({
           </div>
           <Button
             onClick={handleCommentsClick}
-            className="mt-4 w-full py-2 text-[13px] font-medium text-[#1d1d1f] bg-[#f5f5f7] rounded-[10px] hover:bg-[#e8e8ed] transition-all shadow-none"
+            className="mt-6 w-full py-2.5 text-[13px] sm:text-[14px] font-medium text-[#1d1d1f] bg-[#f5f5f7] rounded-[10px] hover:bg-[#e8e8ed] transition-all shadow-none"
           >
             댓글 목록 보기
           </Button>

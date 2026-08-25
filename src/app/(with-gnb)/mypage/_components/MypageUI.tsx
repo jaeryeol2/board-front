@@ -66,7 +66,7 @@ export default function MypageUI({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto py-4 sm:py-6">
+    <div className="w-full max-w-6xl mx-auto py-4 sm:py-6 lg:py-8">
       {/* Page Header */}
       <div className="mb-6 sm:mb-8 text-center sm:text-left">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1d1d1f] tracking-tight mb-2">
@@ -78,7 +78,7 @@ export default function MypageUI({
       </div>
 
       {/* Main Layout: LNB + Dynamic Content */}
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
+      <div className="flex flex-col lg:flex-row gap-6 items-start lg:min-h-[560px]">
         {/* Left Navigation Bar */}
         <MypageLnb
           activeMenu={activeMenu}

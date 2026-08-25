@@ -52,7 +52,7 @@ export default function MyActivities({
   return (
     <div className="flex flex-col gap-6">
       {/* Title & Sub-Tabs */}
-      <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 sm:p-8">
+      <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 sm:p-8 lg:p-10 lg:min-h-[560px] flex flex-col">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-[#f0f0f0]">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-[#1d1d1f]">

@@ -80,7 +80,7 @@ export default function PasswordConfirmView({
     .get();
 
   return (
-    <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 sm:p-8">
+    <div className="bg-white rounded-[18px] border border-[#e0e0e0] p-6 sm:p-8 lg:p-10 lg:min-h-[560px] flex flex-col justify-center">
       <div className="max-w-md mx-auto py-4 sm:py-6">
         <div className="text-center mb-6">
           <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#f5f5f7] border border-[#e0e0e0] flex items-center justify-center text-xl text-[#0066cc]">
@@ -106,7 +106,7 @@ export default function PasswordConfirmView({
             />
           </div>
 
-          <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center justify-center gap-3 mt-2">
             <Submit
               disabled={isSubmitting}
               className="flex-1 py-2.5 text-[14px] font-medium text-white bg-[#0066cc] rounded-full hover:bg-[#0071e3] transition-all shadow-none"
@@ -115,7 +115,7 @@ export default function PasswordConfirmView({
             </Submit>
             <Button
               onClick={onCancel}
-              className="px-5 py-2.5 text-[14px] font-medium text-[#7a7a7a] bg-[#f5f5f7] rounded-full hover:bg-[#e8e8ed] hover:text-[#1d1d1f] transition-all shadow-none"
+              className="flex-1 py-2.5 text-[14px] font-medium text-[#7a7a7a] bg-[#f5f5f7] rounded-full hover:bg-[#e8e8ed] hover:text-[#1d1d1f] transition-all shadow-none"
             >
               취소
             </Button>

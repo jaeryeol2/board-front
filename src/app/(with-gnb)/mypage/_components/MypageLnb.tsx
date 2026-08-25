@@ -49,7 +49,7 @@ export default function MypageLnb({
   return (
     <nav className="w-full lg:w-64 flex-shrink-0" aria-label="마이페이지 메뉴">
       {/* Desktop / Tablet Vertical Menu */}
-      <div className="hidden lg:flex flex-col gap-1.5 bg-white rounded-[18px] border border-[#e0e0e0] p-3">
+      <div className="hidden lg:flex flex-col gap-1.5 bg-white rounded-[18px] border border-[#e0e0e0] p-3.5 lg:min-h-[560px]">
         {menuItems.map((item) => {
           const isActive = activeMenu === item.id;
           const buttonClass = conditionGet<string>()
