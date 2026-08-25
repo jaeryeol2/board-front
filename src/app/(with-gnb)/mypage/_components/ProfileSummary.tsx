@@ -7,7 +7,7 @@ import { MypageMenuType } from './MypageLnb';
 
 interface ProfileSummaryProps {
   personal: PersonalUserInfoType;
-  onNavigateMenu: (menu: MypageMenuType) => void;
+  onNavigateMenu: (menu: MypageMenuType, tab?: 'posts' | 'comments') => void;
 }
 
 export default function ProfileSummary({
@@ -29,8 +29,12 @@ export default function ProfileSummary({
     onNavigateMenu('edit-profile');
   };
 
-  const handleActivitiesClick = () => {
-    onNavigateMenu('activities');
+  const handlePostsClick = () => {
+    onNavigateMenu('activities', 'posts');
+  };
+
+  const handleCommentsClick = () => {
+    onNavigateMenu('activities', 'comments');
   };
 
   return (
@@ -92,7 +96,7 @@ export default function ProfileSummary({
             </p>
           </div>
           <Button
-            onClick={handleActivitiesClick}
+            onClick={handlePostsClick}
             className="mt-4 w-full py-2 text-[13px] font-medium text-[#1d1d1f] bg-[#f5f5f7] rounded-[10px] hover:bg-[#e8e8ed] transition-all shadow-none"
           >
             게시글 목록 보기
@@ -112,7 +116,7 @@ export default function ProfileSummary({
             </p>
           </div>
           <Button
-            onClick={handleActivitiesClick}
+            onClick={handleCommentsClick}
             className="mt-4 w-full py-2 text-[13px] font-medium text-[#1d1d1f] bg-[#f5f5f7] rounded-[10px] hover:bg-[#e8e8ed] transition-all shadow-none"
           >
             댓글 목록 보기

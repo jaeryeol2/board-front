@@ -95,17 +95,24 @@ export default function ProfileEditForm({
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5 max-w-xl">
-        <div className="flex flex-col gap-1">
-          <Text
-            label="아이디"
-            value={personal.userId}
-            readOnly
-            disabled
-            className="cursor-not-allowed bg-[#f5f5f7] text-[#7a7a7a]"
-          />
-          <p className="text-[12px] text-[#86868b]">
-            아이디는 변경할 수 없습니다.
-          </p>
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between mb-1.5">
+            <label
+              htmlFor="profile-user-id"
+              className="block text-[13px] font-semibold text-[#1d1d1f]"
+            >
+              아이디
+            </label>
+            <span className="text-[11px] font-medium text-[#86868b]">
+              변경 불가
+            </span>
+          </div>
+          <div
+            id="profile-user-id"
+            className="w-full rounded-[11px] border border-[#e0e0e0] bg-[#f5f5f7] px-3.5 py-2.5 text-[15px] font-medium text-[#555558] select-none"
+          >
+            @{personal.userId}
+          </div>
         </div>
 
         <div className="flex flex-col">

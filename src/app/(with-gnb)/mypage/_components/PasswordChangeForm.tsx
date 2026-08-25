@@ -1,5 +1,6 @@
 'use client';
 
+import { logoutAction } from '@/actions/user';
 import Button from '@/components/base/Button';
 import Password from '@/components/base/Password';
 import Submit from '@/components/base/Submit';
@@ -72,11 +73,12 @@ export default function PasswordChangeForm({
       );
 
       if (status === 200) {
-        alert(message ?? '비밀번호가 변경되었습니다.');
+        alert(message ?? '비밀번호가 변경되었습니다. 다시 로그인해 주세요.');
         setCurrentPassword('');
         setNewPassword('');
         setNewPasswordConfirm('');
         onSuccess?.();
+        await logoutAction('/login');
       } else {
         alert(message ?? '비밀번호 변경에 실패했습니다.');
       }

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import MyActivities from './MyActivities';
 import MypageLnb, { MypageMenuType } from './MypageLnb';
 import PasswordChangeForm from './PasswordChangeForm';
+import PasswordConfirmView from './PasswordConfirmView';
 import ProfileEditForm from './ProfileEditForm';
 import ProfileSummary from './ProfileSummary';
 
@@ -12,10 +13,43 @@ export default function MypageUI({
   personal,
 }: Readonly<{ personal: PersonalUserInfoType }>) {
   const [activeMenu, setActiveMenu] = useState<MypageMenuType>('profile');
+  const [pendingMenu, setPendingMenu] = useState<MypageMenuType | null>(null);
+  const [isVerified, setIsVerified] = useState(false);
+  const [activityTab, setActivityTab] = useState<'posts' | 'comments'>('posts');
 
   const contentList = personal.writedContentList ?? [];
   const commentList = personal.writedCommentList ?? [];
   const totalActivitiesCount = contentList.length + commentList.length;
+
+  const handleSelectMenu = (
+    menu: MypageMenuType,
+    tab?: 'posts' | 'comments',
+  ) => {
+    if (tab) {
+      setActivityTab(tab);
+    }
+
+    const isSecurityMenu =
+      menu === 'edit-profile' || menu === 'change-password';
+    if (isSecurityMenu && !isVerified) {
+      setPendingMenu(menu);
+      setActiveMenu(menu);
+      return;
+    }
+
+    setPendingMenu(null);
+    setActiveMenu(menu);
+  };
+
+  const handleVerifySuccess = () => {
+    setIsVerified(true);
+    setPendingMenu(null);
+  };
+
+  const handleVerifyCancel = () => {
+    setPendingMenu(null);
+    setActiveMenu('profile');
+  };
 
   const handleProfileSuccess = () => {
     setActiveMenu('profile');
@@ -50,20 +84,28 @@ export default function MypageUI({
         {/* Left Navigation Bar */}
         <MypageLnb
           activeMenu={activeMenu}
-          onSelectMenu={setActiveMenu}
+          onSelectMenu={handleSelectMenu}
           totalActivitiesCount={totalActivitiesCount}
         />
 
         {/* Right Dynamic Content Panel */}
         <main className="flex-1 w-full min-w-0" aria-live="polite">
-          {activeMenu === 'profile' && (
-            <ProfileSummary
-              personal={personal}
-              onNavigateMenu={setActiveMenu}
+          {pendingMenu && (
+            <PasswordConfirmView
+              targetMenu={pendingMenu}
+              onSuccess={handleVerifySuccess}
+              onCancel={handleVerifyCancel}
             />
           )}
 
-          {activeMenu === 'edit-profile' && (
+          {!pendingMenu && activeMenu === 'profile' && (
+            <ProfileSummary
+              personal={personal}
+              onNavigateMenu={handleSelectMenu}
+            />
+          )}
+
+          {!pendingMenu && activeMenu === 'edit-profile' && (
             <ProfileEditForm
               personal={personal}
               onSuccess={handleProfileSuccess}
@@ -71,14 +113,16 @@ export default function MypageUI({
             />
           )}
 
-          {activeMenu === 'activities' && (
+          {!pendingMenu && activeMenu === 'activities' && (
             <MyActivities
               contentList={contentList}
               commentList={commentList}
+              activeTab={activityTab}
+              onTabChange={setActivityTab}
             />
           )}
 
-          {activeMenu === 'change-password' && (
+          {!pendingMenu && activeMenu === 'change-password' && (
             <PasswordChangeForm
               onSuccess={handlePasswordSuccess}
               onCancel={handlePasswordCancel}

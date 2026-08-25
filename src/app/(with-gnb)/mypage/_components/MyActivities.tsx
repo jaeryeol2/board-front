@@ -12,13 +12,26 @@ type ActivityTab = 'posts' | 'comments';
 interface MyActivitiesProps {
   contentList: Board[];
   commentList: BoardComment[];
+  activeTab?: ActivityTab;
+  onTabChange?: (tab: ActivityTab) => void;
 }
 
 export default function MyActivities({
   contentList,
   commentList,
+  activeTab: controlledTab,
+  onTabChange,
 }: Readonly<MyActivitiesProps>) {
-  const [activeTab, setActiveTab] = useState<ActivityTab>('posts');
+  const [internalTab, setInternalTab] = useState<ActivityTab>('posts');
+  const activeTab = controlledTab ?? internalTab;
+
+  const handleTabSelect = (tab: ActivityTab) => {
+    if (onTabChange) {
+      onTabChange(tab);
+    } else {
+      setInternalTab(tab);
+    }
+  };
 
   const postsButtonClass = conditionGet<string>()
     .when(activeTab === 'posts')
@@ -52,13 +65,13 @@ export default function MyActivities({
 
           <div className="flex gap-2">
             <Button
-              onClick={() => setActiveTab('posts')}
+              onClick={() => handleTabSelect('posts')}
               className={`px-4 py-1.5 text-[13px] sm:text-[14px] font-medium rounded-full transition-all shadow-none ${postsButtonClass}`}
             >
               작성한 글 ({contentList.length})
             </Button>
             <Button
-              onClick={() => setActiveTab('comments')}
+              onClick={() => handleTabSelect('comments')}
               className={`px-4 py-1.5 text-[13px] sm:text-[14px] font-medium rounded-full transition-all shadow-none ${commentsButtonClass}`}
             >
               작성한 댓글 ({commentList.length})

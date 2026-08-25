@@ -8,7 +8,7 @@ export const loginAction = async (path?: string) => {
   redirect(path ?? '/', RedirectType.replace);
 };
 
-export const logoutAction = async () => {
+export const logoutAction = async (path?: string) => {
   await clearCacheAll();
-  redirect('/');
+  redirect(path ?? '/', RedirectType.replace);
 };
