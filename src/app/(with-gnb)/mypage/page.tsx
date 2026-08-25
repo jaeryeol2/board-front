@@ -5,9 +5,12 @@ import { isNotEmpty } from '@/utils/is-empty';
 import { notFound } from 'next/navigation';
 import MypageUI from './_components/MypageUI';
 
+const fetchData = async () => {
+  return appFetch<PersonalUserInfoType>('/api/user/personal');
+};
+
 export default async function Mypage() {
-  const { status, data } =
-    await appFetch<PersonalUserInfoType>('/api/user/personal');
+  const { status, data } = await fetchData();
 
   if (status === 401) {
     return <Unauthorized />;
