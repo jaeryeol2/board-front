@@ -25,9 +25,7 @@ export default function MypageUI({
     menu: MypageMenuType,
     tab?: 'posts' | 'comments',
   ) => {
-    if (tab) {
-      setActivityTab(tab);
-    }
+    setActivityTab(tab ?? 'posts');
 
     const isSecurityMenu =
       menu === 'edit-profile' || menu === 'change-password';
