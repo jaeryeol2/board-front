@@ -7,19 +7,27 @@ const checkObjectEmptiness = (data: object): boolean => {
     return data.length === 0;
   }
 
-  if (data instanceof Map || data instanceof Set) {
+  if (
+    data instanceof Map ||
+    data instanceof Set ||
+    data instanceof URLSearchParams
+  ) {
     return data.size === 0;
   }
 
   if (data instanceof FormData) {
-    return data.keys().next()?.done || false;
+    return data.keys().next().done ?? true;
   }
 
   if (data instanceof Blob) {
     return data.size === 0;
   }
 
-  return Object.keys(data).length === 0;
+  if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+    return data.byteLength === 0;
+  }
+
+  return Reflect.ownKeys(data).length === 0;
 };
 
 /**
@@ -45,22 +53,20 @@ export const isEmpty = <T>(data: T): boolean => {
 
   switch (type) {
     case 'string':
-      return (data as string).replaceAll(/\s/g, '').length === 0;
-
+      return (data as string).trim().length === 0;
     case 'object':
       return checkObjectEmptiness(data);
-
     case 'number':
-    case 'bigint':
-    case 'boolean':
       return Number.isNaN(data);
 
+    case 'bigint':
+    case 'boolean':
     case 'function':
     case 'symbol':
       return false;
 
     default:
-      throw new TypeError(`Unsupported type. parameter type : ${type}`);
+      return false;
   }
 };
 
