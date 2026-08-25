@@ -17,10 +17,10 @@ export type UserProfileUpdatePayload = {
   userName: string;
   email?: string;
   userAddr?: string;
+  userGender?: 'M' | 'W' | '';
 };
 
 export type UserPasswordUpdatePayload = {
   currentPassword: string;
   newPassword: string;
 };
-

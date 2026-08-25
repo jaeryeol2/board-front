@@ -6,6 +6,7 @@ import Button from '@/components/base/Button';
 import { GlobalContext } from '@/contexts/GlobalContext';
 import { Menu, MenuItem } from '@/types/global';
 import { appFetch } from '@/utils/app-fetch';
+import { isNotEmpty } from '@/utils/is-empty';
 import { usePathname } from 'next/navigation';
 import {
   Fragment,
@@ -50,6 +51,10 @@ export default function ClientHeader({ menus }: Readonly<ClientHeaderProps>) {
   const menuTree = useMemo(() => {
     const menuMap = new Map<number, MenuItem>();
     const rootMenus: MenuItem[] = [];
+
+    if (!isNotEmpty(menus)) {
+      return [];
+    }
 
     for (const menu of menus) {
       menuMap.set(menu.id, { ...menu, children: [] });

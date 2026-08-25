@@ -3,6 +3,7 @@
 import { clearCacheAll } from '@/actions/common';
 import Button from '@/components/base/Button';
 import Email from '@/components/base/Email';
+import Select from '@/components/base/Select';
 import Submit from '@/components/base/Submit';
 import Text from '@/components/base/Text';
 import { useValidator } from '@/hooks/use-validator';
@@ -28,6 +29,7 @@ export default function ProfileEditForm({
     userName: personal.userName ?? '',
     email: personal.email ?? '',
     userAddr: personal.userAddr ?? '',
+    userGender: personal.userGender ?? '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,6 +39,13 @@ export default function ProfileEditForm({
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, email: e.target.value }));
+  };
+
+  const handleGenderChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      userGender: (e.target.value as 'M' | 'W' | '') || '',
+    }));
   };
 
   const handleAddrChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -121,6 +130,25 @@ export default function ProfileEditForm({
             placeholder="이름을 입력하세요"
             value={formData.userName}
             onChange={handleNameChange}
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <label
+            htmlFor="profile-user-gender"
+            className="block text-[13px] font-semibold text-[#1d1d1f] mb-1.5"
+          >
+            성별
+          </label>
+          <Select
+            id="profile-user-gender"
+            value={formData.userGender ?? ''}
+            onChange={handleGenderChange}
+            options={[
+              { label: '선택 안 함', value: '' },
+              { label: '남성', value: 'M' },
+              { label: '여성', value: 'W' },
+            ]}
           />
         </div>
 
