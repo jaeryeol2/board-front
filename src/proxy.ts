@@ -139,7 +139,7 @@ const nextResponse = (
     },
     headers: {
       [X_CURRENT_PATH]: path,
-      [X_IS_LOGIN]: `${isLogin}`,
+      [X_IS_LOGIN]: `${typeof isLogin === 'boolean' ? isLogin : false}`,
     },
   });
 
