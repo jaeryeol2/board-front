@@ -1,5 +1,6 @@
 'use client';
 
+import { clearCacheAll } from '@/actions/common';
 import Button from '@/components/base/Button';
 import Email from '@/components/base/Email';
 import Submit from '@/components/base/Submit';
@@ -9,7 +10,6 @@ import { PersonalUserInfoType, UserProfileUpdatePayload } from '@/types/user';
 import { appFetch } from '@/utils/app-fetch';
 import { conditionGet } from '@/utils/condition-get';
 import { isEmpty } from '@/utils/is-empty';
-import { useRouter } from 'next/navigation';
 import { ChangeEvent, SubmitEvent, useState } from 'react';
 
 interface ProfileEditFormProps {
@@ -23,7 +23,6 @@ export default function ProfileEditForm({
   onSuccess,
   onCancel,
 }: Readonly<ProfileEditFormProps>) {
-  const router = useRouter();
   const { validator } = useValidator();
   const [formData, setFormData] = useState<UserProfileUpdatePayload>({
     userName: personal.userName ?? '',
@@ -61,11 +60,12 @@ export default function ProfileEditForm({
       const { status, message } = await appFetch<boolean>('/api/user/profile', {
         method: 'put',
         body: formData,
+        timeout: 3000,
       });
 
       if (status === 200) {
         alert(message ?? '회원정보가 수정되었습니다.');
-        router.refresh();
+        clearCacheAll();
         onSuccess?.();
       } else {
         alert(message ?? '회원정보 수정에 실패했습니다.');

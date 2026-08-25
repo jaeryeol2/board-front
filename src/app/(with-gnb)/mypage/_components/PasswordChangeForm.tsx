@@ -69,6 +69,7 @@ export default function PasswordChangeForm({
             currentPassword,
             newPassword,
           },
+          timeout: 3000,
         },
       );
 
@@ -77,10 +78,12 @@ export default function PasswordChangeForm({
         setCurrentPassword('');
         setNewPassword('');
         setNewPasswordConfirm('');
-        onSuccess?.();
-        await logoutAction('/login');
+
+        Promise.resolve()
+          .then(() => logoutAction('/login'))
+          .then(() => onSuccess?.());
       } else {
-        alert(message ?? '비밀번호 변경에 실패했습니다.');
+        throw new Error(message ?? '비밀번호 변경에 실패했습니다.');
       }
     } catch (error) {
       alert((error as Error).message);

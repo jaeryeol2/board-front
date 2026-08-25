@@ -56,6 +56,7 @@ export default function PasswordConfirmView({
         {
           method: 'post',
           body: { password },
+          timeout: 3000,
         },
       );
 
