@@ -34,18 +34,20 @@ export default function MyActivities({
   };
 
   const postsButtonClass = conditionGet<string>()
-    .when(activeTab === 'posts')
-    .do('bg-[#0066cc] text-white hover:bg-[#0071e3]')
+    .when(() => activeTab === 'posts')
+    .do(() => 'bg-[#0066cc] text-white hover:bg-[#0071e3]')
     .other(
-      'bg-transparent text-[#7a7a7a] hover:bg-[#f5f5f7] hover:text-[#1d1d1f] border-none',
+      () =>
+        'bg-transparent text-[#7a7a7a] hover:bg-[#f5f5f7] hover:text-[#1d1d1f] border-none',
     )
     .get();
 
   const commentsButtonClass = conditionGet<string>()
-    .when(activeTab === 'comments')
-    .do('bg-[#0066cc] text-white hover:bg-[#0071e3]')
+    .when(() => activeTab === 'comments')
+    .do(() => 'bg-[#0066cc] text-white hover:bg-[#0071e3]')
     .other(
-      'bg-transparent text-[#7a7a7a] hover:bg-[#f5f5f7] hover:text-[#1d1d1f] border-none',
+      () =>
+        'bg-transparent text-[#7a7a7a] hover:bg-[#f5f5f7] hover:text-[#1d1d1f] border-none',
     )
     .get();
 

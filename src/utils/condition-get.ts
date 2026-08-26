@@ -1,6 +1,6 @@
-type Condition = (() => boolean) | boolean;
-type ValueOrSupplier<T> = T | (() => T);
-type Rule<T> = [Condition, ValueOrSupplier<T>];
+type Condition = () => boolean;
+type Supplier<T> = () => T;
+type Rule<T> = [Condition, Supplier<T>];
 
 export interface ConditionGetInitial<T> {
   when(condition: Condition): ConditionGetDo<T>;
@@ -8,9 +8,9 @@ export interface ConditionGetInitial<T> {
 
 export interface ConditionGetDo<T> {
   /**
-   * 조건이 참일 때 반환할 값 또는 실행할 함수를 지정합니다. (when 직후에는 do만 호출 가능)
+   * 조건이 참일 때 실행/반환할 Supplier 함수를 지정합니다. (when 직후에는 do만 호출 가능)
    */
-  do(action: ValueOrSupplier<T>): ConditionGetThen<T>;
+  do(action: Supplier<T>): ConditionGetThen<T>;
 }
 
 export interface ConditionGetThen<T> {
@@ -19,9 +19,9 @@ export interface ConditionGetThen<T> {
    */
   when(condition: Condition): ConditionGetDo<T>;
   /**
-   * 모든 조건이 거짓일 때 반환할 기본값을 지정합니다.
+   * 모든 조건이 거짓일 때 실행/반환할 기본 Supplier 함수를 지정합니다.
    */
-  other(action: ValueOrSupplier<T>): ConditionGetEnd<T>;
+  other(action: Supplier<T>): ConditionGetEnd<T>;
   /**
    * 조건을 순차 평가하여 일치하는 첫 번째 결과를 반환합니다.
    */
@@ -41,11 +41,8 @@ export interface ConditionGetEnd<T> {
 const evaluate = <T>(rules: Rule<T>[]): T | undefined => {
   for (let i = 0, len = rules.length; i < len; i++) {
     const rule = rules[i];
-    const cond = rule[0];
-    const isMatched = typeof cond === 'function' ? cond() : cond;
-    if (isMatched) {
-      const action = rule[1];
-      return typeof action === 'function' ? (action as () => T)() : action;
+    if (rule[0]()) {
+      return rule[1]();
     }
   }
   return undefined;
@@ -66,8 +63,8 @@ const createConditionGetChain = <T>(initialPending: Condition | null) => {
       pending = cond;
       return doStage;
     },
-    other(action: ValueOrSupplier<T>): ConditionGetEnd<T> {
-      rules.push([true, action]);
+    other(action: Supplier<T>): ConditionGetEnd<T> {
+      rules.push([() => true, action]);
       return endStage;
     },
     get(): T | undefined {
@@ -76,7 +73,7 @@ const createConditionGetChain = <T>(initialPending: Condition | null) => {
   };
 
   const doStage: ConditionGetDo<T> = {
-    do(action: ValueOrSupplier<T>): ConditionGetThen<T> {
+    do(action: Supplier<T>): ConditionGetThen<T> {
       if (pending !== null) {
         rules.push([pending, action]);
         pending = null;
@@ -92,8 +89,8 @@ const createConditionGetChain = <T>(initialPending: Condition | null) => {
  * 조건부 분기 실행 유틸리티 (Type-State FSM & Memory-Optimized & Non-Thenable)
  *
  * 사용 예시:
- * 1) conditionGet.when(isAdmin).do('관리자').other('사용자').get();
- * 2) conditionGet<string>().when(a).do(() => 'A').other(() => 'B').get();
+ * 1) conditionGet.when(() => isAdmin).do(() => '관리자').other(() => '사용자').get();
+ * 2) conditionGet<string>().when(() => a).do(() => 'A').other(() => 'B').get();
  */
 export const conditionGet = <T = unknown>(
   initialCondition: Condition | null = null,

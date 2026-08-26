@@ -1,4 +1,4 @@
-type Condition = (() => boolean) | boolean;
+type Condition = () => boolean;
 type Action = () => void;
 type Rule = [Condition, Action];
 
@@ -41,9 +41,7 @@ export interface ConditionEnd {
 const run = (rules: Rule[]): void => {
   for (let i = 0, len = rules.length; i < len; i++) {
     const rule = rules[i];
-    const cond = rule[0];
-    const isMatched = typeof cond === 'function' ? cond() : cond;
-    if (isMatched) {
+    if (rule[0]()) {
       rule[1]();
       break;
     }
@@ -66,7 +64,7 @@ const createConditionChain = (initialPending: Condition | null) => {
       return doStage;
     },
     other(action: Action): ConditionEnd {
-      rules.push([true, action]);
+      rules.push([() => true, action]);
       return endStage;
     },
     execute(): void {
@@ -91,8 +89,8 @@ const createConditionChain = (initialPending: Condition | null) => {
  * 조건부 액션 실행 유틸리티 (Type-State FSM & Memory-Optimized & Non-Thenable)
  *
  * 사용 예시:
- * 1) condition.when(isSuccess).do(() => alert('성공')).other(() => alert('실패')).execute();
- * 2) condition().when(a).do(() => fnA()).other(() => fnB()).execute(); // 기존 문법 100% 호환
+ * 1) condition.when(() => isSuccess).do(() => alert('성공')).other(() => alert('실패')).execute();
+ * 2) condition().when(() => a).do(() => fnA()).other(() => fnB()).execute();
  */
 export const condition = (
   initialCondition: Condition | null = null,

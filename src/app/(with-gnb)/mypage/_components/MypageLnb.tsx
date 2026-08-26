@@ -53,20 +53,26 @@ export default function MypageLnb({
         {menuItems.map((item) => {
           const isActive = activeMenu === item.id;
           const buttonClass = conditionGet<string>()
-            .when(isActive)
+            .when(() => isActive)
             .do(
-              'w-full flex items-center justify-between px-4 py-3 text-[14px] font-semibold text-white bg-[#0066cc] rounded-[12px] shadow-none hover:bg-[#0071e3] transition-all',
+              () =>
+                'w-full flex items-center justify-between px-4 py-3 text-[14px] font-semibold text-white bg-[#0066cc] rounded-[12px] shadow-none hover:bg-[#0071e3] transition-all',
             )
             .other(
-              'w-full flex items-center justify-between px-4 py-3 text-[14px] font-medium text-[#1d1d1f] bg-transparent rounded-[12px] shadow-none hover:bg-[#f5f5f7] transition-all',
+              () =>
+                'w-full flex items-center justify-between px-4 py-3 text-[14px] font-medium text-[#1d1d1f] bg-transparent rounded-[12px] shadow-none hover:bg-[#f5f5f7] transition-all',
             )
             .get();
 
           const badgeClass = conditionGet<string>()
-            .when(isActive)
-            .do('text-[12px] px-2 py-0.5 rounded-full bg-white/20 text-white')
+            .when(() => isActive)
+            .do(
+              () =>
+                'text-[12px] px-2 py-0.5 rounded-full bg-white/20 text-white',
+            )
             .other(
-              'text-[12px] px-2 py-0.5 rounded-full bg-[#f5f5f7] text-[#7a7a7a]',
+              () =>
+                'text-[12px] px-2 py-0.5 rounded-full bg-[#f5f5f7] text-[#7a7a7a]',
             )
             .get();
 
@@ -90,12 +96,14 @@ export default function MypageLnb({
         {menuItems.map((item) => {
           const isActive = activeMenu === item.id;
           const mobileButtonClass = conditionGet<string>()
-            .when(isActive)
+            .when(() => isActive)
             .do(
-              'flex-shrink-0 px-4 py-2 text-[13px] font-semibold text-white bg-[#0066cc] rounded-full shadow-none hover:bg-[#0071e3]',
+              () =>
+                'flex-shrink-0 px-4 py-2 text-[13px] font-semibold text-white bg-[#0066cc] rounded-full shadow-none hover:bg-[#0071e3]',
             )
             .other(
-              'flex-shrink-0 px-4 py-2 text-[13px] font-medium text-[#7a7a7a] bg-[#f5f5f7] rounded-full shadow-none hover:bg-[#e8e8ed] hover:text-[#1d1d1f]',
+              () =>
+                'flex-shrink-0 px-4 py-2 text-[13px] font-medium text-[#7a7a7a] bg-[#f5f5f7] rounded-full shadow-none hover:bg-[#e8e8ed] hover:text-[#1d1d1f]',
             )
             .get();
 

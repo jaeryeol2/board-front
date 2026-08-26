@@ -93,9 +93,9 @@ export default function PasswordChangeForm({
   };
 
   const submitText = conditionGet<string>()
-    .when(isSubmitting)
-    .do('변경 중...')
-    .other('비밀번호 변경')
+    .when(() => isSubmitting)
+    .do(() => '변경 중...')
+    .other(() => '비밀번호 변경')
     .get();
 
   return (

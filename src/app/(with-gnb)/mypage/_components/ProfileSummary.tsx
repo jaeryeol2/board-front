@@ -18,11 +18,11 @@ export default function ProfileSummary({
   const commentList = personal.writedCommentList ?? [];
 
   const genderText = conditionGet<string>()
-    .when(personal.userGender === 'M')
-    .do('남성')
-    .when(personal.userGender === 'W')
-    .do('여성')
-    .other('-')
+    .when(() => personal.userGender === 'M')
+    .do(() => '남성')
+    .when(() => personal.userGender === 'W')
+    .do(() => '여성')
+    .other(() => '-')
     .get();
 
   const handleEditClick = () => {
