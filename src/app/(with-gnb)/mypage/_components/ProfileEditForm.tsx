@@ -88,8 +88,8 @@ export default function ProfileEditForm({
 
   const submitText = conditionGet<string>()
     .when(() => isSubmitting)
-    .do(() => '저장 중...')
-    .other(() => '변경사항 저장')
+    .do('저장 중...')
+    .other('변경사항 저장')
     .get();
 
   return (

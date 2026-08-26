@@ -19,10 +19,10 @@ export default function ProfileSummary({
 
   const genderText = conditionGet<string>()
     .when(() => personal.userGender === 'M')
-    .do(() => '남성')
+    .do('남성')
     .when(() => personal.userGender === 'W')
-    .do(() => '여성')
-    .other(() => '-')
+    .do('여성')
+    .other('-')
     .get();
 
   const handleEditClick = () => {

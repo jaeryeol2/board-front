@@ -27,10 +27,10 @@ export default function PasswordConfirmView({
 
   const targetTitle = conditionGet<string>()
     .when(() => targetMenu === 'edit-profile')
-    .do(() => '회원정보 수정')
+    .do('회원정보 수정')
     .when(() => targetMenu === 'change-password')
-    .do(() => '비밀번호 변경')
-    .other(() => '보안 메뉴')
+    .do('비밀번호 변경')
+    .other('보안 메뉴')
     .get();
 
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -75,8 +75,8 @@ export default function PasswordConfirmView({
 
   const submitButtonText = conditionGet<string>()
     .when(() => isSubmitting)
-    .do(() => '확인 중...')
-    .other(() => '확인')
+    .do('확인 중...')
+    .other('확인')
     .get();
 
   return (
