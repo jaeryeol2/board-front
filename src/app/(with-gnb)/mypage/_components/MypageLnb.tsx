@@ -29,7 +29,7 @@ export default function MypageLnb({
   const menuItems: MenuItem[] = [
     {
       id: 'profile',
-      label: '프로필 요약',
+      label: '프로필',
     },
     {
       id: 'edit-profile',
