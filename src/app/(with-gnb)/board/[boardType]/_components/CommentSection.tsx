@@ -65,13 +65,13 @@ export default function CommentSection({
       const { data: newComments } = await appFetch<Array<BoardComment>>(
         `/api/board/comment/${boardId}`,
         {
-          onRequest() {
+          beforeRequest() {
             setLoading(true);
           },
-          onResponse() {
+          afterResponse() {
             setLoading(false);
           },
-          onRequestError() {
+          onError() {
             setLoading(false);
           },
         },

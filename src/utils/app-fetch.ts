@@ -1,5 +1,10 @@
 import { getCookie, getIp } from '@/actions/common';
-import { FetchError, FetchOptions, ofetch } from 'ofetch';
+import {
+  AppFetchOptions,
+  appFetch as baseFetch,
+  getData,
+  returnError,
+} from 'app-fetch';
 
 const ACCESS_TOKEN = 'access_token';
 const REFRESH_TOKEN = 'auth_token';
@@ -11,18 +16,6 @@ const AUTHORIZATION = 'Authorization';
 // 📌 1. TYPES & INTERFACES (appFetch 관련 타입 정의)
 // =================================================================
 
-interface QueryFetchOptions extends Omit<
-  FetchOptions,
-  'method' | 'body' | 'params'
-> {
-  method?: 'get' | 'delete';
-}
-interface BodyFetchOptions extends Omit<FetchOptions, 'method' | 'params'> {
-  method: 'post' | 'put' | 'patch';
-}
-
-type AppFetchOptions = QueryFetchOptions | BodyFetchOptions;
-
 type ResponseApi<T> = {
   status: number;
   message: string;
@@ -30,16 +23,24 @@ type ResponseApi<T> = {
 };
 
 // =================================================================
-// 📌 2. OFETCH INSTANCE & BASE INTERCEPTOR CONFIG (기본 인스턴스 및 설정)
+// 📌 2. APP-FETCH INSTANCE CONFIG (기본 인스턴스 및 설정)
 // =================================================================
 
-const fetchInterceptor: Pick<
-  FetchOptions,
-  'onRequest' | 'onResponse' | 'onRequestError' | 'onResponseError'
-> = {
-  async onRequest({ request, options }) {
-    console.log('api request path: ', request);
-
+/**
+ * app-fetch 인스턴스 설정
+ * - retry: 408, 429, 5xx 및 네트워크 에러 발생 시 app-fetch가 3회 자동 재시도합니다.
+ *   멱등하지 않은 post/patch는 중복 처리 방지를 위해 app-fetch가 재시도하지 않습니다.
+ * - timeout: beforeRequest(server action 호출 포함)부터 응답 헤더 수신까지 시도당 적용됩니다.
+ *   브라우저에서는 server action이 네트워크 왕복이므로 서버보다 길게 잡습니다.
+ * - 401 (Unauthorized) 에러는 자동 재시도 대상이 아니며,
+ *   하단의 native 함수에서 토큰 갱신(refreshAccessToken) 후 딱 1회 수동 재시도됩니다.
+ */
+const $fetch = baseFetch.create({
+  baseURL: process.env.NEXT_BASE_API_URL,
+  retry: 3,
+  delay: 1000,
+  timeout: globalThis?.window === undefined ? 2000 : 5000,
+  async beforeRequest(options) {
     const [ip, accessToken, guestId] = await Promise.all([
       getIp().catch(() => 'Unknown IP'),
       getCookie(ACCESS_TOKEN).catch(() => undefined),
@@ -49,7 +50,8 @@ const fetchInterceptor: Pick<
     const headers = new Headers(options.headers);
     headers.set('X-Forwarded-For', ip);
 
-    if (accessToken) {
+    // 토큰 갱신 후 재시도 시 호출부에서 넣은 새 토큰을 쿠키의 이전 토큰으로 덮어쓰지 않습니다.
+    if (accessToken && !headers.has(AUTHORIZATION)) {
       headers.set(AUTHORIZATION, `Bearer ${accessToken}`);
     }
     if (guestId) {
@@ -58,72 +60,11 @@ const fetchInterceptor: Pick<
 
     options.headers = headers;
   },
-  async onResponseError({ response, error }) {
-    if (error && !(error instanceof FetchError)) {
-      throw new FetchError(error.message, { cause: error.cause });
-    }
-
-    const data = response?._data as ResponseApi<null>;
-    const errorMessage =
-      data?.message ??
-      response?.statusText ??
-      error?.message ??
-      'API Fetch Error.';
-    const err = new FetchError(errorMessage);
-
-    err.response = response;
-
-    if (data) {
-      err.data = data;
-    }
-
-    throw err;
-  },
-};
-
-/**
- * $fetch 인스턴스 설정
- * - retry/retryStatusCodes: 408, 500 등 지정된 일시적 서버 에러 발생 시 ofetch가 3회 자동 재시도합니다.
- * - 401 (Unauthorized) 에러는 ofetch의 자동 재시도 대상에서 제외되며,
- *   하단의 native 및 fetch 함수 내에서 토큰 갱신(refreshAccessToken) 후 딱 1회 수동 재시도됩니다.
- */
-const $fetch = ofetch.create({
-  baseURL: process.env.NEXT_BASE_API_URL,
-  retry: 3,
-  retryDelay: 1000,
-  timeout: 2000,
-  retryStatusCodes: [408, 409, 425, 429, 500, 502, 503, 504],
-  ...fetchInterceptor,
 });
 
 // =================================================================
-// 📌 3. HELPER FUNCTIONS (쿠키, 헤더 및 에러 처리 유틸리티)
+// 📌 3. HELPER FUNCTIONS (쿠키, 헤더 및 응답 변환 유틸리티)
 // =================================================================
-
-const returnError = (error: unknown) => {
-  const defaultError = {
-    status: 500,
-    message: 'Internal Server Error',
-    data: null,
-  };
-
-  if (error instanceof FetchError) {
-    return {
-      status: error.response?.status ?? error.status ?? 500,
-      message: error.response?._data?.message ?? error.message ?? 'Fetch Error',
-      data: error.data,
-    };
-  }
-
-  if (error instanceof Error) {
-    return {
-      ...defaultError,
-      message: error.message,
-    };
-  }
-
-  return defaultError;
-};
 
 const setAccessTokenHeaders = (headers: Headers, response: Response) => {
   const optHeaders = response.headers;
@@ -157,73 +98,57 @@ const appendSetCookieHeaders = (target: Headers, source: Headers) => {
   }
 };
 
-// =================================================================
-// 📌 4. INTERCEPTOR COMPOSER (기본 & 커스텀 인터셉터 병합)
-// =================================================================
+/**
+ * 토큰 갱신 응답의 Set-Cookie를 대상 응답 헤더에 추가한 새 Response를 반환합니다.
+ */
+const withRefreshCookies = (response: Response, refresh: Response) => {
+  const headers = new Headers(response.headers);
+
+  appendSetCookieHeaders(headers, refresh.headers);
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+};
 
 /**
- * 기본 공통 인터셉터(fetchInterceptor)와 API 요청 시 전달된 커스텀 인터셉터(fetchOptions)를 병합하는 함수입니다.
- * ofetch는 인터셉터에 단일 함수뿐만 아니라 함수 배열(MaybeArray)도 지원하므로,
- * 두 종류의 인터셉터가 모두 존재할 경우 배열로 합쳐 순차적으로 동작하도록 제어합니다.
- *
- * @param fetchOptions - 병합할 대상이 되는 개별 API 요청의 fetch 옵션 객체
+ * 파싱된 응답 본문을 백엔드 공통 응답 규격(ResponseApi)으로 변환합니다.
+ * app-fetch는 4xx/5xx를 예외 없이 Response로 반환하므로 response.ok로 에러를 판별합니다.
  */
-const mergeFetchInterceptor = (fetchOptions: AppFetchOptions) => {
-  /**
-   * 단일 값 혹은 배열로 전달된 인터셉터를 하나의 안전한 배열로 결합하는 제네릭 헬퍼 함수입니다.
-   * 린트 규칙 준수를 위해 중첩 삼항 연산자를 사용하지 않고 명시적인 분기로 배열화합니다.
-   */
-  const composeInterceptors = <T>(
-    base: T | T[] | undefined,
-    custom: T | T[] | undefined,
-  ): T[] | undefined => {
-    let baseArr: T[] = [];
-    let customArr: T[] = [];
-    if (base) {
-      baseArr = Array.isArray(base) ? base : [base];
-    }
-    if (custom) {
-      customArr = Array.isArray(custom) ? custom : [custom];
-    }
+const toResponseApi = <R>(
+  response: Response,
+  body: unknown,
+): ResponseApi<R> => {
+  const api =
+    typeof body === 'object' && body !== null
+      ? (body as Partial<ResponseApi<R>>)
+      : null;
 
-    return [...baseArr, ...customArr];
-  };
-
-  // [onRequest] 공통 요청 전처리 인터셉터(IP, 토큰 설정 등)와 커스텀 요청 인터셉터를 병합합니다.
-  if (fetchInterceptor.onRequest || fetchOptions.onRequest) {
-    fetchOptions.onRequest = composeInterceptors(
-      fetchInterceptor.onRequest,
-      fetchOptions.onRequest,
-    );
+  if (!response.ok) {
+    return {
+      status: response.status,
+      message: api?.message ?? (response.statusText || 'API Fetch Error.'),
+      data: api?.data ?? null,
+    };
+  }
+  if (!body) {
+    return { status: 500, message: 'do not get response data.', data: null };
+  }
+  if (api) {
+    return {
+      status: api.status ?? response.status,
+      message: api.message ?? 'success',
+      data: api.data ?? null,
+    };
   }
 
-  // [onRequestError] 요청 에러 인터셉터를 병합합니다.
-  if (fetchInterceptor.onRequestError || fetchOptions.onRequestError) {
-    fetchOptions.onRequestError = composeInterceptors(
-      fetchInterceptor.onRequestError,
-      fetchOptions.onRequestError,
-    );
-  }
-
-  // [onResponse] 응답 성공 시 동작하는 인터셉터를 병합합니다.
-  if (fetchInterceptor.onResponse || fetchOptions.onResponse) {
-    fetchOptions.onResponse = composeInterceptors(
-      fetchInterceptor.onResponse,
-      fetchOptions.onResponse,
-    );
-  }
-
-  // [onResponseError] 공통 응답 에러 처리 로직과 커스텀 응답 에러 인터셉터를 병합합니다.
-  if (fetchInterceptor.onResponseError || fetchOptions.onResponseError) {
-    fetchOptions.onResponseError = composeInterceptors(
-      fetchInterceptor.onResponseError,
-      fetchOptions.onResponseError,
-    );
-  }
+  return { status: 200, message: 'success', data: body as R };
 };
 
 // =================================================================
-// 📌 5. CORE FETCH IMPLEMENTATIONS (native & appFetch 핵심 구현)
+// 📌 4. CORE FETCH IMPLEMENTATIONS (native & appFetch 핵심 구현)
 // =================================================================
 
 let clientRefreshPromise: Promise<Response> | null = null;
@@ -263,65 +188,40 @@ const refreshAccessToken = async (
   return fetchRefresh();
 };
 
+/**
+ * 공통 인스턴스로 요청합니다.
+ * HTTP 에러(4xx/5xx)는 그대로 Response로 반환되고, 네트워크 에러·타임아웃만 500 Response로 변환합니다.
+ */
+const request = (path: string, options?: AppFetchOptions): Promise<Response> => {
+  console.log('api request path: ', path);
+
+  return $fetch(path, options).catch((error: unknown) =>
+    Response.json(returnError(error), { status: 500 }),
+  );
+};
+
 const native = async (
   path: string,
   options?: AppFetchOptions,
 ): Promise<Response> => {
-  let accessResponse: Response | undefined = undefined;
+  const response = await request(path, options);
 
-  const result = await $fetch.raw(path, options).catch((error) => ({
-    headers: error.response?.headers || {},
-    status: error.response?.status || 500,
-    statusText: error.response?.statusText || '',
-    _data: returnError(error),
-  }));
-
-  const { headers, status, statusText, _data } = result;
-  const data = typeof _data === 'object' ? JSON.stringify(_data) : _data;
-  const responseHeaders = new Headers(headers);
-  const errorData = _data as { status?: number } | null;
-
-  responseHeaders.delete('content-length');
-
-  if (
-    errorData &&
-    'status' in errorData &&
-    errorData.status === 401 &&
-    path !== '/api/auth/access'
-  ) {
-    accessResponse = await refreshAccessToken(native);
-    const clone = accessResponse.clone();
-
-    if (clone.ok) {
-      const opt = { ...options } as AppFetchOptions;
-      const nextHeaders = new Headers(options?.headers);
-
-      setAccessTokenHeaders(nextHeaders, clone);
-      opt.headers = nextHeaders;
-
-      const finalResponse = await native(path, opt);
-
-      const finalHeaders = new Headers(finalResponse.headers);
-
-      appendSetCookieHeaders(finalHeaders, clone.headers);
-
-      return new Response(finalResponse.body, {
-        status: finalResponse.status,
-        statusText: finalResponse.statusText,
-        headers: finalHeaders,
-      });
-    }
+  if (response.status !== 401 || path === '/api/auth/access') {
+    return response;
   }
 
-  if (accessResponse) {
-    appendSetCookieHeaders(responseHeaders, accessResponse.headers);
+  const clone = (await refreshAccessToken(native)).clone();
+
+  if (!clone.ok) {
+    return withRefreshCookies(response, clone);
   }
 
-  return new Response(data, {
-    status,
-    statusText,
-    headers: responseHeaders,
-  });
+  const headers = new Headers(options?.headers);
+
+  setAccessTokenHeaders(headers, clone);
+
+  // 갱신된 토큰으로 1회만 재시도합니다 (재시도 응답이 401이어도 다시 갱신하지 않음).
+  return withRefreshCookies(await request(path, { ...options, headers }), clone);
 };
 
 const fetchData = async <R = unknown>(
@@ -329,59 +229,17 @@ const fetchData = async <R = unknown>(
   options?: AppFetchOptions,
 ): Promise<ResponseApi<R>> => {
   try {
-    const mergeOptions = { ...options } as AppFetchOptions;
-    mergeFetchInterceptor(mergeOptions);
-    const response = await $fetch(path, mergeOptions);
+    const response = await native(path, options);
 
-    if (!response) {
-      throw new Error('do not get response data.');
-    }
-    if (typeof response === 'object') {
-      if ('data' in response) {
-        return response as ResponseApi<R>;
-      } else {
-        const resObject = response as Omit<ResponseApi<R>, 'data'>;
-
-        return {
-          status: resObject.status,
-          message: resObject.message,
-          data: null,
-        };
-      }
-    }
-
-    return {
-      status: 200,
-      message: 'success',
-      data: response as R,
-    };
+    return toResponseApi<R>(response, await getData(response));
   } catch (error) {
-    const errorInfo = returnError(error);
-
-    if (errorInfo.status === 401 && path !== '/api/auth/access') {
-      const response = await refreshAccessToken(native);
-      const clone = response.clone();
-
-      if (clone.ok) {
-        const opt = { ...options } as AppFetchOptions;
-        const nextHeaders = new Headers(options?.headers);
-
-        opt.headers = clone.headers;
-
-        setAccessTokenHeaders(nextHeaders, clone);
-        opt.headers = nextHeaders;
-
-        return fetchData<R>(path, opt);
-      }
-    }
-
-    return errorInfo;
+    return returnError<R>(error);
   }
 };
 
 /**
  * app fetch
- * data fetching function base ofetch
+ * data fetching function base app-fetch
  * @param path
  * @param options
  * @returns

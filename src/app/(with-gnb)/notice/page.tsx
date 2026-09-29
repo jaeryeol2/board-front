@@ -1,7 +1,7 @@
 import { BoardFilter } from '@/types/board';
+import { SearchParamsType } from '@/types/base';
 import { Notice } from '@/types/notice';
 import { appFetch } from '@/utils/app-fetch';
-import { SearchParameters } from 'ofetch';
 import { cache } from 'react';
 import NoticeListUI from './_components/NoticeListUI';
 
@@ -13,7 +13,7 @@ const fetchData = cache(async (query: BoardFilter) => {
 });
 export default async function NoticePage({
   searchParams,
-}: Readonly<SearchParameters>) {
+}: Readonly<SearchParamsType>) {
   const page = Number((await searchParams)?.page ?? 1);
   const rowsPerPage = 20;
   const { data } = await fetchData({

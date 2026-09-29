@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FetchError } from 'ofetch';
 import {
   ACCESS_TOKEN,
   GUEST_ID,
@@ -166,15 +165,5 @@ const returnError = (error: unknown) => {
       message: error.message,
     };
   }
-  if (error instanceof FetchError) {
-    return {
-      ...returnError,
-      status: error.response?.status
-        ? error.response.status
-        : (error?.status ?? returnError.status),
-      message: error?.message ? error.message : returnError.message,
-    };
-  }
-
   return returnError;
 };

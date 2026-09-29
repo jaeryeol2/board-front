@@ -77,13 +77,13 @@ export default function MyActivities({
     const { data } = await appFetch<{ total: number; list: Board[] }>(
       `/api/user/posts?page=${newPage}&rowsPerPage=${ITEMS_PER_PAGE}`,
       {
-        onRequest() {
+        beforeRequest() {
           setLoading(true);
         },
-        onResponse() {
+        afterResponse() {
           setLoading(false);
         },
-        onRequestError() {
+        onError() {
           setLoading(false);
         },
       },
@@ -103,13 +103,13 @@ export default function MyActivities({
     const { data } = await appFetch<{ total: number; list: BoardComment[] }>(
       `/api/user/comments?page=${newPage}&rowsPerPage=${ITEMS_PER_PAGE}`,
       {
-        onRequest() {
+        beforeRequest() {
           setLoading(true);
         },
-        onResponse() {
+        afterResponse() {
           setLoading(false);
         },
-        onRequestError() {
+        onError() {
           setLoading(false);
         },
       },
