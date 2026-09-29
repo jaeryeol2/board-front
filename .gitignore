@@ -42,3 +42,6 @@ next-env.d.ts
 # vscode
 .vscode
 certificates
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
