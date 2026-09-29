@@ -18,16 +18,12 @@ const nextConfig: NextConfig = {
       beforeFiles: [],
 
       // 2. [afterFiles]
-      // 실행 시점: Next.js의 정적 파일(public/) 및 고정된 정적 라우트(예: app/api/cookie/route.ts) 매핑 검사 "후"에 실행됩니다.
+      // 실행 시점: Next.js의 정적 파일(public/) 및 고정된 정적 라우트(예: app/api/token-expire/route.ts) 매핑 검사 "후"에 실행됩니다.
       // 주의점: 동적 라우트(예: app/api/user/[id]/route.ts) 매핑 검사보다는 "앞서" 실행되므로, 여기에 와일드카드(/api/:path*)를 넣으면 동적 라우트에 도달하지 못합니다.
       afterFiles: [
         {
           source: '/api/token-expire',
           destination: '/api/token-expire',
-        },
-        {
-          source: '/api/cookie',
-          destination: '/api/cookie',
         },
         {
           source: '/api/header',
