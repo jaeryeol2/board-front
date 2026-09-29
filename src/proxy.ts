@@ -8,14 +8,34 @@ import {
   X_IS_LOGIN,
 } from './constants/common';
 import { ResponseApi } from './types/base';
-import { appFetch } from './utils/app-fetch';
+import { appFetch, setApiHeaders } from './utils/app-fetch';
 import { tokenUtil } from './utils/token-util';
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*.png$|.*.ico|.*.json).*)'],
+  matcher: ['/((?!_next/static|_next/image|.*.png$|.*.ico|.*.json).*)'],
+};
+
+/**
+ * 브라우저의 /api/* 요청에 httpOnly 쿠키 값을 gateway 인증 헤더로 주입합니다.
+ * 브라우저 JS는 토큰을 읽지 않고, 쿠키는 같은 origin 요청에 자동 전송됩니다.
+ * X-Forwarded-For는 브라우저가 지정하지 않고 Next rewrite 프록시가 설정합니다.
+ */
+const apiRequest = (request: NextRequest) => {
+  const headers = new Headers(request.headers);
+
+  setApiHeaders(headers, {
+    accessToken: request.cookies.get(ACCESS_TOKEN)?.value,
+    guestId: request.cookies.get(GUEST_ID)?.value,
+  });
+
+  return NextResponse.next({ request: { headers } });
 };
 
 export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    return apiRequest(request);
+  }
+
   const header = new Headers();
   const { verifyToken } = tokenUtil();
   const accessToken = request.cookies.get(ACCESS_TOKEN)?.value ?? '';
