@@ -3,6 +3,7 @@ import {
   AppFetchOptions,
   appFetch as baseFetch,
   getData,
+  RetryStrategyFunction,
   returnError,
 } from 'app-fetch';
 import { unstable_rethrow } from 'next/navigation';
@@ -89,36 +90,52 @@ export const setApiHeaders = (
 // 📌 3. APP-FETCH INSTANCE CONFIG (기본 인스턴스 및 설정)
 // =================================================================
 
+const RETRY_STATUS = new Set([502, 503, 504]);
+const RETRY_DELAY = 1000;
+
+/**
+ * 재시도 정책: GET만, gateway/일시 장애(502/503/504)에 1회.
+ * - 타임아웃·네트워크 에러는 재시도하지 않습니다. 백엔드는 이전 요청을 계속 처리하므로 재시도가 부하를 키웁니다.
+ * - PUT/DELETE도 부수 효과(이미지 정리 등)가 있어 자동 재시도하지 않습니다.
+ * ponytail: Retry-After는 사용하지 않음(현재 gateway/api가 보내지 않음). rate limit 도입 시 ctx.retryAfterMs 반영.
+ */
+const retryIdempotentGetOnce: RetryStrategyFunction = (ctx) => ({
+  shouldRetry:
+    ctx.method === 'GET' &&
+    RETRY_STATUS.has(ctx.response?.status ?? 0) &&
+    ctx.attempt <= 1,
+  delay: RETRY_DELAY,
+});
+
 /**
  * app-fetch 인스턴스 설정
- * - retry: 408, 429, 5xx 및 네트워크 에러 발생 시 app-fetch가 3회 자동 재시도합니다.
- *   멱등하지 않은 post/patch는 중복 처리 방지를 위해 app-fetch가 재시도하지 않습니다.
+ * - retryStrategy: retryIdempotentGetOnce 참고
  * - timeout: beforeRequest부터 응답 헤더 수신까지 시도당 적용됩니다.
  * - 401 (Unauthorized) 에러는 자동 재시도 대상이 아니며,
  *   하단의 native 함수에서 토큰 갱신(refreshAccessToken) 후 딱 1회 수동 재시도됩니다.
- * - 브라우저 요청은 httpOnly 쿠키가 자동 전송되고 proxy.ts가 헤더를 주입하므로 beforeRequest에서 아무것도 하지 않습니다.
+ * - 브라우저 요청은 httpOnly 쿠키가 자동 전송되고 proxy.ts가 헤더를 주입하므로 헤더를 구성하지 않습니다.
  */
 const $fetch = baseFetch.create({
   baseURL: process.env.NEXT_BASE_API_URL,
-  retry: 3,
-  delay: 1000,
   timeout: 2000,
-  async beforeRequest(options) {
+  retryStrategy: retryIdempotentGetOnce,
+  async beforeRequest(options, { path, attempt }) {
+    if (attempt === 1) {
+      console.log('api request path: ', path);
+    }
+
     const server = await getServerRequest();
 
     if (!server) {
       return;
     }
 
-    const headers = new Headers(options.headers);
-
-    setApiHeaders(headers, {
+    // 헤더는 대입하지 않고 set으로 수정합니다 (대입 시 기본 헤더·JSON Content-Type까지 교체됨).
+    setApiHeaders(options.headers, {
       ip: getClientIp(server.headerStore),
       accessToken: server.cookieStore.get(ACCESS_TOKEN)?.value,
       guestId: server.cookieStore.get(GUEST_ID)?.value,
     });
-
-    options.headers = headers;
   },
 });
 
@@ -255,8 +272,6 @@ const refreshAccessToken = async (
  * HTTP 에러(4xx/5xx)는 그대로 Response로 반환되고, 네트워크 에러·타임아웃만 500 Response로 변환합니다.
  */
 const request = (path: string, options?: AppFetchOptions): Promise<Response> => {
-  console.log('api request path: ', path);
-
   return $fetch(path, options).catch((error: unknown) => {
     unstable_rethrow(error);
     return Response.json(returnError(error), { status: 500 });
