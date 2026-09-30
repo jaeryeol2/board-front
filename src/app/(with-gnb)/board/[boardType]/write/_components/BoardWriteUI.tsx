@@ -79,12 +79,12 @@ export default function BoardWriteUI({
         setIsUploadingImage(true);
         const form = new FormData();
         form.set('file', file);
-        const { status, data } = await appFetch<string>('/api/board/image', {
+        const { ok, data } = await appFetch<string>('/api/board/image', {
           method: 'post',
           body: form,
         });
 
-        if (status === 200 && data) {
+        if (ok && data) {
           uploadedImagesRef.current.add(data);
           return data;
         }
@@ -293,14 +293,14 @@ export default function BoardWriteUI({
 
       const method = isModify ? 'put' : 'post';
 
-      const { status, data, message } = await appFetch<boolean>(url, {
+      const { ok, data, message } = await appFetch<boolean>(url, {
         method,
         body: form,
       });
 
       const result = cond
         .when(
-          () => (isModify ? status === 200 : status === 201) && (data ?? false),
+          () => ok && (data ?? false),
         )
         .do(() => {
           alert(`게시글이 ${isModify ? '수정' : '작성'}되었습니다.`);

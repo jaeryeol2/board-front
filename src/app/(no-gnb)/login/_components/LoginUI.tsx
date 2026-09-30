@@ -51,14 +51,14 @@ export default function LoginUI() {
 
     try {
       if (checker.validate()) {
-        const { status, data, message } = await appFetch<
+        const { ok, data, message } = await appFetch<
           boolean | FetchErrorType
         >('/api/user/login', {
           method: 'post',
           body: state,
         });
 
-        if (status === 200 && typeof data === 'boolean' && data) {
+        if (ok && typeof data === 'boolean' && data) {
           // 아이디 저장 체크박스 상태에 따라 localStorage에 아이디를 저장하거나 삭제합니다.
           if (rememberId) {
             localStorage.setItem('savedUserId', state.userId);

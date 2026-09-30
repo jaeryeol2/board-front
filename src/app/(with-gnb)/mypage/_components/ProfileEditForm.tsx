@@ -66,13 +66,13 @@ export default function ProfileEditForm({
 
     try {
       setIsSubmitting(true);
-      const { status, message } = await appFetch<boolean>('/api/user/profile', {
+      const { ok, message } = await appFetch<boolean>('/api/user/profile', {
         method: 'put',
         body: formData,
         timeout: 3000,
       });
 
-      if (status === 200) {
+      if (ok) {
         alert(message ?? '회원정보가 수정되었습니다.');
         clearCacheAll();
         onSuccess?.();

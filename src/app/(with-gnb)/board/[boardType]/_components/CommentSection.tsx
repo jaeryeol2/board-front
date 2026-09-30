@@ -49,7 +49,7 @@ export default function CommentSection({
     }
   };
   const handleCommentSubmit = async () => {
-    const { status, data } = await appFetch<boolean>(
+    const { ok, data } = await appFetch<boolean>(
       `/api/board/comment/${boardId}`,
       {
         method: 'post',
@@ -59,7 +59,7 @@ export default function CommentSection({
       },
     );
 
-    if (status === 201 && data) {
+    if (ok && data) {
       setComment(''); // 댓글 입력 필드 초기화
 
       const { data: newComments } = await appFetch<Array<BoardComment>>(

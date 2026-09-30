@@ -15,7 +15,12 @@ const AUTHORIZATION = 'Authorization';
 // 📌 1. TYPES & INTERFACES (appFetch 관련 타입 정의)
 // =================================================================
 
+/**
+ * 호출부 응답 규격. 성공 여부는 status 숫자 비교 대신 ok로 판정합니다.
+ * ok = HTTP 응답이 2xx이면서 본문 envelope status도 2xx (비즈니스 에러는 HTTP 200 + envelope 999로 내려옴)
+ */
 type ResponseApi<T> = {
+  ok: boolean;
   status: number;
   message: string;
   data: T | null;
@@ -190,9 +195,13 @@ const withRefreshCookies = (response: Response, refresh: Response) => {
   });
 };
 
+const isSuccessStatus = (status: number) => status >= 200 && status < 300;
+
 /**
  * 파싱된 응답 본문을 백엔드 공통 응답 규격(ResponseApi)으로 변환합니다.
- * app-fetch는 4xx/5xx를 예외 없이 Response로 반환하므로 response.ok로 에러를 판별합니다.
+ * - app-fetch는 4xx/5xx를 예외 없이 Response로 반환하므로 response.ok로 전송 계층 에러를 판별합니다.
+ * - 성공 판정은 특정 코드(200/201)가 아닌 2xx 범위로 합니다.
+ * - 2xx + 빈 본문(204 등, getData가 null 반환)은 성공입니다.
  */
 const toResponseApi = <R>(
   response: Response,
@@ -205,23 +214,32 @@ const toResponseApi = <R>(
 
   if (!response.ok) {
     return {
+      ok: false,
       status: response.status,
       message: api?.message ?? (response.statusText || 'API Fetch Error.'),
       data: api?.data ?? null,
     };
   }
-  if (!body) {
-    return { status: 500, message: 'do not get response data.', data: null };
+  if (body === null) {
+    return { ok: true, status: response.status, message: 'success', data: null };
   }
   if (api) {
+    const status = api.status ?? response.status;
+
     return {
-      status: api.status ?? response.status,
+      ok: isSuccessStatus(status),
+      status,
       message: api.message ?? 'success',
       data: api.data ?? null,
     };
   }
 
-  return { status: 200, message: 'success', data: body as R };
+  return {
+    ok: true,
+    status: response.status,
+    message: 'success',
+    data: body as R,
+  };
 };
 
 // =================================================================
@@ -312,7 +330,7 @@ const fetchData = async <R = unknown>(
     return toResponseApi<R>(response, await getData(response));
   } catch (error) {
     unstable_rethrow(error);
-    return returnError<R>(error);
+    return { ok: false, ...returnError<R>(error) };
   }
 };
 

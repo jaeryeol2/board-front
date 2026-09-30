@@ -50,9 +50,9 @@ export default async function ModifyPage({
     return notFound();
   }
 
-  const { status, data } = await fetchData({ boardType, id });
+  const { ok, data } = await fetchData({ boardType, id });
 
-  if (status !== 200 || !data) {
+  if (!ok || !data) {
     return notFound();
   }
 

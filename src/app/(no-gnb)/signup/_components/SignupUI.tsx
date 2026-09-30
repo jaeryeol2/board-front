@@ -67,7 +67,7 @@ export default function SignupUI() {
 
     try {
       if (checker.validate()) {
-        const { status, message, data } = await appFetch<boolean>(
+        const { ok, message, data } = await appFetch<boolean>(
           '/api/user/signup',
           {
             method: 'post',
@@ -80,7 +80,7 @@ export default function SignupUI() {
           },
         );
 
-        if (status === 201 && data) {
+        if (ok && data) {
           // 회원가입 성공 시 201 Created가 일반적입니다.
           alert(`${message} 로그인 페이지로 이동합니다.`);
           push('/login');

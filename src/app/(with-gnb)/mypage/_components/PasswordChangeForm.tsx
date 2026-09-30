@@ -61,7 +61,7 @@ export default function PasswordChangeForm({
 
     try {
       setIsSubmitting(true);
-      const { status, message } = await appFetch<boolean>(
+      const { ok, message } = await appFetch<boolean>(
         '/api/user/password',
         {
           method: 'put',
@@ -73,7 +73,7 @@ export default function PasswordChangeForm({
         },
       );
 
-      if (status === 200) {
+      if (ok) {
         alert(message ?? '비밀번호가 변경되었습니다. 다시 로그인해 주세요.');
         setCurrentPassword('');
         setNewPassword('');

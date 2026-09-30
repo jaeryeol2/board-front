@@ -51,7 +51,7 @@ export default function PasswordConfirmView({
 
     try {
       setIsSubmitting(true);
-      const { status, message, data } = await appFetch<boolean>(
+      const { ok, message, data } = await appFetch<boolean>(
         '/api/user/verify-password',
         {
           method: 'post',
@@ -60,7 +60,7 @@ export default function PasswordConfirmView({
         },
       );
 
-      if (status === 200 && data) {
+      if (ok && data) {
         setPassword('');
         onSuccess();
       } else {
