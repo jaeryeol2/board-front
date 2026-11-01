@@ -18,9 +18,9 @@
     "date-fns": "^4.1.0",
     "immer": "^11.1.4",
     "jose": "^6.2.2",
-    "next": "^16.3.6",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "use-immer": "^0.11.0",
     "zustand": "^5.0.12"
   },
@@ -33,7 +33,7 @@
     "class-variance-authority": "^0.7.1",
     "cross-env": "^10.1.0",
     "eslint": "^9",
-    "eslint-config-next": "16.2.2",
+    "eslint-config-next": "16.4.3",
     "tailwindcss": "^4.3.1",
     "typescript": "^6"
   },
