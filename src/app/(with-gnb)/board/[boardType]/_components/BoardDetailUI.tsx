@@ -20,7 +20,8 @@ export default function BoardDetailUI({ board }: Readonly<BoardDetailProps>) {
   const params = useParams();
   const { userInfo } = useContext(GlobalContext);
   const commentArea = useRef<HTMLDivElement>(null);
-  const isAuthor = userInfo?.userId === board.writerId;
+  // 작성자 여부는 서버가 계산합니다. (익명게시판은 writerId를 내려주지 않음)
+  const isAuthor = isNotEmpty(userInfo) && board.author === true;
 
   const handleGoBack = () => {
     router.back();

@@ -52,15 +52,18 @@ export default async function BoardPage({
   const boardType = (await params).boardType;
   const page = Number((await searchParams)?.page ?? 1);
   const rowsPerPage = 20;
-  const { data: info } = await fetchBoardInfoData(boardType);
+  const { data: info, status: infoStatus } =
+    await fetchBoardInfoData(boardType);
+
+  // 존재하지 않는 게시판 타입이면 API가 404를 내려줍니다.
+  if (!isNotEmpty(boardType) || infoStatus === 404) {
+    return notFound();
+  }
+
   const { data } = await fetchBoardListData(boardType, {
     page,
     rowsPerPage,
   });
-
-  if (!isNotEmpty(boardType)) {
-    return notFound();
-  }
 
   return (
     <BoardListUI

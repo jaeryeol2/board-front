@@ -6,7 +6,9 @@ export type BoardFilter = {
 export type Board = {
   id: number;
   title: string;
-  writerId: string;
+  /** 게시판 타입명 (예: BOARD_FREE) */
+  boardType: string;
+  writerId: string | null;
   writerName: string;
   createdAt: string;
   viewCount: number;
@@ -33,7 +35,7 @@ export type BoardFile = {
 export type BoardDetail = {
   id: number;
   title: string;
-  writerId: string;
+  writerId: string | null;
   writerName: string;
   content: string;
   viewCount: number;
@@ -42,4 +44,6 @@ export type BoardDetail = {
   updatedAt: string;
   commentList: Array<BoardComment>;
   fileList: Array<BoardFile>;
+  /** 요청자가 작성자인지 여부 (서버 계산) */
+  author?: boolean;
 };

@@ -6,6 +6,7 @@ import Pagination from '@/components/common/client/Pagination';
 import SectionLoading from '@/components/common/SectionLoading';
 import { Board, BoardComment } from '@/types/board';
 import { appFetch } from '@/utils/app-fetch';
+import { toKebabCase } from '@/utils/case-converter';
 import { conditionGet } from '@/utils/condition-get';
 import { format } from 'date-fns';
 import { useMemo, useState } from 'react';
@@ -13,8 +14,14 @@ import { useMemo, useState } from 'react';
 type ActivityTab = 'posts' | 'comments';
 
 interface MyActivitiesProps {
+  /** 첫 페이지 작성 글 */
   contentList: Board[];
+  /** 첫 페이지 작성 댓글 */
   commentList: BoardComment[];
+  /** 작성 글 전체 개수 */
+  contentCount: number;
+  /** 작성 댓글 전체 개수 */
+  commentCount: number;
   activeTab?: ActivityTab;
   onTabChange?: (tab: ActivityTab) => void;
 }
@@ -24,6 +31,8 @@ const ITEMS_PER_PAGE = 10;
 export default function MyActivities({
   contentList,
   commentList,
+  contentCount,
+  commentCount,
   activeTab: controlledTab,
   onTabChange,
 }: Readonly<MyActivitiesProps>) {
@@ -52,7 +61,7 @@ export default function MyActivities({
     return contentList.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [fetchedPosts, postsPage, contentList]);
 
-  const totalPosts = fetchedPosts?.total ?? contentList.length;
+  const totalPosts = fetchedPosts?.total ?? contentCount;
 
   const currentComments = useMemo(() => {
     if (fetchedComments?.page === commentsPage) {
@@ -62,7 +71,7 @@ export default function MyActivities({
     return commentList.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [fetchedComments, commentsPage, commentList]);
 
-  const totalComments = fetchedComments?.total ?? commentList.length;
+  const totalComments = fetchedComments?.total ?? commentCount;
 
   const handleTabSelect = (tab: ActivityTab) => {
     if (onTabChange) {
@@ -179,7 +188,7 @@ export default function MyActivities({
                 {currentPosts.length > 0 ? (
                   <ul className="divide-y divide-[#f0f0f0]">
                     {currentPosts.map((post) => {
-                      const href = `/board/free/${post.id}`;
+                      const href = `/board/${toKebabCase(post.boardType).toLowerCase()}/${post.id}`;
                       return (
                         <li
                           key={post.id}

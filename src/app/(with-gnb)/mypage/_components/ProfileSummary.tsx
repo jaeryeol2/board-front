@@ -14,8 +14,9 @@ export default function ProfileSummary({
   personal,
   onNavigateMenu,
 }: Readonly<ProfileSummaryProps>) {
-  const contentList = personal.writedContentList ?? [];
-  const commentList = personal.writedCommentList ?? [];
+  // 목록은 최근 일부만 내려오므로 개수는 서버가 계산한 전체 개수를 사용합니다.
+  const contentCount = personal.writedContentCount ?? 0;
+  const commentCount = personal.writedCommentCount ?? 0;
 
   const genderText = conditionGet<string>()
     .when(() => personal.userGender === 'M')
@@ -89,7 +90,7 @@ export default function ProfileSummary({
               작성한 게시글
             </p>
             <p className="text-3xl sm:text-4xl font-bold text-[#1d1d1f]">
-              {contentList.length}
+              {contentCount}
               <span className="text-[15px] font-normal text-[#7a7a7a] ml-1">
                 건
               </span>
@@ -109,7 +110,7 @@ export default function ProfileSummary({
               작성한 댓글
             </p>
             <p className="text-3xl sm:text-4xl font-bold text-[#1d1d1f]">
-              {commentList.length}
+              {commentCount}
               <span className="text-[15px] font-normal text-[#7a7a7a] ml-1">
                 건
               </span>

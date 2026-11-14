@@ -19,7 +19,9 @@ export default function MypageUI({
 
   const contentList = personal.writedContentList ?? [];
   const commentList = personal.writedCommentList ?? [];
-  const totalActivitiesCount = contentList.length + commentList.length;
+  const contentCount = personal.writedContentCount ?? 0;
+  const commentCount = personal.writedCommentCount ?? 0;
+  const totalActivitiesCount = contentCount + commentCount;
 
   const handleSelectMenu = (
     menu: MypageMenuType,
@@ -115,6 +117,8 @@ export default function MypageUI({
             <MyActivities
               contentList={contentList}
               commentList={commentList}
+              contentCount={contentCount}
+              commentCount={commentCount}
               activeTab={activityTab}
               onTabChange={setActivityTab}
             />
