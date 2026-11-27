@@ -45,3 +45,6 @@ certificates
 
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
+
+# env (로컬 비밀값은 커밋 금지)
+.env*.local
